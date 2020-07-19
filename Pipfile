@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+weeklyreviewtodotxt = {editable = true,path = "."}
+
+[dev-packages]
+jupyter = "*"
+pytest = "*"
+pytest-xdist = "*"
+pynvim = "*"
+
+[requires]
+python_version = "3.9"

@@ -1,3 +1,13 @@
+Quickstart:
+Ensure system has pipenv and pyenv
+$pyenv install 3.9.0b3
+$pipenv install --dev
+
+Then whenever you want to develop
+
+$pipenv shell
+$pytest -f
+
 Guided Weekly Review
 
 Use git to snapshot before so changes can be reviewed or reverted.
