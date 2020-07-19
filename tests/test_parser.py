@@ -31,6 +31,18 @@ def test_can_get_creation_date():
     l = Line("x 2015-01-27 c")
     assert l.creation_date == date(2015,1,27)
 
+def test_knows_when_completion_date_is_none():
+    l = Line("x 2015-01-27 c")
+    assert l.completion_date == None
+
+def test_can_get_creation_date_when_also_completed():
+    l = Line("x 2015-02-05 2015-01-27 c")
+    assert l.creation_date == date(2015,1,27)
+
+def test_can_get_completion_date():
+    l = Line("x 2015-02-05 2015-01-27 c")
+    assert l.completion_date == date(2015,2,5)
+
 def test_part_repr():
     assert repr(Part("lol###")) == "Part('lol###')"
 

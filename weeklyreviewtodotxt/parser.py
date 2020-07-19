@@ -22,10 +22,26 @@ class Line():
             self.parts.pop(0)
 
     @property
+    def dates(self):
+        return [p for p in self.parts if isinstance(p, Date)]
+
+    @property
     def creation_date(self):
-        dates = [p for p in self.parts if isinstance(p, Date)]
-        assert len(dates) == 1
-        return dates[0].date
+        if len(self.dates) == 1:
+            return self.dates[0].date
+        elif len(self.dates) == 2:
+            return self.dates[1].date
+        else:
+            raise ValueError("Weird amount of dates")
+
+    @property
+    def completion_date(self):
+        if len(self.dates) == 1:
+            return None
+        elif len(self.dates) == 2:
+            return self.dates[0].date
+        else:
+            raise ValueError("Weird amount of dates")
 
     def persist(self):
         print(self.parts)
