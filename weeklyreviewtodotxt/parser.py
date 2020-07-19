@@ -1,4 +1,5 @@
 import re
+from datetime import date
 
 
 
@@ -35,7 +36,7 @@ class Part():
         self.string = string
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({self.string})"
+        return f"{self.__class__.__name__}({repr(self.persist())})"
 
     @staticmethod
     def match(string):
@@ -52,6 +53,8 @@ class Completed(Part):
 
 class Date(Part):
     datestamp = re.compile(r"^\d\d\d\d-\d\d-\d\d$")
+    def __init__(self, string):
+        self.date = date.fromisoformat(string)
 
     @staticmethod
     def match(string):
@@ -59,7 +62,10 @@ class Date(Part):
         return (r is not None)
 
     def set_date(self, date):
-        self.string = date.isoformat()
+        self.date = date
+
+    def persist(self):
+        return self.date.isoformat()
 
 def make_part(i, string):
     if i == 0 and Completed.match(string):
