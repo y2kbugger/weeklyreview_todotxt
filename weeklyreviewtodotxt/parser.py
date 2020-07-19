@@ -1,5 +1,5 @@
 class Line():
     def __init__(self, line):
-        pass
+        self.line = line
     def persist(self):
-        return ""
+        return self.line
