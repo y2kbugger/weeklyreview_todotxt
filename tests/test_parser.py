@@ -27,10 +27,9 @@ def test_can_uncomplete():
 def test_can_have_date():
     assert_unchanged("x 2015-01-27 c")
 
-def test_can_set_date():
+def test_can_get_creation_date():
     l = Line("x 2015-01-27 c")
-    l.creation_date(date(2015,1,22))
-    assert l.persist() == "x 2015-01-22 c"
+    assert l.creation_date == date(2015,1,27)
 
 def test_part_repr():
     assert repr(Part("lol###")) == "Part('lol###')"
