@@ -1,3 +1,4 @@
-from weeklyreviewtodotxt.parser import parse_line
+from weeklyreviewtodotxt.parser import Line
+
 def test_empty_line():
-    assert parse_line("").persist() == ""
+    assert Line("").persist() == ""
