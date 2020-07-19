@@ -1,13 +1,16 @@
 from weeklyreviewtodotxt.parser import Line
 
+def assert_unchanged(line):
+    assert Line(line).persist() == line
+
 def test_empty_line():
-    assert Line("").persist() == ""
+    assert_unchanged("")
 
 def test_single_char():
-    assert Line("c").persist() == "c"
+    assert_unchanged("c")
 
 def test_completed():
-    assert Line("x c").persist() == "x c"
+    assert_unchanged("x c")
 
 def test_can_uncomplete():
     l = Line("x c")
