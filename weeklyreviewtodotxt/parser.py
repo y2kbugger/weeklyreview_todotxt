@@ -13,20 +13,6 @@ class Line():
         print(sorted(self.parts),sorted(o.parts))
         return sorted(self.parts) == sorted(o.parts)
 
-    def parse_line(self, line):
-        parts = []
-        for i, s in enumerate(line.split()):
-            parts.append(make_part(i, s))
-        return parts
-
-    def complete(self):
-        if not isinstance(self.parts[0], Completed):
-            self.parts.insert(0, Completed('x'))
-
-    def uncomplete(self):
-        if isinstance(self.parts[0], Completed):
-            self.parts.pop(0)
-
     @property
     def dates(self):
         return [p for p in self.parts if isinstance(p, Date)]
@@ -54,6 +40,25 @@ class Line():
         print(self.parts)
         return ' '.join(p.persist for p in self.parts)
 
+    def parse_line(self, line):
+        parts = []
+        for i, s in enumerate(line.split()):
+            parts.append(make_part(i, s))
+        return parts
+
+    def complete(self):
+        if not isinstance(self.parts[0], Completed):
+            self.parts.insert(0, Completed('x'))
+
+    def uncomplete(self):
+        if isinstance(self.parts[0], Completed):
+            self.parts.pop(0)
+
+    def add_part(self, part):
+        if part in [p.persist for p in self.parts]:
+            return
+        else:
+            raise NotImplementedError()
 
 class Part():
     def __init__(self, string):
