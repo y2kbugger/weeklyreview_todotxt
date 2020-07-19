@@ -1,3 +1,4 @@
+from datetime import date
 from weeklyreviewtodotxt.parser import Line
 
 def assert_unchanged(line):
@@ -25,7 +26,7 @@ def test_can_uncomplete():
 def test_can_have_date():
     assert_unchanged("x 2015-01-27 c")
 
-# def test_can_set_date():
-#     l = Line("x 2015-01-27 c")
-#     l.creation_date("2015-01-25")
-#     assert l.persist() == "x 2015-01-25 c"
+def test_can_set_date():
+    l = Line("x 2015-01-27 c")
+    l.creation_date(date(2015,1,22))
+    assert l.persist() == "x 2015-01-22 c"

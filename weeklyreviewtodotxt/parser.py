@@ -20,8 +20,10 @@ class Line():
         if isinstance(self.parts[0], Completed):
             self.parts.pop(0)
 
-    def creation_date(self, datestamp):
-        self.creation_stamp = datestamp
+    def creation_date(self, date):
+        dates = [p for p in self.parts if isinstance(p, Date)]
+        assert len(dates) == 1
+        dates[0].set_date(date)
 
     def persist(self):
         print(self.parts)
@@ -55,6 +57,9 @@ class Date(Part):
     def match(string):
         r = Date.datestamp.search(string)
         return (r is not None)
+
+    def set_date(self, date):
+        self.string = date.isoformat()
 
 def make_part(i, string):
     if i == 0 and Completed.match(string):
