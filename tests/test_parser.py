@@ -5,6 +5,12 @@ from weeklyreviewtodotxt.parser import Task, Date, Completed, Part
 def assert_unchanged(line):
     assert Task(line).persist == line
 
+def assert_tasks_equal(task1, task2):
+    assert sorted(task1.parts) == sorted(task2.parts)
+
+def assert_tasks_not_equal(task1, task2):
+    assert sorted(task1.parts) != sorted(task2.parts)
+
 def test_empty_line():
     assert_unchanged("")
 
@@ -53,17 +59,17 @@ def test_can_evaluate_equality():
     l = Task("x 2015-02-05 2015-01-27 c +mytag")
     l2 = Task("x 2015-02-05 2015-01-27 +mytag c")
     l3 = Task("x 2015-02-05 2015-01-27 +mytag d")
-    assert l == l2
-    assert l != l3
+    assert_tasks_equal(l, l2)
+    assert_tasks_not_equal(l, l3)
 
 def test_cant_add_tag_twice():
     initial = Task("x 2015-02-05 2015-01-27 c +mytag")
     target = Task("x 2015-02-05 2015-01-27 c +mytag")
     initial.add_part('+mytag')
-    assert initial == target
+    assert_tasks_equal(initial, target)
 
 def test_can_add_tag():
-     initial = Task("x 2015-02-05 2015-01-27 c")
-     target = Task("x 2015-02-05 2015-01-27 c +mytag")
-     initial.add_part('+mytag')
-     assert initial == target
+    initial = Task("x 2015-02-05 2015-01-27 c")
+    target = Task("x 2015-02-05 2015-01-27 c +mytag")
+    initial.add_part('+mytag')
+    assert_tasks_equal(initial, target)
