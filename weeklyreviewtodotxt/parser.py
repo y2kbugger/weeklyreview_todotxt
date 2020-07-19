@@ -49,9 +49,10 @@ class Line():
         else:
             raise ValueError("Weird amount of dates")
 
+    @property
     def persist(self):
         print(self.parts)
-        return ' '.join(p.persist() for p in self.parts)
+        return ' '.join(p.persist for p in self.parts)
 
 
 class Part():
@@ -59,19 +60,20 @@ class Part():
         self.string = string
 
     def __lt__(self, o):
-        return self.persist() < o.persist()
+        return self.persist < o.persist
 
     def __eq__(self, o):
-        return self.persist() == o.persist()
+        return self.persist == o.persist
 
     def __repr__(self):
-        return f"{self.__class__.__name__}({repr(self.persist())})"
+        return f"{self.__class__.__name__}({repr(self.persist)})"
 
     @staticmethod
     def match(string):
 
         return True
 
+    @property
     def persist(self):
         return self.string
 
@@ -90,6 +92,7 @@ class Date(Part):
         r = Date.datestamp.search(string)
         return (r is not None)
 
+    @property
     def persist(self):
         return self.date.isoformat()
 
