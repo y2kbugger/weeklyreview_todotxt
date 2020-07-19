@@ -58,7 +58,7 @@ class Line():
         if part in [p.persist for p in self.parts]:
             return
         else:
-            raise NotImplementedError()
+            self.parts.append(make_part(None, part))
 
 class Part():
     def __init__(self, string):

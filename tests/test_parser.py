@@ -62,10 +62,8 @@ def test_cant_add_tag_twice():
     initial.add_part('+mytag')
     assert initial == target
 
-# def test_can_add_tag():
-#      initial = Line("x 2015-02-05 2015-01-27 c")
-#      target = Line("x 2015-02-05 2015-01-27 c +mytag")
-#      initial.add_part('+mytag')
-#      assert initial == target
-
-
+def test_can_add_tag():
+     initial = Line("x 2015-02-05 2015-01-27 c")
+     target = Line("x 2015-02-05 2015-01-27 c +mytag")
+     initial.add_part('+mytag')
+     assert initial == target
