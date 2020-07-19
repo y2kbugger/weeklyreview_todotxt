@@ -34,3 +34,6 @@ def test_can_set_date():
 
 def test_part_repr():
     assert repr(Part("lol###")) == "Part('lol###')"
+
+def test_date_repr():
+    assert repr(Date("2015-11-22")) == "Date('2015-11-22')"
