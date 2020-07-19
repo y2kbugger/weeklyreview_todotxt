@@ -11,6 +11,7 @@ jupyter = "*"
 pytest = "*"
 pytest-xdist = "*"
 pynvim = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.9"

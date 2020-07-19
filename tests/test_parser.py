@@ -25,7 +25,8 @@ def test_can_uncomplete():
 def test_can_have_date():
     assert_unchanged("x 2015-01-27 c")
 
-# def test_can_add_date():
-#     l = Line("c")
-#     l.creation_date("2015-01-27")
-#     assert l.persist() == "2015-01-27 c"
+def test_can_set_date():
+    l = Line("x 2015-01-27 c")
+    l.creation_date("2015-01-25")
+    assert l.persist() == "x 2015-01-25 c"
+
