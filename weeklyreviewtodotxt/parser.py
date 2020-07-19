@@ -3,19 +3,21 @@ from datetime import date
 
 
 
-class Line():
+class Task():
     def __init__(self, line):
         self.parts = self.parse_line(line)
 
     def __eq__(self, o):
-        if not isinstance(o, Line):
+        if not isinstance(o, Task):
             return False
         print(sorted(self.parts),sorted(o.parts))
         return sorted(self.parts) == sorted(o.parts)
 
     @property
     def dates(self):
-        return [p for p in self.parts if isinstance(p, Date)]
+        dates =  [p for p in self.parts if isinstance(p, Date)]
+        assert 0 < len(dates) <= 2, "Should have at most creation and completion date"
+        return dates
 
     @property
     def creation_date(self):
@@ -23,8 +25,6 @@ class Line():
             return self.dates[0].date
         elif len(self.dates) == 2:
             return self.dates[1].date
-        else:
-            raise ValueError("Weird amount of dates")
 
     @property
     def completion_date(self):
@@ -32,8 +32,6 @@ class Line():
             return None
         elif len(self.dates) == 2:
             return self.dates[0].date
-        else:
-            raise ValueError("Weird amount of dates")
 
     @property
     def persist(self):
@@ -75,7 +73,6 @@ class Part():
 
     @staticmethod
     def match(string):
-
         return True
 
     @property
