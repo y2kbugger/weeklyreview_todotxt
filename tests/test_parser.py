@@ -48,3 +48,10 @@ def test_part_repr():
 
 def test_date_repr():
     assert repr(Date("2015-11-22")) == "Date('2015-11-22')"
+
+def test_can_evaluate_equality():
+    l = Line("x 2015-02-05 2015-01-27 c +mytag")
+    l2 = Line("x 2015-02-05 2015-01-27 +mytag c")
+    l3 = Line("x 2015-02-05 2015-01-27 +mytag d")
+    assert l == l2
+    assert l != l3

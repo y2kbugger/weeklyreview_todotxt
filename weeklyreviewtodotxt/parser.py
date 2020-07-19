@@ -7,6 +7,12 @@ class Line():
     def __init__(self, line):
         self.parts = self.parse_line(line)
 
+    def __eq__(self, o):
+        if not isinstance(o, Line):
+            return False
+        print(sorted(self.parts),sorted(o.parts))
+        return sorted(self.parts) == sorted(o.parts)
+
     def parse_line(self, line):
         parts = []
         for i, s in enumerate(line.split()):
@@ -51,6 +57,12 @@ class Line():
 class Part():
     def __init__(self, string):
         self.string = string
+
+    def __lt__(self, o):
+        return self.persist() < o.persist()
+
+    def __eq__(self, o):
+        return self.persist() == o.persist()
 
     def __repr__(self):
         return f"{self.__class__.__name__}({repr(self.persist())})"

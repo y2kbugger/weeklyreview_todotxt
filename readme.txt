@@ -12,7 +12,7 @@ Guided Weekly Review
 
 Use git to snapshot before so changes can be reviewed or reverted.
 
-Tasks -> Project
+Tasks to Projects
 Ensure all open "daily review" tasks are associated with a project
 1 List out all items missing a proj:codename
     Options:
@@ -23,8 +23,10 @@ Ensure all open "daily review" tasks are associated with a project
 Curate projects
 1 Ensure all projects have a priority
 2 Ensure all projects have a unique proj:codename
-3 Refine project priorities.
-
+3 Curate Projects
+    Options:
+    - Refine project priorities.
+    - Rename projects
 
 Plan tasks
 1 Assign all tasks to take on the priority of it's proj:codename parent
