@@ -12,6 +12,11 @@ def test_single_char():
 def test_completed():
     assert_unchanged("x c")
 
+def test_can_complete():
+    l = Line("c")
+    l.complete()
+    l.persist() == "x c"
+
 def test_can_uncomplete():
     l = Line("x c")
     l.complete(False)
