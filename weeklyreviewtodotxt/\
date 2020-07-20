@@ -11,7 +11,9 @@ class Task():
         return sorted(self.parts) == sorted(o.parts)
 
     def __hash__(self):
-        return hash(tuple(sorted(self.parts)))
+        if not isinstance(o, Task):
+            return False
+        return hash(sorted(self.parts))
 
     @property
     def dates(self):
@@ -94,9 +96,6 @@ class Generic():
 
     def __eq__(self, o):
         return self.persist == o.persist
-
-    def __hash__(self):
-        return hash(self.persist)
 
     def __repr__(self):
         return f"{self.__class__.__name__}({repr(self.persist)})"

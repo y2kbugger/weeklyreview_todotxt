@@ -31,6 +31,9 @@ class TasksToProjects:
     def add_task(self, task : Task):
         self.tasks.append(task)
 
+    def there_are_duplicates(self):
+        return len(set(self.tasks)) != len(self.tasks)
+
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]
         new_task = Task(task.persist)
@@ -50,6 +53,11 @@ def main():
     with open('/home/y2k/devel/weeklyreview_todotxt/tests/todo.txt') as f:
         for line in f.readlines():
             ttp.add_task(Task(line))
+
+    if ttp.there_are_duplicates():
+        print('Cannot act on a file containing duplicates')
+        return
+
     for t in ttp.dailyreview_tasks:
         print(t.persist)
 

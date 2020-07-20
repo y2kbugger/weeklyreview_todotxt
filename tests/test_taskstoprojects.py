@@ -47,3 +47,9 @@ def test_can_assign_to_existing_project(ttp):
     assert_tasks_equal(t, Task("research graduate programs"))
     assert_tasks_equal(new_t, Task("research graduate programs prj:earn_degree"))
 
+def test_duplicate_detection(ttp):
+    ttp.add_task(Task("hello"))
+    ttp.add_task(Task("world"))
+    assert ttp.there_are_duplicates() == False
+    ttp.add_task(Task("world"))
+    assert ttp.there_are_duplicates() == True
