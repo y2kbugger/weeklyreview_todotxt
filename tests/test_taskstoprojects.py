@@ -10,6 +10,13 @@ def ttp():
     ttp = TasksToProjects()
     return ttp
 
+def test_can_add_tasks(ttp):
+    ttp.add_task(Task("hello"));
+    ttp.add_task(Task("world"));
+    assert ttp.tasks == [
+        Task("hello"),
+        Task("world"),
+        ]
 
 def test_turn_task_into_project(ttp):
     t = Task("earn degree")

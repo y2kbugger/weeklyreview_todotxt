@@ -1,6 +1,12 @@
 from .parser import Task, Generic
 
 class TasksToProjects:
+    def __init__(self):
+        self.tasks = []
+
+    def add_task(self, task : Task):
+        self.tasks.append(task)
+
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]
         new_task = Task(task.persist)
