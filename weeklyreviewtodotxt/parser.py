@@ -21,6 +21,16 @@ class Task():
         return [p for p in self.parts if isinstance(p, Context)]
 
     @property
+    def extensions(self):
+        extensions = {}
+        for p in self.parts:
+            print(p.persist)
+            if not isinstance(p, Extension):
+                continue
+            extensions[p.key] = p
+        return extensions
+
+    @property
     def creation_date(self):
         if len(self.dates) == 1:
             return self.dates[0].date
@@ -107,14 +117,21 @@ class Context(Generic):
         return string[0] == '@'
 
 class Extension(Generic):
+    def __init__(self, string):
+        self.key, self.value = string.split(':', 1)
+
     @staticmethod
     def match(string):
         pair = string.split(':')
         if len(pair) != 2:
             return False
-        if pair[0] in ['prj', 'rec', 't', 'due']:
+        if pair[0] in ['prj', 'rec', 't', 'due', 'h']:
             return True
         return False
+
+    @property
+    def persist(self):
+        return f'{self.key}:{self.value}'
 
 class Date(Generic):
     datestamp = re.compile(r"^\d\d\d\d-\d\d-\d\d$")

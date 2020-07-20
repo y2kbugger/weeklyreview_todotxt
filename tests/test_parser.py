@@ -58,12 +58,16 @@ def test_can_get_contexts():
 def test_can_get_extensions():
     t = Task("@home b c h:1 +mytag @whoa")
     extension = t.extensions['h']
-    assert "1" == extension.persist
+    assert "h:1" == extension.persist
 
-def test_can_get_priority():
+def test_can_get_extensions_values():
     t = Task("@home b c h:1 +mytag @whoa")
     extension = t.extensions['h']
-    assert "1" == extension.persist
+    assert "1" == extension.value
+
+# def test_can_get_priority():
+#     t = Task("(A) @home b c h:1 +mytag @whoa")
+#     assert "A" == t.priority
 
 def test_part_repr():
     assert repr(Generic("lol###")) == "Generic('lol###')"
