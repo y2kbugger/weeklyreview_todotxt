@@ -58,7 +58,5 @@ tag curation assistant (combine/eliminate/add) tags
 
 TDD
 ----------------
-filter hidden from dailyreview
-test accessors for no creation date, no completion date and no prio
 
 

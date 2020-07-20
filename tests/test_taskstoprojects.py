@@ -23,6 +23,7 @@ def test_can_refine_list_to_daily_review(ttp):
         "be happy @@@project",
         "twist and shout @~music",
         "bak 15r @^chores",
+        "rotate peacock h:1",
         "oil basketball",
         "pet cat @@home",
         "paint cat @@art",

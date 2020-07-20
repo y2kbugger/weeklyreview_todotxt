@@ -6,19 +6,27 @@ class TasksToProjects:
 
     @property
     def dailyreview_tasks(self):
-        def is_part_of_dailyreview(t):
-            for c in t.contexts:
-                if c.persist[:3] == '@@@':
-                    return False
-                if c.persist[:2] in ['@^', '@~']:
-                    return False
-                if c.persist in ['@@agenda', '@@art', '@@plants', '@@store']:
-                    # todo: Once i split todo.txt into more files
-                    # this special case should drop out
-                    return False
+        return [t for t in self.tasks if self.is_part_of_dailyreview(t)]
 
-            return True
-        return [t for t in self.tasks if is_part_of_dailyreview(t)]
+    @staticmethod
+    def is_part_of_dailyreview(t):
+        for c in t.contexts:
+            if c.persist[:3] == '@@@':
+                return False
+            if c.persist[:2] in ['@^', '@~']:
+                return False
+            if c.persist in ['@@agenda', '@@art', '@@plants', '@@store']:
+                # todo: Once i split todo.txt into more files
+                # this special case should drop out
+                return False
+        try:
+            # hidden
+            if t.extensions['h'].value == '1':
+                return False
+        except KeyError:
+            pass
+
+        return True
 
     def add_task(self, task : Task):
         self.tasks.append(task)
