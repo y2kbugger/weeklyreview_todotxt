@@ -119,7 +119,7 @@ def make_part(string, i=None):
     if i == 0 and Completed.match(string):
         return Completed(string)
 
-    for PartClass in [Date, Tag, Generic]:
+    for PartClass in [Date, Tag, Context, Generic]:
         if PartClass.match(string):
             return PartClass(string)
 

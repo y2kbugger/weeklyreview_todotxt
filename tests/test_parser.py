@@ -67,15 +67,15 @@ def test_generic_words_must_stay_as_lumps_for_equality():
     t2 = Task("b a")
     assert_tasks_not_equal(t1, t2)
 
-# def test_tags_can_separate_lumps():
-#     t1 = Task("a +mytag b c")
-#     t2 = Task("b c +mytag a")
-#     assert_tasks_equal(t1, t2)
+def test_tags_can_separate_lumps():
+    t1 = Task("a +mytag b c")
+    t2 = Task("b c +mytag a")
+    assert_tasks_equal(t1, t2)
 
-# def test_contexts_can_separate_lumps():
-#     t1 = Task("a @home b c")
-#     t2 = Task("b c @home a")
-#     assert_tasks_equal(t1, t2)
+def test_contexts_can_separate_lumps():
+    t1 = Task("a @home b c")
+    t2 = Task("b c @home a")
+    assert_tasks_equal(t1, t2)
 
 # def test_extensions_can_separate_lumps():
 #     t1 = Task("a proj:myproj b c")
