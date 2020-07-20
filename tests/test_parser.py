@@ -55,6 +55,10 @@ def test_can_get_contexts():
     contexts = {c.persist for c in t.contexts}
     assert {"@home", "@whoa"} == contexts
 
+def test_has_no_extensions_returns_empty_dict():
+    t = Task("@home b c +mytag @whoa")
+    assert t.extensions == {}
+
 def test_can_get_extensions():
     t = Task("@home b c h:1 +mytag @whoa")
     extension = t.extensions['h']
