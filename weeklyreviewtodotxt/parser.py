@@ -25,6 +25,14 @@ class Task():
         return {p.key:p for p in self.parts if isinstance(p, Extension)}
 
     @property
+    def priority(self):
+        priorities = [p for p in self.parts if isinstance(p, Priority)]
+        if len(priorities) == 0:
+            return None
+        if len(priorities) == 1:
+            return priorities[0]
+
+    @property
     def creation_date(self):
         if len(self.dates) == 1:
             return self.dates[0].date
@@ -110,6 +118,21 @@ class Context(Generic):
     def match(string):
         return string[0] == '@'
 
+class Priority(Generic):
+    pattern = re.compile(r"^\(([A-Z])\)$")
+    def __init__(self, string):
+        r = Priority.pattern.search(string)
+        self.value = r.group(1)
+
+    @staticmethod
+    def match(string):
+        r = Priority.pattern.search(string)
+        return (r is not None)
+
+    @property
+    def persist(self):
+        return f'({self.value})'
+
 class Extension(Generic):
     def __init__(self, string):
         self.key, self.value = string.split(':', 1)
@@ -145,7 +168,7 @@ def make_part(string, i=None):
     if i == 0 and Completed.match(string):
         return Completed(string)
 
-    for PartClass in [Date, Tag, Context, Extension, Generic]:
+    for PartClass in [Date, Tag, Context, Priority, Extension, Generic]:
         if PartClass.match(string):
             return PartClass(string)
 

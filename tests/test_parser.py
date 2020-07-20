@@ -65,9 +65,10 @@ def test_can_get_extensions_values():
     extension = t.extensions['h']
     assert "1" == extension.value
 
-# def test_can_get_priority():
-#     t = Task("(A) @home b c h:1 +mytag @whoa")
-#     assert "A" == t.priority
+def test_can_get_priority():
+    t = Task("(A) @home b c h:1 +mytag @whoa")
+    assert "A" == t.priority.value
+    assert "(A)" == t.priority.persist
 
 def test_part_repr():
     assert repr(Generic("lol###")) == "Generic('lol###')"
