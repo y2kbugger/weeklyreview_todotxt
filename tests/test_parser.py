@@ -51,9 +51,19 @@ def test_can_get_completion_date():
     assert l.completion_date == date(2015,2,5)
 
 def test_can_get_contexts():
-    t1 = Task("@home b c +mytag @whoa")
-    contexts = {c.persist for c in t1.contexts}
+    t = Task("@home b c +mytag @whoa")
+    contexts = {c.persist for c in t.contexts}
     assert {"@home", "@whoa"} == contexts
+
+def test_can_get_extensions():
+    t = Task("@home b c h:1 +mytag @whoa")
+    extension = t.extensions['h']
+    assert "1" == extension.persist
+
+def test_can_get_priority():
+    t = Task("@home b c h:1 +mytag @whoa")
+    extension = t.extensions['h']
+    assert "1" == extension.persist
 
 def test_part_repr():
     assert repr(Generic("lol###")) == "Generic('lol###')"

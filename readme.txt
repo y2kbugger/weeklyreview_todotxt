@@ -58,6 +58,6 @@ tag curation assistant (combine/eliminate/add) tags
 
 TDD
 ----------------
-Can read in various todo.txt lines and re-persist
+filter hidden from dailyreview
 
 
