@@ -6,3 +6,6 @@ def convert_task_to_project(task : Task):
     task.add_part("prj:" + first_generic.persist.replace(' ', '_'))
     task.add_part("@@@project")
 
+def assign_task_to_project(task : Task, project : str):
+    assert project[:4] == 'prj:'
+    task.add_part(project)
