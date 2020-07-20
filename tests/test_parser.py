@@ -38,6 +38,10 @@ def test_can_get_creation_date():
     l = Task("x 2015-01-27 c")
     assert l.creation_date == date(2015,1,27)
 
+def test_has_no_creation_date():
+    l = Task("x c")
+    assert l.creation_date == None
+
 def test_knows_when_completion_date_is_none():
     l = Task("x 2015-01-27 c")
     assert l.completion_date == None

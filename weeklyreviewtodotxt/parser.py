@@ -13,7 +13,7 @@ class Task():
     @property
     def dates(self):
         dates =  [p for p in self.parts if isinstance(p, Date)]
-        assert 0 < len(dates) <= 2, "Should have at most creation and completion date"
+        assert len(dates) <= 2, "Should have at most creation and completion date"
         return dates
 
     @property
