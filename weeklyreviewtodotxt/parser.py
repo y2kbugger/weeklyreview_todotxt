@@ -17,6 +17,10 @@ class Task():
         return dates
 
     @property
+    def contexts(self):
+        return [p for p in self.parts if isinstance(p, Context)]
+
+    @property
     def creation_date(self):
         if len(self.dates) == 1:
             return self.dates[0].date

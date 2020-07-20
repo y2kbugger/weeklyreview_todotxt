@@ -50,6 +50,11 @@ def test_can_get_completion_date():
     l = Task("x 2015-02-05 2015-01-27 c")
     assert l.completion_date == date(2015,2,5)
 
+def test_can_get_contexts():
+    t1 = Task("@home b c +mytag @whoa")
+    contexts = {c.persist for c in t1.contexts}
+    assert {"@home", "@whoa"} == contexts
+
 def test_part_repr():
     assert repr(Generic("lol###")) == "Generic('lol###')"
 
