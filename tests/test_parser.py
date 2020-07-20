@@ -79,8 +79,8 @@ def test_contexts_can_separate_lumps():
     assert_tasks_equal(t1, t2)
 
 def test_extensions_can_separate_lumps():
-    t1 = Task("a proj:myproj b c")
-    t2 = Task("b c proj:myproj a")
+    t1 = Task("a prj:myprj b c")
+    t2 = Task("b c prj:myprj a")
     assert_tasks_equal(t1, t2)
 
 def test_cant_add_tag_twice():
@@ -93,6 +93,12 @@ def test_can_add_tag():
     initial = Task("x 2015-02-05 2015-01-27 c")
     target = Task("x 2015-02-05 2015-01-27 c +mytag")
     initial.add_part('+mytag')
+    assert_tasks_equal(initial, target)
+
+def test_can_remove_part():
+    initial = Task("x 2015-02-05 2015-01-27 c +mytag")
+    target = Task("x 2015-02-05 2015-01-27 +mytag")
+    initial.remove_part('c')
     assert_tasks_equal(initial, target)
 
 def test_against_legacy():

@@ -57,11 +57,14 @@ class Task():
         if isinstance(self.parts[0], Completed):
             self.parts.pop(0)
 
-    def add_part(self, part):
+    def add_part(self, part : str):
         if part in [p.persist for p in self.parts]:
             return
         else:
             self.parts.append(make_part(part))
+
+    def remove_part(self, part : str):
+        self.parts.remove(make_part(part))
 
 class Generic():
     def __init__(self, string):
@@ -105,7 +108,7 @@ class Extension(Generic):
         pair = string.split(':')
         if len(pair) != 2:
             return False
-        if pair[0] in ['proj', 'rec', 't', 'due']:
+        if pair[0] in ['prj', 'rec', 't', 'due']:
             return True
         return False
 
