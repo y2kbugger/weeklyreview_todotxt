@@ -8,7 +8,6 @@ class Task():
     def __eq__(self, o):
         if not isinstance(o, Task):
             return False
-        print(sorted(self.parts),sorted(o.parts))
         return sorted(self.parts) == sorted(o.parts)
 
     @property
@@ -33,7 +32,6 @@ class Task():
 
     @property
     def persist(self):
-        print(self.parts)
         return ' '.join(p.persist for p in self.parts)
 
     def parse_line(self, line):

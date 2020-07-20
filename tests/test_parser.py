@@ -1,9 +1,10 @@
+from pathlib import Path
 from datetime import date
 
 from weeklyreviewtodotxt.parser import Task, Date, Completed, Generic
 
 def assert_unchanged(line):
-    assert Task(line).persist == line
+    assert Task(line).persist == line.strip()
 
 def assert_tasks_equal(task1, task2):
     assert sorted(task1.parts) == sorted(task2.parts)
@@ -93,3 +94,8 @@ def test_can_add_tag():
     target = Task("x 2015-02-05 2015-01-27 c +mytag")
     initial.add_part('+mytag')
     assert_tasks_equal(initial, target)
+
+def test_against_legacy():
+    with open(Path(__file__).parent / 'todo.txt') as f:
+        for line in f.readlines():
+            assert_unchanged(line)
