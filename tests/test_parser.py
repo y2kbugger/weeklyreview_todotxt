@@ -65,6 +65,10 @@ def test_can_get_extensions_values():
     extension = t.extensions['h']
     assert "1" == extension.value
 
+def test_empty_priority_is_none():
+    t = Task("@home b c h:1 +mytag @whoa")
+    assert t.priority is None
+
 def test_can_get_priority():
     t = Task("(A) @home b c h:1 +mytag @whoa")
     assert "A" == t.priority.value
