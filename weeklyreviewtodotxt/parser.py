@@ -22,13 +22,7 @@ class Task():
 
     @property
     def extensions(self):
-        extensions = {}
-        for p in self.parts:
-            print(p.persist)
-            if not isinstance(p, Extension):
-                continue
-            extensions[p.key] = p
-        return extensions
+        return {p.key:p for p in self.parts if isinstance(p, Extension)}
 
     @property
     def creation_date(self):
