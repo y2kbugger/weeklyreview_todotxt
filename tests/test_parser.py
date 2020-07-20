@@ -1,6 +1,6 @@
 from datetime import date
 
-from weeklyreviewtodotxt.parser import Task, Date, Completed, Part
+from weeklyreviewtodotxt.parser import Task, Date, Completed, Generic
 
 def assert_unchanged(line):
     assert Task(line).persist == line
@@ -50,17 +50,37 @@ def test_can_get_completion_date():
     assert l.completion_date == date(2015,2,5)
 
 def test_part_repr():
-    assert repr(Part("lol###")) == "Part('lol###')"
+    assert repr(Generic("lol###")) == "Generic('lol###')"
 
 def test_date_repr():
     assert repr(Date("2015-11-22")) == "Date('2015-11-22')"
 
 def test_can_evaluate_equality():
-    l = Task("x 2015-02-05 2015-01-27 c +mytag")
-    l2 = Task("x 2015-02-05 2015-01-27 +mytag c")
-    l3 = Task("x 2015-02-05 2015-01-27 +mytag d")
-    assert_tasks_equal(l, l2)
-    assert_tasks_not_equal(l, l3)
+    t1 = Task("c +mytag")
+    t2 = Task("+mytag c")
+    t3 = Task("+mytag d")
+    assert_tasks_equal(t1, t2)
+    assert_tasks_not_equal(t1, t3)
+
+def test_generic_words_must_stay_as_lumps_for_equality():
+    t1 = Task("a b")
+    t2 = Task("b a")
+    assert_tasks_not_equal(t1, t2)
+
+# def test_tags_can_separate_lumps():
+#     t1 = Task("a +mytag b c")
+#     t2 = Task("b c +mytag a")
+#     assert_tasks_equal(t1, t2)
+
+# def test_contexts_can_separate_lumps():
+#     t1 = Task("a @home b c")
+#     t2 = Task("b c @home a")
+#     assert_tasks_equal(t1, t2)
+
+# def test_extensions_can_separate_lumps():
+#     t1 = Task("a proj:myproj b c")
+#     t2 = Task("b c proj:myproj a")
+#     assert_tasks_equal(t1, t2)
 
 def test_cant_add_tag_twice():
     initial = Task("x 2015-02-05 2015-01-27 c +mytag")

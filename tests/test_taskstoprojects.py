@@ -1,8 +1,9 @@
-from weeklyreviewtodotxt import parser
-from weeklyreviewtodotxt.tasktoprojects import TaskToProjects
+from weeklyreviewtodotxt.parser import Task
+from weeklyreviewtodotxt.tasktoprojects import convert_task_to_project
 
+from test_parser import assert_tasks_equal
 
 # def test_turn_task_into_project():
-#     l = parser.Task("earn degree")
-#     TaskToProjects.convert_task_to_project(l)
-#     assert l.persist == "prj:earn_degree @@@project"
+#     t = Task("earn degree")
+#     convert_task_to_project(t)
+#     assert_tasks_equal(t, Task("prj:earn_degree @@@project"))

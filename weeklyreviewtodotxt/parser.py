@@ -1,8 +1,6 @@
 import re
 from datetime import date
 
-
-
 class Task():
     def __init__(self, line):
         self.parts = self.parse_line(line)
@@ -41,7 +39,16 @@ class Task():
     def parse_line(self, line):
         parts = []
         for i, s in enumerate(line.split()):
-            parts.append(make_part(i, s))
+            try:
+                previous_part = parts[-1]
+            except:
+                previous_part = None
+            new_part = make_part(s, i)
+            # merge generics together
+            if (type(previous_part) is Generic) and type(new_part) is Generic:
+                parts[-1] = make_part(previous_part.persist + ' ' + new_part.persist)
+            else:
+                parts.append(new_part)
         return parts
 
     def complete(self):
@@ -56,9 +63,9 @@ class Task():
         if part in [p.persist for p in self.parts]:
             return
         else:
-            self.parts.append(make_part(None, part))
+            self.parts.append(make_part(part))
 
-class Part():
+class Generic():
     def __init__(self, string):
         self.string = string
 
@@ -79,12 +86,22 @@ class Part():
     def persist(self):
         return self.string
 
-class Completed(Part):
+class Completed(Generic):
     @staticmethod
     def match(string):
         return string == 'x'
 
-class Date(Part):
+class Tag(Generic):
+    @staticmethod
+    def match(string):
+        return string[0] == '+'
+
+class Context(Generic):
+    @staticmethod
+    def match(string):
+        return string[0] == '@'
+
+class Date(Generic):
     datestamp = re.compile(r"^\d\d\d\d-\d\d-\d\d$")
     def __init__(self, string):
         self.date = date.fromisoformat(string)
@@ -98,11 +115,11 @@ class Date(Part):
     def persist(self):
         return self.date.isoformat()
 
-def make_part(i, string):
+def make_part(string, i=None):
     if i == 0 and Completed.match(string):
         return Completed(string)
 
-    for PartClass in [Date, Part]:
+    for PartClass in [Date, Tag, Generic]:
         if PartClass.match(string):
             return PartClass(string)
 
