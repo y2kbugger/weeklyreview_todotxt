@@ -8,7 +8,7 @@ class TasksToProjects:
     def dailyreview_tasks(self):
         def is_part_of_dailyreview(t):
             for c in t.contexts:
-                if c[:1] in ['@@', '@^', '@~']:
+                if c.persist[:2] in ['@@', '@^', '@~']:
                     return False
             return True
         return [t for t in self.tasks if is_part_of_dailyreview(t)]

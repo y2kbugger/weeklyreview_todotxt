@@ -18,18 +18,18 @@ def test_can_add_tasks(ttp):
         Task("world"),
         ]
 
-# def test_can_refine_list_to_daily_review(ttp):
-#     [ttp.add_task(Task(t)) for t in [
-#         "be happy @@@project",
-#         "twist and shout @~music",
-#         "bak 15r @^chores",
-#         "oil basketball",
-#         "fix speaker fur prj:boom_box",
-#         ]]
-#     assert [t.persist for t in ttp.dailyreview_tasks] == [
-#         "fix speaker fur prj:boom_box"
-#         "world"
-#         ]
+def test_can_refine_list_to_daily_review(ttp):
+    [ttp.add_task(Task(t)) for t in [
+        "be happy @@@project",
+        "twist and shout @~music",
+        "bak 15r @^chores",
+        "oil basketball",
+        "fix speaker fur prj:boom_box",
+        ]]
+    assert [t.persist for t in ttp.dailyreview_tasks] == [
+        "oil basketball",
+        "fix speaker fur prj:boom_box"
+        ]
 
 def test_turn_task_into_project(ttp):
     t = Task("earn degree")
