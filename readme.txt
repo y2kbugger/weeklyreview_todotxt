@@ -49,6 +49,12 @@ Plan week
     - We can interactively move these around until an appropriate amount is assign to each day.
 2. Save it out to make threshold match the assigned day.
 
+Future:
+review for places
+break some of the non-todos out to their own files...
+    maybe this would elimiate need for @^ or @~
+    It should also help reduce tag sprawl
+tag curation assistant (combine/eliminate/add) tags
 
 TDD
 ----------------

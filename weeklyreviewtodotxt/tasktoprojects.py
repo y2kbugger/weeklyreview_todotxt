@@ -8,8 +8,15 @@ class TasksToProjects:
     def dailyreview_tasks(self):
         def is_part_of_dailyreview(t):
             for c in t.contexts:
-                if c.persist[:2] in ['@@', '@^', '@~']:
+                if c.persist[:3] == '@@@':
                     return False
+                if c.persist[:2] in ['@^', '@~']:
+                    return False
+                if c.persist in ['@@agenda', '@@art', '@@plants', '@@store']:
+                    # todo: Once i split todo.txt into more files
+                    # this special case should drop out
+                    return False
+
             return True
         return [t for t in self.tasks if is_part_of_dailyreview(t)]
 
@@ -31,7 +38,12 @@ class TasksToProjects:
         return new_task
 
 def main():
-    pass
-    # init from file
-    # create TTP
+    ttp = TasksToProjects()
+    with open('/home/y2k/devel/weeklyreview_todotxt/tests/todo.txt') as f:
+        for line in f.readlines():
+            ttp.add_task(Task(line))
+    for t in ttp.dailyreview_tasks:
+        print(t.persist)
 
+if __name__ == '__main__':
+    main()

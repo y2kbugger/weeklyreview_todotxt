@@ -24,10 +24,13 @@ def test_can_refine_list_to_daily_review(ttp):
         "twist and shout @~music",
         "bak 15r @^chores",
         "oil basketball",
+        "pet cat @@home",
+        "paint cat @@art",
         "fix speaker fur prj:boom_box",
         ]]
     assert [t.persist for t in ttp.dailyreview_tasks] == [
         "oil basketball",
+        "pet cat @@home",
         "fix speaker fur prj:boom_box"
         ]
 
