@@ -101,6 +101,16 @@ class Context(Generic):
     def match(string):
         return string[0] == '@'
 
+class Extension(Generic):
+    @staticmethod
+    def match(string):
+        pair = string.split(':')
+        if len(pair) != 2:
+            return False
+        if pair[0] in ['proj', 'rec', 't', 'due']:
+            return True
+        return False
+
 class Date(Generic):
     datestamp = re.compile(r"^\d\d\d\d-\d\d-\d\d$")
     def __init__(self, string):
@@ -119,7 +129,7 @@ def make_part(string, i=None):
     if i == 0 and Completed.match(string):
         return Completed(string)
 
-    for PartClass in [Date, Tag, Context, Generic]:
+    for PartClass in [Date, Tag, Context, Extension, Generic]:
         if PartClass.match(string):
             return PartClass(string)
 
