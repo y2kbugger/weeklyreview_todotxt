@@ -9,5 +9,7 @@ def convert_task_to_project(task : Task):
     return new_task
 
 def assign_task_to_project(task : Task, project : str):
+    new_task = Task(task.persist)
     assert project[:4] == 'prj:'
-    task.add_part(project)
+    new_task.add_part(project)
+    return new_task
