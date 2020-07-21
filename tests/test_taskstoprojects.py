@@ -1,3 +1,4 @@
+from io import StringIO
 import pytest
 
 from weeklyreviewtodotxt.parser import Task
@@ -9,10 +10,6 @@ from test_parser import assert_tasks_equal
 def tasks():
     return Tasks()
 
-@pytest.fixture
-def ttp(tasks):
-    ttp = TasksToProjects(tasks)
-    return ttp
 
 def test_can_get_projects(tasks):
     tasks.add_task(Task("hello prj:lol @@@project"))
@@ -22,10 +19,20 @@ def test_can_get_projects(tasks):
 def test_can_add_tasks(tasks):
     tasks.add_task(Task("hello"))
     tasks.add_task(Task("world"))
-    assert list(tasks) == [
-        Task("hello"),
-        Task("world"),
-        ]
+    assert list(tasks) == [Task("hello"), Task("world")]
+
+def test_can_read_tasks_from_file(tasks):
+    sio = StringIO("hello\nworld\n")
+    tasks.add_tasks_from_file(sio)
+    assert list(tasks) == [Task("hello"), Task("world")]
+
+
+
+
+@pytest.fixture
+def ttp(tasks):
+    ttp = TasksToProjects(tasks)
+    return ttp
 
 def test_can_refine_list_to_daily_review(tasks, ttp):
     [tasks.add_task(Task(t)) for t in [

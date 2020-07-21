@@ -27,6 +27,10 @@ class Tasks:
     def make_project_if_doesnt_exist(self, proj):
         pass
 
+    def add_tasks_from_file(self, file):
+        for line in file.readlines():
+            self.add_task(Task(line))
+
 class TasksToProjects:
     def __init__(self, tasks):
         self._tasks = tasks
@@ -66,10 +70,13 @@ class TasksToProjects:
         task.add_part(project)
 
 def main():
-    ttp = TasksToProjects()
-    with open('/home/y2k/devel/weeklyreview_todotxt/tests/todo.txt') as f:
-        for line in f.readlines():
-            ttp.add_task(Task(line))
+    from pathlib import Path
+    projdir = Path(__file__).parent.parent
+    tasks = Tasks()
+    ttp = TasksToProjects(tasks)
+
+    with open(projdir/'tests'/'todo.txt') as f:
+        tasks.add_tasks_from_file(f)
 
     for t in ttp.dailyreview_tasks:
         print(t.persist)
