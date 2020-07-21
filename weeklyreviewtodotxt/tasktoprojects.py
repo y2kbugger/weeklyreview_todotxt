@@ -15,8 +15,6 @@ class Tasks:
     def projects(self):
         projects = []
         for t in self._tasklist:
-            print(t)
-            print([c.persist for c in t.contexts])
             if '@@@project' in {c.persist for c in t.contexts}:
                 try:
                     projects.append(t.extensions['prj'].value)
@@ -48,9 +46,10 @@ class Tasks:
 
         return True
 
-
     def make_project_if_doesnt_exist(self, proj):
-        pass
+        if proj not in self.projects:
+            print(proj, self.projects)
+            self.add_task(Task(f"@@@project prj:{proj}"))
 
     def add_tasks_from_file(self, file):
         for line in file.readlines():
@@ -70,8 +69,8 @@ class TasksToProjects:
         task.add_part("@@@project")
 
     def assign_task_to_project(self, task : Task, project : str):
-        assert project[:4] == 'prj:'
-        task.add_part(project)
+        task.add_part("prj:" + project)
+        self._tasks.make_project_if_doesnt_exist(project)
 
 def main():
     from pathlib import Path

@@ -10,13 +10,6 @@ from test_parser import assert_tasks_equal
 def tasks():
     return Tasks()
 
-
-def test_can_get_projects(tasks):
-    [tasks.add_task(Task(t)) for t in [
-        "hello prj:lol @@@project",
-        "world"]]
-    assert tasks.projects == ['lol']
-
 def test_can_add_tasks(tasks):
     [tasks.add_task(Task(t)) for t in ["hello", "world", ]]
     assert list(tasks) == [Task("hello"), Task("world")]
@@ -32,6 +25,12 @@ def test_can_save_tasks_to_file(tasks):
     tasks.persist_task_to_file(sio)
     sio.seek(0)
     assert sio.read() == "hello\nworld\n"
+
+def test_can_get_projects(tasks):
+    [tasks.add_task(Task(t)) for t in [
+        "hello prj:lol @@@project",
+        "world"]]
+    assert tasks.projects == ['lol']
 
 
 
@@ -65,7 +64,7 @@ def test_turn_task_into_project(ttp):
 def test_can_assign_to_existing_project(tasks, ttp):
     tasks.add_task(Task("prj:earn_degree @@@project"))
     tasks.add_task(t:=Task("research graduate programs"))
-    ttp.assign_task_to_project(t, 'prj:earn_degree')
+    ttp.assign_task_to_project(t, 'earn_degree')
     assert list(tasks) == [
         Task("prj:earn_degree @@@project"),
         Task("research graduate programs prj:earn_degree"),
@@ -73,7 +72,7 @@ def test_can_assign_to_existing_project(tasks, ttp):
 
 def test_ttp_creates_project_if_doesnt_exist(tasks, ttp):
     tasks.add_task(t:=Task("research graduate programs"))
-    ttp.assign_task_to_project(t, 'prj:earn_degree')
+    ttp.assign_task_to_project(t, 'earn_degree')
     assert list(tasks) == [
         Task("research graduate programs prj:earn_degree"),
         Task("prj:earn_degree @@@project"),

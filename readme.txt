@@ -59,3 +59,4 @@ tag curation assistant (combine/eliminate/add) tags
 TDD
 ----------------
 -Create new project
+-Have to handle creation date somehow
