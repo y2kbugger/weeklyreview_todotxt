@@ -28,8 +28,11 @@ class Tasks:
         pass
 
 class TasksToProjects:
-    def __init__(self):
-        self.tasks = Tasks()
+    def __init__(self, tasks=None):
+        if tasks is None:
+            self.tasks = Tasks()
+        else:
+            self.tasks = tasks
 
     @property
     def dailyreview_tasks(self):
