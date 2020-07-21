@@ -53,6 +53,8 @@ class Tasks:
 
     def add_tasks_from_file(self, file):
         for line in file.readlines():
+            if len(line.strip()) == 0:
+                continue
             self.add_task(Task(line))
 
     def persist_task_to_file(self, file):
@@ -82,7 +84,18 @@ def main():
         tasks.add_tasks_from_file(f)
 
     for t in tasks.dailyreview_tasks:
-        print(t.persist)
+         print('#', t.persist, flush=True)
+    # for t in tasks.dailyreview_tasks:
+    #     print("Task:")
+    #     print(repr(t))
+    #     print(t.persist, flush=True)
+    #     choices = ['1','2','3']
+    #     choice = None
+    #     while choice not in choices:
+    #         prompt = ("Options:\n"
+    #             "\t1. Assign to a project\n"
+    #             )
+    #         choice = input(prompt)
 
     with open(projdir/'tests'/'todo.txt.out', 'w') as f:
         tasks.persist_task_to_file(f)

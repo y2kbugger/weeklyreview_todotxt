@@ -17,8 +17,8 @@ Ensure all open "daily review" tasks are associated with a project
 1 List out all items missing a proj:codename
     Options:
         - Assign to a project
-        - Turn into a project
-        - Create a project for it
+        - Assign to new project (Create a project for it)
+        - Turn into a project (no input)
 
 Curate projects
 1 Ensure all projects have a priority
@@ -59,4 +59,4 @@ tag curation assistant (combine/eliminate/add) tags
 TDD
 ----------------
 -Create new project
--Have to handle creation date somehow
+-Have to handle creation date somehow --> maybe new tasks could always inherit from existing task..there are not that many cases for creating new tasks.
