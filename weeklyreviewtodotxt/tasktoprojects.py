@@ -1,18 +1,20 @@
 from collections import OrderedDict
 from .parser import Task, Generic
 
+class OrderedSetOfTasks:
+    def __init__(self):
+        self.dict = OrderedDict()
+    def __contains__(self, v):
+        return v in self.dict
+    def __iter__(self):
+        return self.dict.keys().__iter__()
+    def add_task(self, task : Task):
+        if task not in self:
+            self.dict[task] = None
+
 class TasksToProjects:
     def __init__(self):
-        class OrderedSet:
-            def __init__(self):
-                self.dict = OrderedDict()
-            def __contains__(self, v):
-                return v in self.dict
-            def __iter__(self):
-                return self.dict.keys().__iter__()
-            def add(self, v):
-                self.dict[v] = None
-        self.tasks = OrderedSet()
+        self.tasks = OrderedSetOfTasks()
 
     @property
     def dailyreview_tasks(self):
@@ -39,10 +41,7 @@ class TasksToProjects:
         return True
 
     def add_task(self, task : Task):
-        if task not in self.tasks:
-            # self.seen_tasks.add(task)
-            # self.tasks.append(task)
-            self.tasks.add(task)
+        self.tasks.add_task(task)
 
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]
