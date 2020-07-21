@@ -35,7 +35,6 @@ def test_can_save_tasks_to_file(tasks):
 
 
 
-
 @pytest.fixture
 def ttp(tasks):
     ttp = TasksToProjects(tasks)
@@ -72,10 +71,10 @@ def test_can_assign_to_existing_project(tasks, ttp):
         Task("research graduate programs prj:earn_degree"),
         ]
 
-# def test_ttp_creates_project_if_doesnt_exist(tasks, ttp):
-#     tasks.add_task(t:=Task("research graduate programs"))
-#     tasks.assign_task_to_project(t, 'prj:earn_degree')
-#     assert list(tasks) == [
-#         Task("research graduate programs prj:earn_degree"),
-#         Task("prj:earn_degree @@@project"),
-#         ]
+def test_ttp_creates_project_if_doesnt_exist(tasks, ttp):
+    tasks.add_task(t:=Task("research graduate programs"))
+    ttp.assign_task_to_project(t, 'prj:earn_degree')
+    assert list(tasks) == [
+        Task("research graduate programs prj:earn_degree"),
+        Task("prj:earn_degree @@@project"),
+        ]

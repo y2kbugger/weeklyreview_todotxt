@@ -1,2 +1,3 @@
 *.egg-info
 tests/todo.txt
+tests/todo.txt.out
