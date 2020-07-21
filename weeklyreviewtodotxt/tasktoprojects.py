@@ -31,6 +31,9 @@ class Tasks:
         for line in file.readlines():
             self.add_task(Task(line))
 
+    def persist_task_to_file(self, file):
+        file.writelines(t.persist + '\n' for t in self)
+
 class TasksToProjects:
     def __init__(self, tasks):
         self._tasks = tasks
@@ -81,8 +84,8 @@ def main():
     for t in ttp.dailyreview_tasks:
         print(t.persist)
 
-    # with open('/home/y2k/devel/weeklyreview_todotxt/tests/todo.txt.out','w') as f:
-    #     f.writelines(t.persist + '\n' for t in ttp._tasks)
+    with open(projdir/'tests'/'todo.txt.out', 'w') as f:
+        tasks.persist_task_to_file(f)
 
 if __name__ == '__main__':
     main()

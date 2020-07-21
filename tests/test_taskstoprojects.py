@@ -26,6 +26,14 @@ def test_can_read_tasks_from_file(tasks):
     tasks.add_tasks_from_file(sio)
     assert list(tasks) == [Task("hello"), Task("world")]
 
+def test_can_save_tasks_to_file(tasks):
+    [tasks.add_task(Task(t)) for t in [
+        "hello", "world", ]]
+    sio = StringIO()
+    tasks.persist_task_to_file(sio)
+    sio.seek(0)
+    assert sio.read() == "hello\nworld\n"
+
 
 
 
