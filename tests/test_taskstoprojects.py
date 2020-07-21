@@ -12,13 +12,13 @@ def tasks():
 
 
 def test_can_get_projects(tasks):
-    tasks.add_task(Task("hello prj:lol @@@project"))
-    tasks.add_task(Task("world"))
+    [tasks.add_task(Task(t)) for t in [
+        "hello prj:lol @@@project",
+        "world"]]
     assert tasks.projects == ['lol']
 
 def test_can_add_tasks(tasks):
-    tasks.add_task(Task("hello"))
-    tasks.add_task(Task("world"))
+    [tasks.add_task(Task(t)) for t in ["hello", "world", ]]
     assert list(tasks) == [Task("hello"), Task("world")]
 
 def test_can_read_tasks_from_file(tasks):
@@ -27,8 +27,7 @@ def test_can_read_tasks_from_file(tasks):
     assert list(tasks) == [Task("hello"), Task("world")]
 
 def test_can_save_tasks_to_file(tasks):
-    [tasks.add_task(Task(t)) for t in [
-        "hello", "world", ]]
+    [tasks.add_task(Task(t)) for t in ["hello", "world", ]]
     sio = StringIO()
     tasks.persist_task_to_file(sio)
     sio.seek(0)
