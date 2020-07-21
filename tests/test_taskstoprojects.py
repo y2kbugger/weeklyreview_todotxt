@@ -41,7 +41,7 @@ def ttp(tasks):
     ttp = TasksToProjects(tasks)
     return ttp
 
-def test_can_refine_list_to_daily_review(tasks, ttp):
+def test_can_refine_list_to_daily_review(tasks):
     [tasks.add_task(Task(t)) for t in [
         "be happy @@@project",
         "twist and shout @~music",
@@ -52,7 +52,7 @@ def test_can_refine_list_to_daily_review(tasks, ttp):
         "paint cat @@art",
         "fix speaker fur prj:boom_box",
         ]]
-    assert [t.persist for t in ttp.dailyreview_tasks] == [
+    assert [t.persist for t in tasks.dailyreview_tasks] == [
         "oil basketball",
         "pet cat @@home",
         "fix speaker fur prj:boom_box"

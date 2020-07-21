@@ -24,23 +24,9 @@ class Tasks:
                     pass
         return projects
 
-    def make_project_if_doesnt_exist(self, proj):
-        pass
-
-    def add_tasks_from_file(self, file):
-        for line in file.readlines():
-            self.add_task(Task(line))
-
-    def persist_task_to_file(self, file):
-        file.writelines(t.persist + '\n' for t in self)
-
-class TasksToProjects:
-    def __init__(self, tasks):
-        self._tasks = tasks
-
     @property
     def dailyreview_tasks(self):
-        return [t for t in self._tasks if self.is_part_of_dailyreview(t)]
+        return [t for t in self if self.is_part_of_dailyreview(t)]
 
     @staticmethod
     def is_part_of_dailyreview(t):
@@ -62,6 +48,21 @@ class TasksToProjects:
 
         return True
 
+
+    def make_project_if_doesnt_exist(self, proj):
+        pass
+
+    def add_tasks_from_file(self, file):
+        for line in file.readlines():
+            self.add_task(Task(line))
+
+    def persist_task_to_file(self, file):
+        file.writelines(t.persist + '\n' for t in self)
+
+class TasksToProjects:
+    def __init__(self, tasks):
+        self._tasks = tasks
+
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]
         task.remove_part(first_generic.persist)
@@ -81,7 +82,7 @@ def main():
     with open(projdir/'tests'/'todo.txt') as f:
         tasks.add_tasks_from_file(f)
 
-    for t in ttp.dailyreview_tasks:
+    for t in tasks.dailyreview_tasks:
         print(t.persist)
 
     with open(projdir/'tests'/'todo.txt.out', 'w') as f:
