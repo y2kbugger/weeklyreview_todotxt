@@ -16,8 +16,8 @@ Tasks to Projects
 Ensure all open "daily review" tasks are associated with a project
 1 List out all items missing a proj:codename
     Options:
-        - Turn into a project
         - Assign to a project
+        - Turn into a project
         - Create a project for it
 
 Curate projects
@@ -58,5 +58,6 @@ tag curation assistant (combine/eliminate/add) tags
 
 TDD
 ----------------
-
+-List existing projects
+-Create new project
 
