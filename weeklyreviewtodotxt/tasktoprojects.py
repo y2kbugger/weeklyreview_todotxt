@@ -1,20 +1,35 @@
-from collections import OrderedDict
 from .parser import Task, Generic
 
-class OrderedSetOfTasks:
+class Tasks:
     def __init__(self):
-        self.dict = OrderedDict()
+        self._tasks = list()
+        self._seentasks = set()
     def __contains__(self, v):
-        return v in self.dict
+        return v in self._tasks
     def __iter__(self):
-        return self.dict.keys().__iter__()
+        return self._tasks.__iter__()
     def add_task(self, task : Task):
-        if task not in self:
-            self.dict[task] = None
+        if task not in self._seentasks:
+            self._tasks.append(task)
+    @property
+    def projects(self):
+        projects = []
+        for t in self._tasks:
+            print(t)
+            print([c.persist for c in t.contexts])
+            if '@@@project' in {c.persist for c in t.contexts}:
+                try:
+                    projects.append(t.extensions['prj'].value)
+                except KeyError:
+                    pass
+        return projects
+
+    def make_project_if_doesnt_exist(self, proj):
+        pass
 
 class TasksToProjects:
     def __init__(self):
-        self.tasks = OrderedSetOfTasks()
+        self.tasks = Tasks()
 
     @property
     def dailyreview_tasks(self):

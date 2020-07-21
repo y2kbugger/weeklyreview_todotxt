@@ -4,14 +4,14 @@ from datetime import date
 class Task():
     def __init__(self, line):
         self.parts = self.parse_line(line)
-
     def __eq__(self, o):
         if not isinstance(o, Task):
             return False
         return sorted(self.parts) == sorted(o.parts)
-
     def __hash__(self):
         return hash(tuple(sorted(self.parts)))
+    def __repr__(self):
+        return f"{self.__class__.__name__}({repr(self.persist)})"
 
     @property
     def dates(self):
