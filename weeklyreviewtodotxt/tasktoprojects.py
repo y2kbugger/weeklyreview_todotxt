@@ -2,19 +2,19 @@ from .parser import Task, Generic
 
 class Tasks:
     def __init__(self):
-        self._tasks = list()
+        self._tasklist = list()
         self._seentasks = set()
     def __contains__(self, v):
-        return v in self._tasks
+        return v in self._tasklist
     def __iter__(self):
-        return self._tasks.__iter__()
+        return self._tasklist.__iter__()
     def add_task(self, task : Task):
         if task not in self._seentasks:
-            self._tasks.append(task)
+            self._tasklist.append(task)
     @property
     def projects(self):
         projects = []
-        for t in self._tasks:
+        for t in self._tasklist:
             print(t)
             print([c.persist for c in t.contexts])
             if '@@@project' in {c.persist for c in t.contexts}:
@@ -28,15 +28,12 @@ class Tasks:
         pass
 
 class TasksToProjects:
-    def __init__(self, tasks=None):
-        if tasks is None:
-            self.tasks = Tasks()
-        else:
-            self.tasks = tasks
+    def __init__(self, tasks):
+        self._tasks = tasks
 
     @property
     def dailyreview_tasks(self):
-        return [t for t in self.tasks if self.is_part_of_dailyreview(t)]
+        return [t for t in self._tasks if self.is_part_of_dailyreview(t)]
 
     @staticmethod
     def is_part_of_dailyreview(t):
@@ -58,9 +55,6 @@ class TasksToProjects:
 
         return True
 
-    def add_task(self, task : Task):
-        self.tasks.add_task(task)
-
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]
         task.remove_part(first_generic.persist)
@@ -81,7 +75,7 @@ def main():
         print(t.persist)
 
     # with open('/home/y2k/devel/weeklyreview_todotxt/tests/todo.txt.out','w') as f:
-    #     f.writelines(t.persist + '\n' for t in ttp.tasks)
+    #     f.writelines(t.persist + '\n' for t in ttp._tasks)
 
 if __name__ == '__main__':
     main()

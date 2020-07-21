@@ -9,26 +9,26 @@ from test_parser import assert_tasks_equal
 def tasks():
     return Tasks()
 
+@pytest.fixture
+def ttp(tasks):
+    ttp = TasksToProjects(tasks)
+    return ttp
+
 def test_can_get_projects(tasks):
     tasks.add_task(Task("hello prj:lol @@@project"))
     tasks.add_task(Task("world"))
     assert tasks.projects == ['lol']
 
-@pytest.fixture
-def ttp():
-    ttp = TasksToProjects()
-    return ttp
-
-def test_can_add_tasks(ttp):
-    ttp.add_task(Task("hello"))
-    ttp.add_task(Task("world"))
-    assert list(ttp.tasks) == [
+def test_can_add_tasks(tasks):
+    tasks.add_task(Task("hello"))
+    tasks.add_task(Task("world"))
+    assert list(tasks) == [
         Task("hello"),
         Task("world"),
         ]
 
-def test_can_refine_list_to_daily_review(ttp):
-    [ttp.add_task(Task(t)) for t in [
+def test_can_refine_list_to_daily_review(tasks, ttp):
+    [tasks.add_task(Task(t)) for t in [
         "be happy @@@project",
         "twist and shout @~music",
         "bak 15r @^chores",
@@ -49,20 +49,19 @@ def test_turn_task_into_project(ttp):
     ttp.convert_task_to_project(t)
     assert_tasks_equal(t, Task("prj:earn_degree @@@project"))
 
-def test_can_assign_to_existing_project(ttp):
-    ttp.add_task(Task("prj:earn_degree @@@project"))
-    t = Task("research graduate programs")
-    ttp.add_task(t)
+def test_can_assign_to_existing_project(tasks, ttp):
+    tasks.add_task(Task("prj:earn_degree @@@project"))
+    tasks.add_task(t:=Task("research graduate programs"))
     ttp.assign_task_to_project(t, 'prj:earn_degree')
-    assert list(ttp.tasks) == [
+    assert list(tasks) == [
         Task("prj:earn_degree @@@project"),
         Task("research graduate programs prj:earn_degree"),
         ]
 
-# def test_ttp_creates_project_if_doesnt_exist(ttp):
-#     ttp.add_task(t:=Task("research graduate programs"))
-#     ttp.assign_task_to_project(t, 'prj:earn_degree')
-#     assert list(ttp.tasks) == [
+# def test_ttp_creates_project_if_doesnt_exist(tasks, ttp):
+#     tasks.add_task(t:=Task("research graduate programs"))
+#     tasks.assign_task_to_project(t, 'prj:earn_degree')
+#     assert list(tasks) == [
 #         Task("research graduate programs prj:earn_degree"),
 #         Task("prj:earn_degree @@@project"),
 #         ]
