@@ -1,8 +1,18 @@
+from collections import OrderedDict
 from .parser import Task, Generic
 
 class TasksToProjects:
     def __init__(self):
-        self.tasks = []
+        class OrderedSet:
+            def __init__(self):
+                self.dict = OrderedDict()
+            def __contains__(self, v):
+                return v in self.dict
+            def __iter__(self):
+                return self.dict.keys().__iter__()
+            def add(self, v):
+                self.dict[v] = None
+        self.tasks = OrderedSet()
 
     @property
     def dailyreview_tasks(self):
@@ -29,10 +39,10 @@ class TasksToProjects:
         return True
 
     def add_task(self, task : Task):
-        self.tasks.append(task)
-
-    def there_are_duplicates(self):
-        return len(set(self.tasks)) != len(self.tasks)
+        if task not in self.tasks:
+            # self.seen_tasks.add(task)
+            # self.tasks.append(task)
+            self.tasks.add(task)
 
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]
@@ -54,12 +64,11 @@ def main():
         for line in f.readlines():
             ttp.add_task(Task(line))
 
-    if ttp.there_are_duplicates():
-        print('Cannot act on a file containing duplicates')
-        return
-
     for t in ttp.dailyreview_tasks:
         print(t.persist)
+
+    # with open('/home/y2k/devel/weeklyreview_todotxt/tests/todo.txt.out','w') as f:
+    #     f.writelines(t.persist + '\n' for t in ttp.tasks)
 
 if __name__ == '__main__':
     main()
