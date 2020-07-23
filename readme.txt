@@ -60,3 +60,5 @@ TDD
 ----------------
 -Create new project
 -Have to handle creation date somehow --> maybe new tasks could always inherit from existing task..there are not that many cases for creating new tasks.
+-handle legacy of projects not having prj:blahblah tags
+-may want to refactor is_xxx_task into the Task class

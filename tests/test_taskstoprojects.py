@@ -38,12 +38,6 @@ def test_can_get_projects(tasks):
     assert tasks.projects == ['lol']
 
 
-
-@pytest.fixture
-def ttp(tasks):
-    ttp = TasksToProjects(tasks)
-    return ttp
-
 def test_can_refine_list_to_daily_review(tasks):
     [tasks.add_task(Task(t)) for t in [
         "be happy @@@project",
@@ -60,6 +54,21 @@ def test_can_refine_list_to_daily_review(tasks):
         "pet cat @@home",
         "fix speaker fur prj:boom_box"
         ]
+
+def test_can_refine_list_projects(tasks):
+    [tasks.add_task(Task(t)) for t in [
+        "be happy @@@project",
+        "twist and shout @~music",
+        "hidden h:1 @@@project",
+        ]]
+    assert [t.persist for t in tasks.project_tasks] == [
+        "be happy @@@project",
+        ]
+
+@pytest.fixture
+def ttp(tasks):
+    ttp = TasksToProjects(tasks)
+    return ttp
 
 def test_turn_task_into_project(ttp):
     t = Task("earn degree")

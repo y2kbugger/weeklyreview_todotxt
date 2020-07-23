@@ -85,6 +85,16 @@ class Task():
     def remove_part(self, part : str):
         self.parts.remove(make_part(part))
 
+    def is_hidden(self):
+        try:
+            if self.extensions['h'].value == '1':
+                return True
+            else:
+                return False
+        except KeyError:
+            return False
+
+
 class Generic():
     def __init__(self, string):
         self.string = string

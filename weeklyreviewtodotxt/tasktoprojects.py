@@ -24,10 +24,16 @@ class Tasks:
 
     @property
     def dailyreview_tasks(self):
-        return [t for t in self if self.is_part_of_dailyreview(t)]
+        return [t for t in self if self.is_dailyreview_task(t)]
+
+    @property
+    def project_tasks(self):
+        return [t for t in self if self.is_project_task(t)]
 
     @staticmethod
-    def is_part_of_dailyreview(t):
+    def is_dailyreview_task(t):
+        if t.is_hidden():
+            return False
         for c in t.contexts:
             if c.persist[:3] == '@@@':
                 return False
@@ -37,18 +43,16 @@ class Tasks:
                 # todo: Once i split todo.txt into more files
                 # this special case should drop out
                 return False
-        try:
-            # hidden
-            if t.extensions['h'].value == '1':
-                return False
-        except KeyError:
-            pass
-
         return True
+
+    @staticmethod
+    def is_project_task(t):
+        if t.is_hidden():
+            return False
+        return any(c.persist == '@@@project' for c in t.contexts)
 
     def make_project_if_doesnt_exist(self, proj):
         if proj not in self.projects:
-            print(proj, self.projects)
             self.add_task(Task(f"@@@project prj:{proj}"))
 
     def add_tasks_from_file(self, file):
@@ -83,19 +87,50 @@ def main():
     with open(projdir/'tests'/'todo.txt') as f:
         tasks.add_tasks_from_file(f)
 
+    for t in tasks.project_tasks:
+        try:
+            t.extensions['prj']
+            continue
+        except KeyError:
+            pass
+        nt = Task(t.persist)
+        ttp.convert_task_to_project(nt)
+
+        print("\n@@@Project Task missing prj:xxx:\n")
+        choices = ['1','2','3']
+        choice = None
+        while choice not in choices:
+            print(""+t.persist+"\n", flush=True)
+            prompt = ("Options:\n"
+                f"\t1. Auto: `{nt.persist}`\n"
+                "\t2. Manually enter prj:xxx\n"
+                "\t3. skipn\n\n"
+                )
+            choice = input(prompt)
+        if choice == '1':
+            ttp.convert_task_to_project(t)
+        elif choice == '2':
+            ttp.assign_task_to_project(t, input('prj:'))
+        elif choice == '3':
+            continue
+
+
     for t in tasks.dailyreview_tasks:
-         print('#', t.persist, flush=True)
-    # for t in tasks.dailyreview_tasks:
-    #     print("Task:")
-    #     print(repr(t))
-    #     print(t.persist, flush=True)
-    #     choices = ['1','2','3']
-    #     choice = None
-    #     while choice not in choices:
-    #         prompt = ("Options:\n"
-    #             "\t1. Assign to a project\n"
-    #             )
-    #         choice = input(prompt)
+        choices = ['1','2','3']
+        choice = None
+        prj_str = '\n'.join([f"\t\t{len(choices)+i}. {p}"for i,p in enumerate(tasks.projects)])
+        [choices.append(str(i)) for i,p in enumerate(tasks.projects)]
+        while choice not in choices:
+            print("\nDaily review Task missing prj:xxx,")
+            print("\n\n\n"+t.persist+"\n", flush=True)
+            prompt = ("Options:\n"
+                "\t1. Turn into a project\n"
+                "\t2. Create new project and assign\n\n"
+                "\tOr, assign to a project:\n\n"
+                f"{prj_str}\n\n"
+                "Choice?: "
+                )
+            choice = input(prompt)
 
     with open(projdir/'tests'/'todo.txt.out', 'w') as f:
         tasks.persist_task_to_file(f)
