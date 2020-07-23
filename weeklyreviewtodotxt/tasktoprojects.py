@@ -98,7 +98,7 @@ def main():
             prompt = ("Options:\n"
                 f"\t1. Auto: `{nt.persist}`\n"
                 "\t2. Manually enter prj:xxx\n"
-                "\t3. skipn\n\n"
+                "\t3. skip\n\n"
                 )
             choice = input(prompt)
         if choice == '1':

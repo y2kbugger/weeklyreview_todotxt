@@ -62,3 +62,7 @@ TDD
 -Have to handle creation date somehow --> maybe new tasks could always inherit from existing task..there are not that many cases for creating new tasks.
 -handle legacy of projects not having prj:blahblah tags
 -may want to refactor is_xxx_task into the Task class
+-add Task.is_prj_tagged
+-add (1/23) type counted to show progress for each step
+-add ability to can cycle or entire step (choice = s,ss)
+
