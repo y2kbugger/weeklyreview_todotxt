@@ -28,7 +28,7 @@ class Tasks:
 
     @property
     def project_tasks(self):
-        return [t for t in self if self.is_project_task(t)]
+        return [t for t in self if t.is_project()]
 
     @staticmethod
     def is_dailyreview_task(t):
@@ -44,12 +44,6 @@ class Tasks:
                 # this special case should drop out
                 return False
         return True
-
-    @staticmethod
-    def is_project_task(t):
-        if t.is_hidden():
-            return False
-        return any(c.persist == '@@@project' for c in t.contexts)
 
     def make_project_if_doesnt_exist(self, proj):
         if proj not in self.projects:

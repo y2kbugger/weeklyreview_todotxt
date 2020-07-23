@@ -143,6 +143,13 @@ def test_can_check_if_is_hidden_task():
     t = Task("c h:0")
     assert t.is_hidden() == False
 
+def test_can_check_if_is_a_project_task():
+    t = Task("c")
+    assert t.is_project() == False
+
+    t = Task("c @@@project")
+    assert t.is_project() == True
+
 def test_against_legacy():
     with open(Path(__file__).parent / 'todo.txt') as f:
         for line in f.readlines():
