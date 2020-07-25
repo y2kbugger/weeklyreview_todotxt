@@ -9,9 +9,15 @@ class DummyPhase(Phase):
     def prompt(self) -> str:
         return "What do"
 
-@pytest.fixture()
+    @property
+    def relevant_tasks(self):
+        return list(self.dummy_tasks)
+
+@pytest.fixture(scope="function")
 def dp(tasks):
-    return DummyPhase(tasks)
+    dp = DummyPhase()
+    dp.dummy_tasks = tasks
+    return dp
 
 @pytest.fixture()
 def out(capsys):
@@ -25,8 +31,7 @@ def test_no_prompt_if_no_tasks(dp, out):
 def test_phase_can_skip_cycle(dp, out, tasks : Tasks, capsys):
     tasks.add_task(Task(""))
     dp.add_input(['skip'])
-    for cycle in dp:
-        pass
+    next(dp)
     o = out()
     assert o.count("What do") == 1
     assert o.count("Skipping") == 1
@@ -46,14 +51,22 @@ def test_asks_for_user_input_if_responses_run_dry(dp):
 def test_displays_options_command(dp, out, tasks):
     tasks.add_task(Task(""))
     with pytest.raises(IOError):
-        for cycle in dp:
-            pass
+        next(dp)
     assert out().count('skip') == 1
 
 def test_only_run_selected_option(dp, out, tasks):
     tasks.add_task(Task(""))
     dp.add_input(['d'])
-    for cycle in dp:
-        pass
+    next(dp)
     o = out()
     assert o.count("Skipping") == 0
+
+# def test_can_retry_response(dp, out, tasks):
+#     tasks.add_task(Task(""))
+#     dp.add_input(['d', 's'])
+#     next(dp)
+#     assert out().count("Skipping") == 0
+#     next(dp)
+#     assert out().count("Skipping") == 1
+
+# partial match option

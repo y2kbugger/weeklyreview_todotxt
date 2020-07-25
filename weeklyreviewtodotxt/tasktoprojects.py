@@ -11,6 +11,7 @@ class Tasks:
     def add_task(self, task : Task):
         if task not in self._seentasks:
             self._tasklist.append(task)
+
     @property
     def projects(self):
         projects = []

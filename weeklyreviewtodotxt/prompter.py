@@ -1,25 +1,30 @@
 class Phase():
-    def __init__(self, tasks):
-        self.tasks = tasks
-        self.options = {}
+    def __init__(self):
+        self.current_task_ix = 0
         self.input = []
+        self.options = {}
         self.add_option('skip', lambda t:print('Skipping'))
 
-    @property
-    def prompt(self) -> str:
-        raise NotImplementedError()
-
     def __iter__(self):
-        for task in self.tasks:
-            print(self.prompt, flush=True)
-            for o in self.options.keys():
-                print(o)
-            r = self.next_response()
-            try:
-                self.options[r](task)
-            except KeyError:
-                print("Invalid choice, try again")
-            yield None
+        return self
+
+    def __next__(self):
+        try:
+            current_task = self.relevant_tasks[self.current_task_ix]
+        except IndexError:
+            raise StopIteration()
+        self.run_prompt_for_task(current_task)
+        self.current_task_ix += 1
+
+    def run_prompt_for_task(self, task):
+        print(self.prompt, flush=True)
+        for o in self.options.keys():
+            print(o)
+        r = self.next_response()
+        try:
+            self.options[r](task)
+        except KeyError:
+            print("Invalid choice, try again")
 
     def add_option(self, command, action):
         self.options[command] = action
@@ -34,5 +39,15 @@ class Phase():
         except IndexError:
             return input()
 
+    @property
+    def prompt(self) -> str:
+        raise NotImplementedError()
+
+    @property
+    def relevant_tasks(self):
+        raise NotImplementedError()
+
+
 # class Option:
+
 
