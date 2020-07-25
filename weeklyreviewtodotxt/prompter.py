@@ -21,10 +21,13 @@ class Phase():
         for o in self.options.keys():
             print(o)
         r = self.next_response()
+        print("Choice: ", r)
+
         try:
             self.options[r](task)
         except KeyError:
             print("Invalid choice, try again")
+            self.run_prompt_for_task(task)
 
     def add_option(self, command, action):
         self.options[command] = action

@@ -54,19 +54,10 @@ def test_displays_options_command(dp, out, tasks):
         next(dp)
     assert out().count('skip') == 1
 
-def test_only_run_selected_option(dp, out, tasks):
+def test_can_retry_response(dp, out, tasks):
     tasks.add_task(Task(""))
-    dp.add_input(['d'])
+    dp.add_input(['d', 'skip'])
     next(dp)
-    o = out()
-    assert o.count("Skipping") == 0
-
-# def test_can_retry_response(dp, out, tasks):
-#     tasks.add_task(Task(""))
-#     dp.add_input(['d', 's'])
-#     next(dp)
-#     assert out().count("Skipping") == 0
-#     next(dp)
-#     assert out().count("Skipping") == 1
+    assert out().count("Skipping") == 1
 
 # partial match option
