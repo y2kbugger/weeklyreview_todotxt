@@ -5,12 +5,6 @@ class Phase():
         self.input = []
         self.add_option('skip', lambda t:None)
 
-    def add_option(self, command, action):
-        self.options[command] = action
-
-    def add_input(self, responses):
-        self.input.extend(responses)
-
     @property
     def prompt(self) -> str:
         raise NotImplementedError()
@@ -19,3 +13,12 @@ class Phase():
         for task in self.tasks:
             print(self.prompt)
             yield None
+
+    def add_option(self, command, action):
+        self.options[command] = action
+
+    def add_input(self, responses):
+        self.input.extend(responses)
+
+    def next_response(self):
+        return self.input.pop(0)
