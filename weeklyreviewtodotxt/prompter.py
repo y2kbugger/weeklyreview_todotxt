@@ -3,7 +3,7 @@ class Phase():
         self.tasks = tasks
         self.options = {}
         self.input = []
-        self.add_option('skip', lambda t:None)
+        self.add_option('skip', lambda t:print('Skipping'))
 
     @property
     def prompt(self) -> str:
@@ -11,7 +11,8 @@ class Phase():
 
     def __iter__(self):
         for task in self.tasks:
-            print(self.prompt)
+            print(self.prompt, flush=True)
+            self.next_response()
             yield None
 
     def add_option(self, command, action):
@@ -26,3 +27,4 @@ class Phase():
             return self.input.pop(0)
         except IndexError:
             return input()
+
