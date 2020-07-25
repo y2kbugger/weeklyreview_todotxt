@@ -12,6 +12,8 @@ class Phase():
     def __iter__(self):
         for task in self.tasks:
             print(self.prompt, flush=True)
+            for o in self.options.keys():
+                print(o)
             self.next_response()
             yield None
 

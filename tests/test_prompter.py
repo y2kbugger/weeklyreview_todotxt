@@ -43,10 +43,9 @@ def test_asks_for_user_input_if_responses_run_dry(dp):
     with pytest.raises(IOError):
         dp.next_response()
 
-# def test_displays_options_command(dp, tasks):
-#     dp.add_input(['s'])
-#     assert dp.next_response() == 's'
-#     assert "skip" in capsys.readouterr().out
-#     with pytest.raises(IOError):
-#         dp.next_response()
-
+def test_displays_options_command(dp, out, tasks):
+    tasks.add_task(Task(""))
+    with pytest.raises(IOError):
+        for cycle in dp:
+            pass
+    assert out().count('skip') == 1
