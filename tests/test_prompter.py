@@ -5,6 +5,10 @@ from weeklyreviewtodotxt.prompter import Phase
 from test_taskstoprojects import tasks
 
 class DummyPhase(Phase):
+    def __init__(self, *args, **kw):
+        super().__init__(*args, **kw)
+        self.dummy_input = []
+
     @property
     def prompt(self) -> str:
         return "What do"
@@ -12,6 +16,15 @@ class DummyPhase(Phase):
     @property
     def relevant_tasks(self):
         return list(self.dummy_tasks)
+
+    def next_response(self):
+        try:
+            return self.dummy_input.pop(0)
+        except IndexError:
+            raise IOError()
+
+    def add_input(self, responses):
+        self.dummy_input = responses
 
 @pytest.fixture(scope="function")
 def dp(tasks):
@@ -37,12 +50,11 @@ def test_phase_can_skip_cycle(dp, out, tasks : Tasks, capsys):
     assert o.count("Skipping") == 1
 
 def test_input_consumed_fifo(dp):
-    dp.add_input(['s'])
-    dp.add_input(['s2'])
+    dp.add_input(['s', 's2'])
     assert dp.next_response() == 's'
     assert dp.next_response() == 's2'
 
-def test_asks_for_user_input_if_responses_run_dry(dp):
+def test_dummy_raise_ioerror_when_input_exhausted(dp):
     dp.add_input(['s'])
     assert dp.next_response() == 's'
     with pytest.raises(IOError):
@@ -60,4 +72,8 @@ def test_can_retry_response(dp, out, tasks):
     next(dp)
     assert out().count("Skipping") == 1
 
-# partial match option
+# def test_can_match_unique_partial_command(dp, out, tasks):
+#     tasks.add_task(Task(""))
+#     dp.add_input(['d', 's'])
+#     next(dp)
+#     assert out().count("Skipping") == 1

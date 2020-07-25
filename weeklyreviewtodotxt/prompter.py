@@ -1,7 +1,6 @@
 class Phase():
     def __init__(self):
         self.current_task_ix = 0
-        self.input = []
         self.options = {}
         self.add_option('skip', lambda t:print('Skipping'))
 
@@ -32,15 +31,8 @@ class Phase():
     def add_option(self, command, action):
         self.options[command] = action
 
-    def add_input(self, responses):
-        assert all(isinstance(a, str) for a in responses)
-        self.input.extend(responses)
-
     def next_response(self):
-        try:
-            return self.input.pop(0)
-        except IndexError:
-            return input()
+        return input()
 
     @property
     def prompt(self) -> str:
