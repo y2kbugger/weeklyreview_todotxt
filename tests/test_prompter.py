@@ -23,9 +23,6 @@ class DummyPhase(Phase):
         except IndexError:
             raise IOError()
 
-    def add_input(self, responses):
-        self.dummy_input = responses
-
 @pytest.fixture(scope="function")
 def dp(tasks):
     dp = DummyPhase()
@@ -43,19 +40,19 @@ def test_no_prompt_if_no_tasks(dp, out):
 
 def test_phase_can_skip_cycle(dp, out, tasks : Tasks, capsys):
     tasks.add_task(Task(""))
-    dp.add_input(['skip'])
+    dp.dummy_input = ['skip']
     next(dp)
     o = out()
     assert o.count("What do") == 1
     assert o.count("Skipping") == 1
 
 def test_input_consumed_fifo(dp):
-    dp.add_input(['s', 's2'])
+    dp.dummy_input = ['s', 's2']
     assert dp.next_response() == 's'
     assert dp.next_response() == 's2'
 
 def test_dummy_raise_ioerror_when_input_exhausted(dp):
-    dp.add_input(['s'])
+    dp.dummy_input = ['s']
     assert dp.next_response() == 's'
     with pytest.raises(IOError):
         dp.next_response()
@@ -68,12 +65,12 @@ def test_displays_options_command(dp, out, tasks):
 
 def test_can_retry_response(dp, out, tasks):
     tasks.add_task(Task(""))
-    dp.add_input(['d', 'skip'])
+    dp.dummy_input = ['d', 'skip']
     next(dp)
     assert out().count("Skipping") == 1
 
 # def test_can_match_unique_partial_command(dp, out, tasks):
 #     tasks.add_task(Task(""))
-#     dp.add_input(['d', 's'])
+#     dp.dummy_input = ['d', 's']
 #     next(dp)
 #     assert out().count("Skipping") == 1
