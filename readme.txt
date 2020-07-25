@@ -12,9 +12,16 @@ Guided Weekly Review
 
 Use git to snapshot before so changes can be reviewed or reverted.
 
+
+Update Legacy Projects:
+Review @@@project missing a prj: to add a prj tag
+    Options
+        - Auto (show preview)
+        - Manual
+
 Tasks to Projects
 Ensure all open "daily review" tasks are associated with a project
-1 List out all items missing a proj:codename
+1 List out all items missing a prj:codename
     Options:
         - Assign to a project
         - Assign to new project (Create a project for it)
@@ -22,14 +29,14 @@ Ensure all open "daily review" tasks are associated with a project
 
 Curate projects
 1 Ensure all projects have a priority
-2 Ensure all projects have a unique proj:codename
+2 Ensure all projects have a unique prj:codename
 3 Curate Projects
     Options:
     - Refine project priorities.
     - Rename projects
 
 Plan tasks
-1 Assign all tasks to take on the priority of it's proj:codename parent
+1 Assign all tasks to take on the priority of it's prj:codename parent
     - Automatic, but give summary and ask for confirmation
 2 Ensure all A or B projects have at least one task
     - Show existing tasks for each
@@ -65,4 +72,4 @@ TDD
 -add Task.is_prj_tagged
 -add (1/23) type counted to show progress for each step
 -add ability to can cycle or entire step (choice = s,ss)
-
+-Fix Legacy Project should check for duplicate prj: tags
