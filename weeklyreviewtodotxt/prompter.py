@@ -1,5 +1,6 @@
 class Phase():
-    def __init__(self):
+    def __init__(self, tasks):
+        self.tasks = tasks
         self.options = {}
         self.input = []
         self.add_option('skip', lambda t:None)
@@ -15,5 +16,6 @@ class Phase():
         raise NotImplementedError()
 
     def __iter__(self):
-        print(self.prompt)
-        yield None
+        for task in self.tasks:
+            print(self.prompt)
+            yield None
