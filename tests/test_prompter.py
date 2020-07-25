@@ -29,7 +29,7 @@ def test_phase_can_skip_cycle(dp, out, tasks : Tasks, capsys):
         pass
     o = out()
     assert o.count("What do") == 1
-    # assert o.count("Skipping") == 1
+    assert o.count("Skipping") == 1
 
 def test_input_consumed_fifo(dp):
     dp.add_input(['s'])

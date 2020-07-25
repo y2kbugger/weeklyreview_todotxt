@@ -14,6 +14,7 @@ class Phase():
             print(self.prompt, flush=True)
             for o in self.options.keys():
                 print(o)
+                self.options[o](task)
             self.next_response()
             yield None
 
