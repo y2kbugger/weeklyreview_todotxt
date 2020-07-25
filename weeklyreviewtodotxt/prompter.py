@@ -18,7 +18,11 @@ class Phase():
         self.options[command] = action
 
     def add_input(self, responses):
+        assert all(isinstance(a, str) for a in responses)
         self.input.extend(responses)
 
     def next_response(self):
-        return self.input.pop(0)
+        try:
+            return self.input.pop(0)
+        except IndexError:
+            return input()

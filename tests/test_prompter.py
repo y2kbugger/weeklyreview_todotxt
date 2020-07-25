@@ -32,6 +32,9 @@ def test_input_consumed_fifo(dp):
     assert dp.next_response() == 's'
     assert dp.next_response() == 's2'
 
-# def test_asks_for_user_input_if_responses_run_dry(dp):
-#     dp.next_response()
+def test_asks_for_user_input_if_responses_run_dry(dp):
+    dp.add_input(['s'])
+    assert dp.next_response() == 's'
+    with pytest.raises(IOError):
+        dp.next_response()
 
