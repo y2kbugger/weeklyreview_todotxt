@@ -1,6 +1,7 @@
 import pytest
 
 from weeklyreviewtodotxt.prompter import Phase
+from test_taskstoprojects import tasks
 
 class DummyPhase(Phase):
     @property
@@ -8,15 +9,11 @@ class DummyPhase(Phase):
         return "What do"
 
 @pytest.fixture()
-def dp():
+def dp(tasks):
     return DummyPhase()
 
-def test_phase_can_give_prompt(dp, capsys):
-    for cycle in dp:
-        pass
-    assert "What do" in capsys.readouterr().out
-
-def test_phase_can_skip_cylce(dp, capsys):
+def test_phase_can_skip_cycle(dp, capsys):
+    dp.add_input(['s'])
     for cycle in dp:
         pass
     assert "What do" in capsys.readouterr().out
