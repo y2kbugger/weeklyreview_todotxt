@@ -14,8 +14,11 @@ class Phase():
             print(self.prompt, flush=True)
             for o in self.options.keys():
                 print(o)
-                self.options[o](task)
-            self.next_response()
+            r = self.next_response()
+            try:
+                self.options[r](task)
+            except KeyError:
+                print("Invalid choice, try again")
             yield None
 
     def add_option(self, command, action):
@@ -30,4 +33,6 @@ class Phase():
             return self.input.pop(0)
         except IndexError:
             return input()
+
+# class Option:
 

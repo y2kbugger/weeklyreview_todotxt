@@ -24,7 +24,7 @@ def test_no_prompt_if_no_tasks(dp, out):
 
 def test_phase_can_skip_cycle(dp, out, tasks : Tasks, capsys):
     tasks.add_task(Task(""))
-    dp.add_input(['s'])
+    dp.add_input(['skip'])
     for cycle in dp:
         pass
     o = out()
@@ -49,3 +49,11 @@ def test_displays_options_command(dp, out, tasks):
         for cycle in dp:
             pass
     assert out().count('skip') == 1
+
+def test_only_run_selected_option(dp, out, tasks):
+    tasks.add_task(Task(""))
+    dp.add_input(['d'])
+    for cycle in dp:
+        pass
+    o = out()
+    assert o.count("Skipping") == 0
