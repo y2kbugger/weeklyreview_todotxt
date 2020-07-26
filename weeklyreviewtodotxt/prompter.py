@@ -8,7 +8,7 @@ class Option():
     @property
     def description(self) -> str:
         return ""
-    def action(self, wk:WeeklyReview, t:Task, phase):
+    def action(self, wr:WeeklyReview, t:Task, phase):
         pass
     def preview(self, t:Task) -> str:
         return ""
@@ -20,7 +20,7 @@ class Skip(Option):
     @property
     def description(self) -> str:
         return "Go on to the next Task without processing"
-    def action(self, wk:WeeklyReview, t:Task, phase):
+    def action(self, wr:WeeklyReview, t:Task, phase):
         print("Skipping")
 
 class Phase():
@@ -98,8 +98,8 @@ class FixLegacyProjectPhase(Phase):
         @property
         def description(self) -> str:
             return "Guess the project tag from the legacy project contents"
-        def action(self, wk:WeeklyReview, t:Task, p:Phase):
-            wk.convert_task_to_project(t)
+        def action(self, wr:WeeklyReview, t:Task, p:Phase):
+            wr.convert_task_to_project(t)
         def preview(self, t:Task) -> str:
             nt = Task(t.persist)
             WeeklyReview.convert_task_to_project(None, nt)
@@ -112,7 +112,7 @@ class FixLegacyProjectPhase(Phase):
         @property
         def description(self) -> str:
             return ""
-        def action(self, wk:WeeklyReview, t:Task, p:Phase):
+        def action(self, wr:WeeklyReview, t:Task, p:Phase):
             wr.assign_task_to_project(t, p.next_response())
         def preview(self, t:Task) -> str:
             return f"{t.persist} prj:???"
