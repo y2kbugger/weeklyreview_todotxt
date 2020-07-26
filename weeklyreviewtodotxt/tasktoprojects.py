@@ -62,7 +62,7 @@ class Tasks:
     def persist_task_to_file(self, file):
         file.writelines(t.persist + '\n' for t in self)
 
-class TasksToProjects:
+class WeeklyReview:
     def __init__(self, tasks:Tasks):
         self._tasks = tasks
 
@@ -80,7 +80,7 @@ def main():
     from pathlib import Path
     projdir = Path(__file__).parent.parent
     tasks = Tasks()
-    ttp = TasksToProjects(tasks)
+    wr = WeeklyReview(tasks)
 
     with open(projdir/'tests'/'todo.txt') as f:
         tasks.add_tasks_from_file(f)
@@ -92,7 +92,7 @@ def main():
         except KeyError:
             pass
         nt = Task(t.persist)
-        ttp.convert_task_to_project(nt)
+        wr.convert_task_to_project(nt)
 
         print("\n@@@Project Task missing prj:xxx:\n")
         choices = ['1','2','3']
@@ -106,9 +106,9 @@ def main():
                 )
             choice = input(prompt)
         if choice == '1':
-            ttp.convert_task_to_project(t)
+            wr.convert_task_to_project(t)
         elif choice == '2':
-            ttp.assign_task_to_project(t, input('prj:'))
+            wr.assign_task_to_project(t, input('prj:'))
         elif choice == '3':
             continue
 

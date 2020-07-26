@@ -2,7 +2,7 @@ from io import StringIO
 import pytest
 
 from weeklyreviewtodotxt.parser import Task
-from weeklyreviewtodotxt.tasktoprojects import TasksToProjects, Tasks
+from weeklyreviewtodotxt.tasktoprojects import WeeklyReview, Tasks
 
 from test_parser import assert_tasks_equal
 
@@ -76,27 +76,27 @@ def test_can_refine_list_prj_tag(tasks:Tasks):
         ]
 
 @pytest.fixture
-def ttp(tasks):
-    ttp = TasksToProjects(tasks)
-    return ttp
+def wr(tasks):
+    wr = WeeklyReview(tasks)
+    return wr
 
-def test_turn_task_into_project(ttp):
+def test_turn_task_into_project(wr):
     t = Task("earn degree")
-    ttp.convert_task_to_project(t)
+    wr.convert_task_to_project(t)
     assert_tasks_equal(t, Task("prj:earn_degree @@@project"))
 
-def test_can_assign_to_existing_project(tasks, ttp):
+def test_can_assign_to_existing_project(tasks, wr):
     tasks.add_task(Task("prj:earn_degree @@@project"))
     tasks.add_task(t:=Task("research graduate programs"))
-    ttp.assign_task_to_project(t, 'earn_degree')
+    wr.assign_task_to_project(t, 'earn_degree')
     assert list(tasks) == [
         Task("prj:earn_degree @@@project"),
         Task("research graduate programs prj:earn_degree"),
         ]
 
-def test_ttp_creates_project_if_doesnt_exist(tasks, ttp):
+def test_wr_creates_project_if_doesnt_exist(tasks, wr):
     tasks.add_task(t:=Task("research graduate programs"))
-    ttp.assign_task_to_project(t, 'earn_degree')
+    wr.assign_task_to_project(t, 'earn_degree')
     assert list(tasks) == [
         Task("research graduate programs prj:earn_degree"),
         Task("prj:earn_degree @@@project"),

@@ -1,4 +1,4 @@
-from .tasktoprojects import TasksToProjects
+from .tasktoprojects import WeeklyReview
 class Phase():
     def __init__(self):
         self.current_task_ix = 0
@@ -54,7 +54,7 @@ class Phase():
         raise NotImplementedError()
 
 class FixLegacyProjectPhase(Phase):
-    def __init__(self, weeklyreview:TasksToProjects):
+    def __init__(self, weeklyreview:WeeklyReview):
         self.weeklyreview = weeklyreview
         pass
 

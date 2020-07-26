@@ -2,7 +2,7 @@ import pytest
 
 from weeklyreviewtodotxt.tasktoprojects import Tasks, Task
 from weeklyreviewtodotxt.prompter import Phase, FixLegacyProjectPhase
-from test_taskstoprojects import tasks, ttp
+from test_taskstoprojects import tasks, wr
 
 # Mix-in dummies
 class DummyPhaseInput(Phase):
@@ -96,7 +96,7 @@ def legacy():
         except KeyError:
             pass
         nt = Task(t.persist)
-        ttp.convert_task_to_project(nt)
+        wr.convert_task_to_project(nt)
 
         print("\n@@@Project Task missing prj:xxx:\n")
         choices = ['1','2','3']
@@ -110,18 +110,18 @@ def legacy():
                 )
             choice = input(prompt)
         if choice == '1':
-            ttp.convert_task_to_project(t)
+            wr.convert_task_to_project(t)
         elif choice == '2':
-            ttp.assign_task_to_project(t, input('prj:'))
+            wr.assign_task_to_project(t, input('prj:'))
         elif choice == '3':
             continue
 
 ### Fix Legacy Projects
 @pytest.fixture(scope="function")
-def flp_dp(tasks, ttp):
+def flp_dp(tasks, wr):
     class FLPDP(DummyPhaseInput, FixLegacyProjectPhase):
         pass
-    dp = FLPDP(weeklyreview=ttp)
+    dp = FLPDP(weeklyreview=wr)
     dp.dummy_tasks = tasks
     return dp
 
