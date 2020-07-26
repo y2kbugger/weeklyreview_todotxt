@@ -7,6 +7,7 @@ from test_taskstoprojects import tasks, wr
 # Mix-in dummies
 class DummyPhaseInput(Phase):
     def __init__(self, *args, **kw):
+        self.weeklyreview = None
         super().__init__(*args, **kw)
         self.dummy_input = []
 
@@ -156,3 +157,10 @@ def test_flp_auto_give_preview(flp_dp, tasks, out):
     with pytest.raises(IOError):
         next(flp_dp)
     assert '@@@project prj:test' in out()
+
+def test_flp_manual_give_preview(flp_dp, tasks, out):
+    tasks.add_tasks_from_list([
+        "@@@project test"])
+    with pytest.raises(IOError):
+        next(flp_dp)
+    assert '@@@project test prj:???' in out()
