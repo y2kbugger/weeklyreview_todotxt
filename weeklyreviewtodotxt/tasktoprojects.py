@@ -23,9 +23,6 @@ class Tasks:
                     pass
         return projects
 
-    def tasks_by_extension(self, ext:str):
-        return [t for t in self if ext in t.extensions.keys()]
-
     def make_project_if_doesnt_exist(self, proj):
         if proj not in self.projects:
             self.add_task(Task(f"@@@project prj:{proj}"))
@@ -44,7 +41,7 @@ class TaskFilters():
 
     @staticmethod
     def is_dailyreview_task(t):
-        if t.is_hidden():
+        if TaskFilters.is_hidden(t):
             return False
         for c in t.contexts:
             if c.persist[:3] == '@@@':
@@ -59,9 +56,25 @@ class TaskFilters():
 
     @staticmethod
     def is_project_task(t):
-        if t.is_hidden():
+        if TaskFilters.is_hidden(t):
             return False
         return any(c.persist == '@@@project' for c in t.contexts)
+
+    @staticmethod
+    def make_filter_tasks_by_extension(ext:str):
+        def task_has_extension(t):
+            return ext in t.extensions.keys()
+        return task_has_extension
+
+    @staticmethod
+    def is_hidden(t):
+        try:
+            if t.extensions['h'].value == '1':
+                return True
+            else:
+                return False
+        except KeyError:
+            return False
 
 class WeeklyReview:
     def __init__(self, tasks:Tasks):

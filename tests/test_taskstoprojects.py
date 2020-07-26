@@ -66,14 +66,23 @@ def test_can_refine_list_projects(tasks, wr):
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "be happy @@@project",
         ]
+def test_can_filter_hidden_tasks(tasks, wr):
+    [tasks.add_task(Task(t)) for t in [
+        "c", "c h:1", "c h:0"
+        ]]
+    f = TaskFilters.is_hidden
+    assert [t.persist for t in wr.tasks_filtered_by(f)] == [
+        "c h:1"
+        ]
 
-def test_can_refine_list_prj_tag(tasks:Tasks):
+
+def test_can_refine_list_prj_tag(tasks:Tasks, wr):
     [tasks.add_task(Task(t)) for t in [
         "be happy @@@project",
         "prj:twist",
         ]]
-    print(tasks.tasks_by_extension)
-    assert [t.persist for t in tasks.tasks_by_extension('prj')] == [
+    f = TaskFilters.make_filter_tasks_by_extension('prj')
+    assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "prj:twist",
         ]
 

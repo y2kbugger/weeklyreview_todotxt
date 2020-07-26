@@ -133,16 +133,6 @@ def test_can_remove_part():
     initial.remove_part('c')
     assert_tasks_equal(initial, target)
 
-def test_can_check_if_is_hidden_task():
-    t = Task("c")
-    assert t.is_hidden() == False
-
-    t = Task("c h:1")
-    assert t.is_hidden() == True
-
-    t = Task("c h:0")
-    assert t.is_hidden() == False
-
 def test_against_legacy():
     with open(Path(__file__).parent / 'todo.txt') as f:
         for line in f.readlines():
