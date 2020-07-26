@@ -1,7 +1,7 @@
 import pytest
 
 from weeklyreviewtodotxt.tasktoprojects import Tasks, Task
-from weeklyreviewtodotxt.prompter import Phase, FixLegacyProjectPhase
+from weeklyreviewtodotxt.prompter import Phase, Option, FixLegacyProjectPhase
 from test_taskstoprojects import tasks, wr
 
 # Mix-in dummies
@@ -25,6 +25,12 @@ class DummyPhaseTasks(Phase):
     def relevant_tasks(self):
         return list(self.dummy_tasks)
 
+class DummyOption(Option):
+    def __init__(self, command):
+        self._dummy_command = command
+    @property
+    def command(self) -> str:
+        return self._dummy_command
 
 @pytest.fixture(scope="function")
 def dp(tasks):
@@ -82,9 +88,8 @@ def test_can_match_unique_partial_command(dp, out, tasks):
 
 def test_partial_matcher_handle_non_unique_matches(dp, out, tasks):
     tasks.add_task(Task(""))
-    dp.add_option('kite', lambda t:print('Kit'))
-    dp.add_option('kitten', lambda t:print('Kitten'))
-    dp.dummy_input = ['k']
+    dp._options = [DummyOption('kite'),DummyOption('kitten')]
+    dp.dummy_input = ['kit']
     with pytest.raises(IOError):
         next(dp)
 
@@ -143,3 +148,11 @@ def test_flp_ask_right_options(flp_dp, tasks, out):
     assert o.count('auto') == 1
     assert o.count('manual') == 1
     assert o.count('skip') == 1
+
+
+def test_flp_auto_give_preview(flp_dp, tasks, out):
+    tasks.add_tasks_from_list([
+        "@@@project test"])
+    with pytest.raises(IOError):
+        next(flp_dp)
+    assert '@@@project prj:test' in out()

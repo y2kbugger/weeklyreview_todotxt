@@ -1,10 +1,32 @@
+from .parser import Task
 from .tasktoprojects import WeeklyReview, FilterTasks
+
+class Option():
+    @property
+    def command(self) -> str:
+        raise NotImplementedError()
+    @property
+    def description(self) -> str:
+        return ""
+    def action(self, t:Task):
+        pass
+    def preview(self, t:Task) -> str:
+        return ""
+
+class Skip(Option):
+    @property
+    def command(self) -> str:
+        return 'skip'
+    @property
+    def description(self) -> str:
+        return "Go on to the next Task without processing"
+    def action(self, t:Task):
+        print("Skipping")
 
 class Phase():
     def __init__(self):
         self.current_task_ix = 0
-        self.options = {}
-        self.add_option('skip', lambda t:print('Skipping'))
+        self._options = [Skip()]
 
     def __iter__(self):
         return self
@@ -17,30 +39,31 @@ class Phase():
         self.run_prompt_for_task(current_task)
         self.current_task_ix += 1
 
+    @property
+    def options(self):
+        return {o.command:o for o in self._options}
+
     def run_prompt_for_task(self, task):
         print(self.prompt, flush=True)
-        for o in self.options.keys():
-            print(f"  {o}")
+        for o in self._options:
+            print(f"  {o.command}: {o.preview(task)}")
         r = self.next_response()
         print("Choice: ", r)
 
         try:
-            command_key = self.match_option_command(r)
-            self.options[command_key](task)
+            option = self.match_option(r)
+            option.action(task)
         except KeyError as e:
             print(e.args[0])
             self.run_prompt_for_task(task)
 
-    def match_option_command(self, r):
-        matches = [key for key in self.options.keys() if key.startswith(r)]
+    def match_option(self, r):
+        matches = [o for o in self._options if o.command.startswith(r)]
         if len(matches) == 0:
             raise KeyError("No options matched")
         if len(matches) > 1:
-            raise KeyError(f"Both {','.join(matches)} matched, be more specific.")
+            raise KeyError(f"Both {','.join(o.command for o in matches)} matched, be more specific.")
         return matches[0]
-
-    def add_option(self, command, action):
-        self.options[command] = action
 
     def next_response(self):
         return input()
@@ -54,18 +77,42 @@ class Phase():
         raise NotImplementedError()
 
 class FixLegacyProjectPhase(Phase):
+    def __init__(self, weeklyreview:WeeklyReview):
+        super().__init__()
+        self.weeklyreview = weeklyreview
+        self._options = [self.Auto(),self.Manual(),Skip()]
 
     @property
     def prompt(self) -> str:
         return "@@@Project Task missing `prj:xxx`:"
 
-    def __init__(self, weeklyreview:WeeklyReview):
-        super().__init__()
-        self.weeklyreview = weeklyreview
-        self.add_option('auto', lambda:None)
-        self.add_option('manual', lambda:None)
-
     @property
     def relevant_tasks(self):
         f = FilterTasks.is_legacy_project
         return self.weeklyreview.tasks_filtered_by(f)
+
+    class Auto(Option):
+        @property
+        def command(self) -> str:
+            return 'auto'
+        @property
+        def description(self) -> str:
+            return ""
+        def action(self, t:Task):
+            pass
+        def preview(self, t:Task) -> str:
+            nt = Task(t.persist)
+            WeeklyReview.convert_task_to_project(None, nt)
+            return nt.persist
+
+    class Manual(Option):
+        @property
+        def command(self) -> str:
+            return 'manual'
+        @property
+        def description(self) -> str:
+            return ""
+        def action(self, t:Task):
+            pass
+        def preview(self, t:Task) -> str:
+            return ""
