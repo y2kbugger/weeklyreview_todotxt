@@ -1,4 +1,5 @@
-from .tasktoprojects import WeeklyReview
+from .tasktoprojects import WeeklyReview, FilterTasks
+
 class Phase():
     def __init__(self):
         self.current_task_ix = 0
@@ -60,6 +61,7 @@ class FixLegacyProjectPhase(Phase):
 
     @property
     def relevant_tasks(self):
-        legacy_projects = self.weeklyreview._tasks.project_tasks
-        new_style_projects = self.weeklyreview._tasks
+        # legacy_projects = self.weeklyreview.tasks_filtered_by(FilterTasks.is_project_task
+
+        # new_style_projects = self.weeklyreview._tasks
         return []

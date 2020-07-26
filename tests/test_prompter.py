@@ -125,10 +125,11 @@ def flp_dp(tasks, wr):
     dp.dummy_tasks = tasks
     return dp
 
-# def test_flp_filters_to_correct_tasks(flp_dp, tasks):
-#     tasks.add_task(Task("@@@project test"))
-#     tasks.add_task(Task("@@@project prj:test"))
-#     tasks.add_task(Task("test"))
+# def test_flp_filters_to_correct_tasks(flp_dp, tasks:Tasks):
+#     tasks.add_tasks_from_list([
+#         "@@@project test",
+#         "@@@project prj:test",
+#         "test"])
 #     assert list(flp_dp.relevant_tasks) == [
 #         Task("@@@project test"),
 #         ]

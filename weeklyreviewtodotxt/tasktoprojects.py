@@ -40,17 +40,19 @@ class Tasks:
     def persist_task_to_file(self, file):
         file.writelines(t.persist + '\n' for t in self)
 
-class TaskFilters():
-    """Namespace for Static filters"""
+class FilterTasks():
+    """Namespace for static task filters"""
+    meta_contexts = ['@@@']
+    special_contexts = ['@^', '@~']
 
-    @staticmethod
-    def is_dailyreview_task(t):
-        if TaskFilters.is_hidden(t):
+    @classmethod
+    def is_dailyreview_task(cls,t):
+        if cls.is_hidden(t):
             return False
         for c in t.contexts:
-            if c.persist[:3] == '@@@':
+            if c.persist[:3] in cls.meta_contexts:
                 return False
-            if c.persist[:2] in ['@^', '@~']:
+            if c.persist[:2] in cls.special_contexts:
                 return False
             if c.persist in ['@@agenda', '@@art', '@@plants', '@@store']:
                 # todo: Once i split todo.txt into more files
@@ -58,17 +60,23 @@ class TaskFilters():
                 return False
         return True
 
-    @staticmethod
-    def is_project_task(t):
-        if TaskFilters.is_hidden(t):
+    @classmethod
+    def is_project_task(cls, t):
+        if cls.is_hidden(t):
             return False
-        return any(c.persist == '@@@project' for c in t.contexts)
+        return cls.by_context('@@@project')(t)
 
     @staticmethod
-    def make_filter_tasks_by_extension(ext:str):
+    def by_extension(ext:str):
         def task_has_extension(t):
             return ext in t.extensions.keys()
         return task_has_extension
+
+    @staticmethod
+    def by_context(context:str):
+        def task_has_context(t):
+            return context in [c.persist for c in t.contexts]
+        return task_has_context
 
     @staticmethod
     def is_hidden(t):

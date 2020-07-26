@@ -2,7 +2,7 @@ from io import StringIO
 import pytest
 
 from weeklyreviewtodotxt.parser import Task
-from weeklyreviewtodotxt.tasktoprojects import WeeklyReview, Tasks, TaskFilters
+from weeklyreviewtodotxt.tasktoprojects import WeeklyReview, Tasks, FilterTasks
 
 from test_parser import assert_tasks_equal
 
@@ -49,7 +49,7 @@ def test_can_refine_list_to_daily_review(tasks, wr):
         "paint cat @@art",
         "fix speaker fur prj:boom_box",
         ])
-    f = TaskFilters.is_dailyreview_task
+    f = FilterTasks.is_dailyreview_task
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "oil basketball",
         "pet cat @@home",
@@ -62,13 +62,13 @@ def test_can_refine_list_projects(tasks, wr):
         "twist and shout @~music",
         "hidden h:1 @@@project",
         ])
-    f = TaskFilters.is_project_task
+    f = FilterTasks.is_project_task
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "be happy @@@project",
         ]
 def test_can_filter_hidden_tasks(tasks, wr):
     tasks.add_tasks_from_list([ "c", "c h:1", "c h:0" ])
-    f = TaskFilters.is_hidden
+    f = FilterTasks.is_hidden
     assert [t.persist for t in wr.tasks_filtered_by(f)] == ["c h:1"]
 
 def test_can_refine_list_prj_tag(tasks:Tasks, wr):
@@ -76,7 +76,7 @@ def test_can_refine_list_prj_tag(tasks:Tasks, wr):
         "be happy @@@project",
         "prj:twist",
         ])
-    f = TaskFilters.make_filter_tasks_by_extension('prj')
+    f = FilterTasks.by_extension('prj')
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "prj:twist",
         ]
