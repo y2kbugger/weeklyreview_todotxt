@@ -46,22 +46,7 @@ class FilterTasks():
     special_contexts = ['@^', '@~']
 
     @classmethod
-    def is_dailyreview_task(cls,t):
-        if cls.is_hidden(t):
-            return False
-        for c in t.contexts:
-            if c.persist[:3] in cls.meta_contexts:
-                return False
-            if c.persist[:2] in cls.special_contexts:
-                return False
-            if c.persist in ['@@agenda', '@@art', '@@plants', '@@store']:
-                # todo: Once i split todo.txt into more files
-                # this special case should drop out
-                return False
-        return True
-
-    @classmethod
-    def is_project_task(cls, t):
+    def is_project(cls, t):
         if cls.is_hidden(t):
             return False
         return cls.by_context('@@@project')(t)
@@ -87,6 +72,27 @@ class FilterTasks():
                 return False
         except KeyError:
             return False
+
+    @classmethod
+    def is_dailyreview(cls,t):
+        if cls.is_hidden(t):
+            return False
+        for c in t.contexts:
+            if c.persist[:3] in cls.meta_contexts:
+                return False
+            if c.persist[:2] in cls.special_contexts:
+                return False
+            if c.persist in ['@@agenda', '@@art', '@@plants', '@@store']:
+                # todo: Once i split todo.txt into more files
+                # this special case should drop out
+                return False
+        return True
+
+    @classmethod
+    def is_legacy_project(cls, t):
+        project_metacontext_f = cls.is_project
+        prj_ext_f= cls.by_extension('prj')
+        return project_metacontext_f(t) and not prj_ext_f(t)
 
 class WeeklyReview:
     def __init__(self, tasks:Tasks):

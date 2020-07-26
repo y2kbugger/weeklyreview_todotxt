@@ -49,7 +49,7 @@ def test_can_refine_list_to_daily_review(tasks, wr):
         "paint cat @@art",
         "fix speaker fur prj:boom_box",
         ])
-    f = FilterTasks.is_dailyreview_task
+    f = FilterTasks.is_dailyreview
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "oil basketball",
         "pet cat @@home",
@@ -62,7 +62,7 @@ def test_can_refine_list_projects(tasks, wr):
         "twist and shout @~music",
         "hidden h:1 @@@project",
         ])
-    f = FilterTasks.is_project_task
+    f = FilterTasks.is_project
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "be happy @@@project",
         ]

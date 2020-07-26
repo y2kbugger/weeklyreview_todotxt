@@ -61,7 +61,6 @@ class FixLegacyProjectPhase(Phase):
 
     @property
     def relevant_tasks(self):
-        # legacy_projects = self.weeklyreview.tasks_filtered_by(FilterTasks.is_project_task
+        f = FilterTasks.is_legacy_project
+        return self.weeklyreview.tasks_filtered_by(f)
 
-        # new_style_projects = self.weeklyreview._tasks
-        return []
