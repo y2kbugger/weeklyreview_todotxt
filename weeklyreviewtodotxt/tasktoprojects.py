@@ -31,6 +31,9 @@ class Tasks:
     def project_tasks(self):
         return [t for t in self if t.is_project()]
 
+    def tasks_by_extension(self, ext:str):
+        return [t for t in self if ext in t.extensions.keys()]
+
     @staticmethod
     def is_dailyreview_task(t):
         if t.is_hidden():
@@ -60,7 +63,7 @@ class Tasks:
         file.writelines(t.persist + '\n' for t in self)
 
 class TasksToProjects:
-    def __init__(self, tasks):
+    def __init__(self, tasks:Tasks):
         self._tasks = tasks
 
     def convert_task_to_project(self, task : Task):
@@ -108,7 +111,6 @@ def main():
             ttp.assign_task_to_project(t, input('prj:'))
         elif choice == '3':
             continue
-
 
     for t in tasks.dailyreview_tasks:
         choices = ['1','2','3']

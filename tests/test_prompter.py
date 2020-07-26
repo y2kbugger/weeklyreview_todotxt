@@ -1,11 +1,11 @@
 import pytest
 
 from weeklyreviewtodotxt.tasktoprojects import Tasks, Task
-from weeklyreviewtodotxt.prompter import Phase
-from test_taskstoprojects import tasks
+from weeklyreviewtodotxt.prompter import Phase, FixLegacyProjectPhase
+from test_taskstoprojects import tasks, ttp
 
-class DummyPhase(Phase):
-    """Can use this as a mix-in as well as a generic Dummy"""
+# Mix-in dummies
+class DummyPhaseInput(Phase):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.dummy_input = []
@@ -14,19 +14,23 @@ class DummyPhase(Phase):
     def prompt(self) -> str:
         return "What do"
 
-    @property
-    def relevant_tasks(self):
-        return list(self.dummy_tasks)
-
     def next_response(self):
         try:
             return self.dummy_input.pop(0)
         except IndexError:
-            raise IOError("Exausted Dummy Input")
+            raise IOError("Exhausted Dummy Input")
+
+class DummyPhaseTasks(Phase):
+    @property
+    def relevant_tasks(self):
+        return list(self.dummy_tasks)
+
 
 @pytest.fixture(scope="function")
 def dp(tasks):
-    dp = DummyPhase()
+    class DP(DummyPhaseTasks, DummyPhaseInput, Phase):
+        pass
+    dp = DP()
     dp.dummy_tasks = tasks
     return dp
 
@@ -84,6 +88,47 @@ def test_partial_matcher_handle_non_unique_matches(dp, out, tasks):
     with pytest.raises(IOError):
         next(dp)
 
-def test_fix_legacy_projects():
-    pass
+def legacy():
+    for t in tasks.project_tasks:
+        try:
+            t.extensions['prj']
+            continue
+        except KeyError:
+            pass
+        nt = Task(t.persist)
+        ttp.convert_task_to_project(nt)
 
+        print("\n@@@Project Task missing prj:xxx:\n")
+        choices = ['1','2','3']
+        choice = None
+        while choice not in choices:
+            print(""+t.persist+"\n", flush=True)
+            prompt = ("Options:\n"
+                f"\t1. Auto: `{nt.persist}`\n"
+                "\t2. Manually enter prj:xxx\n"
+                "\t3. skip\n\n"
+                )
+            choice = input(prompt)
+        if choice == '1':
+            ttp.convert_task_to_project(t)
+        elif choice == '2':
+            ttp.assign_task_to_project(t, input('prj:'))
+        elif choice == '3':
+            continue
+
+### Fix Legacy Projects
+@pytest.fixture(scope="function")
+def flp_dp(tasks, ttp):
+    class FLPDP(DummyPhaseInput, FixLegacyProjectPhase):
+        pass
+    dp = FLPDP(weeklyreview=ttp)
+    dp.dummy_tasks = tasks
+    return dp
+
+# def test_flp_filters_to_correct_tasks(flp_dp, tasks):
+#     tasks.add_task(Task("@@@project test"))
+#     tasks.add_task(Task("@@@project prj:test"))
+#     tasks.add_task(Task("test"))
+#     assert list(flp_dp.relevant_tasks) == [
+#         Task("@@@project test"),
+#         ]

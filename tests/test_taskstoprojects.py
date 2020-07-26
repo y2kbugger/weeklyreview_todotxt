@@ -65,6 +65,16 @@ def test_can_refine_list_projects(tasks):
         "be happy @@@project",
         ]
 
+def test_can_refine_list_prj_tag(tasks:Tasks):
+    [tasks.add_task(Task(t)) for t in [
+        "be happy @@@project",
+        "prj:twist",
+        ]]
+    print(tasks.tasks_by_extension)
+    assert [t.persist for t in tasks.tasks_by_extension('prj')] == [
+        "prj:twist",
+        ]
+
 @pytest.fixture
 def ttp(tasks):
     ttp = TasksToProjects(tasks)
