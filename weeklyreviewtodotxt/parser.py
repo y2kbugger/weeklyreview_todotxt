@@ -94,11 +94,6 @@ class Task():
         except KeyError:
             return False
 
-    def is_project(self):
-        if self.is_hidden():
-            return False
-        return any(c.persist == '@@@project' for c in self.contexts)
-
 
 class Generic():
     def __init__(self, string):

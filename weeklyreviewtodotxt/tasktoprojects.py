@@ -23,14 +23,6 @@ class Tasks:
                     pass
         return projects
 
-    @property
-    def dailyreview_tasks(self):
-        return [t for t in self if TaskFilters.is_dailyreview_task(t)]
-
-    @property
-    def project_tasks(self):
-        return [t for t in self if t.is_project()]
-
     def tasks_by_extension(self, ext:str):
         return [t for t in self if ext in t.extensions.keys()]
 
@@ -49,6 +41,7 @@ class Tasks:
 
 class TaskFilters():
     """Namespace for Static filters"""
+
     @staticmethod
     def is_dailyreview_task(t):
         if t.is_hidden():
@@ -64,9 +57,19 @@ class TaskFilters():
                 return False
         return True
 
+    @staticmethod
+    def is_project_task(t):
+        if t.is_hidden():
+            return False
+        return any(c.persist == '@@@project' for c in t.contexts)
+
 class WeeklyReview:
     def __init__(self, tasks:Tasks):
         self._tasks = tasks
+
+    def tasks_filtered_by(self, filter):
+        """filter = lamba Task: -> bool"""
+        return [t for t in self._tasks if filter(t)]
 
     def convert_task_to_project(self, task : Task):
         first_generic = [p for p in task.parts if type(p) is Generic][0]

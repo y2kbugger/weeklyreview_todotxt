@@ -2,7 +2,7 @@ from io import StringIO
 import pytest
 
 from weeklyreviewtodotxt.parser import Task
-from weeklyreviewtodotxt.tasktoprojects import WeeklyReview, Tasks
+from weeklyreviewtodotxt.tasktoprojects import WeeklyReview, Tasks, TaskFilters
 
 from test_parser import assert_tasks_equal
 
@@ -38,7 +38,7 @@ def test_can_get_projects(tasks):
     assert tasks.projects == ['lol']
 
 
-def test_can_refine_list_to_daily_review(tasks):
+def test_can_refine_list_to_daily_review(tasks, wr):
     [tasks.add_task(Task(t)) for t in [
         "be happy @@@project",
         "twist and shout @~music",
@@ -49,19 +49,21 @@ def test_can_refine_list_to_daily_review(tasks):
         "paint cat @@art",
         "fix speaker fur prj:boom_box",
         ]]
-    assert [t.persist for t in tasks.dailyreview_tasks] == [
+    f = TaskFilters.is_dailyreview_task
+    assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "oil basketball",
         "pet cat @@home",
         "fix speaker fur prj:boom_box"
         ]
 
-def test_can_refine_list_projects(tasks):
+def test_can_refine_list_projects(tasks, wr):
     [tasks.add_task(Task(t)) for t in [
         "be happy @@@project",
         "twist and shout @~music",
         "hidden h:1 @@@project",
         ]]
-    assert [t.persist for t in tasks.project_tasks] == [
+    f = TaskFilters.is_project_task
+    assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "be happy @@@project",
         ]
 
