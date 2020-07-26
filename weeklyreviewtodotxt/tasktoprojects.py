@@ -25,7 +25,7 @@ class Tasks:
 
     @property
     def dailyreview_tasks(self):
-        return [t for t in self if self.is_dailyreview_task(t)]
+        return [t for t in self if TaskFilters.is_dailyreview_task(t)]
 
     @property
     def project_tasks(self):
@@ -34,6 +34,21 @@ class Tasks:
     def tasks_by_extension(self, ext:str):
         return [t for t in self if ext in t.extensions.keys()]
 
+    def make_project_if_doesnt_exist(self, proj):
+        if proj not in self.projects:
+            self.add_task(Task(f"@@@project prj:{proj}"))
+
+    def add_tasks_from_file(self, file):
+        for line in file.readlines():
+            if len(line.strip()) == 0:
+                continue
+            self.add_task(Task(line))
+
+    def persist_task_to_file(self, file):
+        file.writelines(t.persist + '\n' for t in self)
+
+class TaskFilters():
+    """Namespace for Static filters"""
     @staticmethod
     def is_dailyreview_task(t):
         if t.is_hidden():
@@ -48,19 +63,6 @@ class Tasks:
                 # this special case should drop out
                 return False
         return True
-
-    def make_project_if_doesnt_exist(self, proj):
-        if proj not in self.projects:
-            self.add_task(Task(f"@@@project prj:{proj}"))
-
-    def add_tasks_from_file(self, file):
-        for line in file.readlines():
-            if len(line.strip()) == 0:
-                continue
-            self.add_task(Task(line))
-
-    def persist_task_to_file(self, file):
-        file.writelines(t.persist + '\n' for t in self)
 
 class WeeklyReview:
     def __init__(self, tasks:Tasks):

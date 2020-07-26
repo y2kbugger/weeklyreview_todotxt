@@ -63,13 +63,12 @@ break some of the non-todos out to their own files...
     It should also help reduce tag sprawl
 tag curation assistant (combine/eliminate/add) tags
 
-TDD
+Todo/TDD
 ----------------
 -Create new project
 -Have to handle creation date somehow --> maybe new tasks could always inherit from existing task..there are not that many cases for creating new tasks.
--handle legacy of projects not having prj:blahblah tags
 -may want to refactor is_xxx_task into the Task class
--add Task.is_prj_tagged
 -add (1/23) type counted to show progress for each step
 -add ability to can cycle or entire step (choice = s,ss)
 -Fix Legacy Project should check for duplicate prj: tags
+-Move main to bin
