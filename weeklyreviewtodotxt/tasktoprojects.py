@@ -33,6 +33,10 @@ class Tasks:
                 continue
             self.add_task(Task(line))
 
+    def add_tasks_from_list(self, list):
+        for line in list:
+            self.add_task(Task(line))
+
     def persist_task_to_file(self, file):
         file.writelines(t.persist + '\n' for t in self)
 

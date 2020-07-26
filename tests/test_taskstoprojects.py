@@ -11,7 +11,7 @@ def tasks():
     return Tasks()
 
 def test_can_add_tasks(tasks):
-    [tasks.add_task(Task(t)) for t in ["hello", "world", ]]
+    tasks.add_tasks_from_list(["hello", "world"])
     assert list(tasks) == [Task("hello"), Task("world")]
 
 def test_can_read_tasks_from_file(tasks):
@@ -25,21 +25,21 @@ def test_can_read_tasks_from_file_and_ignore_blankslines(tasks):
     assert list(tasks) == [Task("hello"), Task("world")]
 
 def test_can_save_tasks_to_file(tasks):
-    [tasks.add_task(Task(t)) for t in ["hello", "world", ]]
+    tasks.add_tasks_from_list(["hello", "world"])
     sio = StringIO()
     tasks.persist_task_to_file(sio)
     sio.seek(0)
     assert sio.read() == "hello\nworld\n"
 
 def test_can_get_projects(tasks):
-    [tasks.add_task(Task(t)) for t in [
+    tasks.add_tasks_from_list([
         "hello prj:lol @@@project",
-        "world"]]
+        "world"])
     assert tasks.projects == ['lol']
 
 
 def test_can_refine_list_to_daily_review(tasks, wr):
-    [tasks.add_task(Task(t)) for t in [
+    tasks.add_tasks_from_list([
         "be happy @@@project",
         "twist and shout @~music",
         "bak 15r @^chores",
@@ -48,7 +48,7 @@ def test_can_refine_list_to_daily_review(tasks, wr):
         "pet cat @@home",
         "paint cat @@art",
         "fix speaker fur prj:boom_box",
-        ]]
+        ])
     f = TaskFilters.is_dailyreview_task
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "oil basketball",
@@ -57,30 +57,25 @@ def test_can_refine_list_to_daily_review(tasks, wr):
         ]
 
 def test_can_refine_list_projects(tasks, wr):
-    [tasks.add_task(Task(t)) for t in [
+    tasks.add_tasks_from_list([
         "be happy @@@project",
         "twist and shout @~music",
         "hidden h:1 @@@project",
-        ]]
+        ])
     f = TaskFilters.is_project_task
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "be happy @@@project",
         ]
 def test_can_filter_hidden_tasks(tasks, wr):
-    [tasks.add_task(Task(t)) for t in [
-        "c", "c h:1", "c h:0"
-        ]]
+    tasks.add_tasks_from_list([ "c", "c h:1", "c h:0" ])
     f = TaskFilters.is_hidden
-    assert [t.persist for t in wr.tasks_filtered_by(f)] == [
-        "c h:1"
-        ]
-
+    assert [t.persist for t in wr.tasks_filtered_by(f)] == ["c h:1"]
 
 def test_can_refine_list_prj_tag(tasks:Tasks, wr):
-    [tasks.add_task(Task(t)) for t in [
+    tasks.add_tasks_from_list([
         "be happy @@@project",
         "prj:twist",
-        ]]
+        ])
     f = TaskFilters.make_filter_tasks_by_extension('prj')
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "prj:twist",
