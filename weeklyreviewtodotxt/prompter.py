@@ -23,10 +23,20 @@ class Phase():
         print("Choice: ", r)
 
         try:
-            self.options[r](task)
-        except KeyError:
-            print("Invalid choice, try again")
+            command_key = self.match_option_command(r)
+            self.options[command_key](task)
+        except KeyError as e:
+            print(e.args[0])
             self.run_prompt_for_task(task)
+
+    def match_option_command(self, r):
+        matches = [key for key in self.options.keys() if key.startswith(r)]
+        if len(matches) == 0:
+            raise KeyError("No options matched")
+        if len(matches) > 1:
+            raise KeyError(f"Both {','.join(matches)} matched, be more specific.")
+        return matches[0]
+
 
     def add_option(self, command, action):
         self.options[command] = action

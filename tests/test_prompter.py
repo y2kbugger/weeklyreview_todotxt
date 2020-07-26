@@ -8,6 +8,8 @@ class DummyPhase(Phase):
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
         self.dummy_input = []
+        self.add_option('kite', lambda t:print('Kit'))
+        self.add_option('kitten', lambda t:print('Kitten'))
 
     @property
     def prompt(self) -> str:
@@ -21,7 +23,7 @@ class DummyPhase(Phase):
         try:
             return self.dummy_input.pop(0)
         except IndexError:
-            raise IOError()
+            raise IOError("Exausted Dummy Input")
 
 @pytest.fixture(scope="function")
 def dp(tasks):
@@ -69,8 +71,15 @@ def test_can_retry_response(dp, out, tasks):
     next(dp)
     assert out().count("Skipping") == 1
 
-# def test_can_match_unique_partial_command(dp, out, tasks):
-#     tasks.add_task(Task(""))
-#     dp.dummy_input = ['d', 's']
-#     next(dp)
-#     assert out().count("Skipping") == 1
+def test_can_match_unique_partial_command(dp, out, tasks):
+    tasks.add_task(Task(""))
+    dp.dummy_input = ['s']
+    next(dp)
+    assert out().count("Skipping") == 1
+
+def test_partial_matcher_handle_non_unique_matches(dp, out, tasks):
+    tasks.add_task(Task(""))
+    dp.dummy_input = ['k']
+    with pytest.raises(IOError):
+        next(dp)
+
