@@ -150,7 +150,6 @@ def test_flp_ask_right_options(flp_dp, tasks, out):
     assert o.count('manual') == 1
     assert o.count('skip') == 1
 
-
 def test_flp_auto_give_preview(flp_dp, tasks, out):
     tasks.add_tasks_from_list([
         "@@@project test"])
@@ -164,3 +163,16 @@ def test_flp_manual_give_preview(flp_dp, tasks, out):
     with pytest.raises(IOError):
         next(flp_dp)
     assert '@@@project test prj:???' in out()
+
+def test_flp_auto_has_correct_effect(flp_dp, tasks, out):
+    flp_dp.dummy_input = ['a']
+    tasks.add_task(t:=Task("@@@project test"))
+    next(flp_dp)
+    assert t.persist == '@@@project prj:test'
+
+# def test_flp_manual_give_preview(flp_dp, tasks, out):
+#     tasks.add_tasks_from_list([
+#         "@@@project test"])
+#     with pytest.raises(IOError):
+#         next(flp_dp)
+#     assert '@@@project test prj:???' in out()
