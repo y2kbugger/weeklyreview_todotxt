@@ -10,10 +10,6 @@ class DummyPhaseInput(Phase):
         super().__init__(*args, **kw)
         self.dummy_input = []
 
-    @property
-    def prompt(self) -> str:
-        return "What do"
-
     def next_response(self):
         try:
             return self.dummy_input.pop(0)
@@ -21,6 +17,10 @@ class DummyPhaseInput(Phase):
             raise IOError("Exhausted Dummy Input")
 
 class DummyPhaseTasks(Phase):
+    @property
+    def prompt(self) -> str:
+        return "What do"
+
     @property
     def relevant_tasks(self):
         return list(self.dummy_tasks)
@@ -98,7 +98,7 @@ def legacy():
         nt = Task(t.persist)
         wr.convert_task_to_project(nt)
 
-        print("\n@@@Project Task missing prj:xxx:\n")
+        print("")
         choices = ['1','2','3']
         choice = None
         while choice not in choices:
@@ -125,7 +125,7 @@ def flp_dp(tasks, wr):
     dp.dummy_tasks = tasks
     return dp
 
-def test_flp_filters_to_correct_tasks(flp_dp, tasks:Tasks):
+def test_flp_filters_to_correct_tasks(flp_dp, tasks):
     tasks.add_tasks_from_list([
         "@@@project test",
         "@@@project prj:test",
@@ -133,3 +133,13 @@ def test_flp_filters_to_correct_tasks(flp_dp, tasks:Tasks):
     assert list(flp_dp.relevant_tasks) == [
         Task("@@@project test"),
         ]
+
+def test_flp_ask_right_options(flp_dp, tasks, out):
+    tasks.add_tasks_from_list([
+        "@@@project test"])
+    with pytest.raises(IOError):
+        next(flp_dp)
+    o = out()
+    assert o.count('auto') == 1
+    assert o.count('manual') == 1
+    assert o.count('skip') == 1

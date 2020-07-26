@@ -20,7 +20,7 @@ class Phase():
     def run_prompt_for_task(self, task):
         print(self.prompt, flush=True)
         for o in self.options.keys():
-            print(o)
+            print(f"  {o}")
         r = self.next_response()
         print("Choice: ", r)
 
@@ -39,7 +39,6 @@ class Phase():
             raise KeyError(f"Both {','.join(matches)} matched, be more specific.")
         return matches[0]
 
-
     def add_option(self, command, action):
         self.options[command] = action
 
@@ -55,12 +54,18 @@ class Phase():
         raise NotImplementedError()
 
 class FixLegacyProjectPhase(Phase):
+
+    @property
+    def prompt(self) -> str:
+        return "@@@Project Task missing `prj:xxx`:"
+
     def __init__(self, weeklyreview:WeeklyReview):
+        super().__init__()
         self.weeklyreview = weeklyreview
-        pass
+        self.add_option('auto', lambda:None)
+        self.add_option('manual', lambda:None)
 
     @property
     def relevant_tasks(self):
         f = FilterTasks.is_legacy_project
         return self.weeklyreview.tasks_filtered_by(f)
-
