@@ -94,36 +94,8 @@ def test_partial_matcher_handle_non_unique_matches(dp, out, tasks):
     with pytest.raises(IOError):
         next(dp)
 
-def legacy():
-    for t in tasks.project_tasks:
-        try:
-            t.extensions['prj']
-            continue
-        except KeyError:
-            pass
-        nt = Task(t.persist)
-        wr.convert_task_to_project(nt)
-
-        print("")
-        choices = ['1','2','3']
-        choice = None
-        while choice not in choices:
-            print(""+t.persist+"\n", flush=True)
-            prompt = ("Options:\n"
-                f"\t1. Auto: `{nt.persist}`\n"
-                "\t2. Manually enter prj:xxx\n"
-                "\t3. skip\n\n"
-                )
-            choice = input(prompt)
-        if choice == '1':
-            wr.convert_task_to_project(t)
-        elif choice == '2':
-            wr.assign_task_to_project(t, input('prj:'))
-        elif choice == '3':
-            continue
-
 ### Fix Legacy Projects
-@pytest.fixture(scope="function")
+@pytest.fixture()
 def flp_dp(tasks, wr):
     class FLPDP(DummyPhaseInput, FixLegacyProjectPhase):
         pass
@@ -175,3 +147,29 @@ def test_flp_manual_has_correct_effect(flp_dp, tasks, out):
     tasks.add_task(t:=Task("@@@project test"))
     next(flp_dp)
     assert t.persist == '@@@project test prj:mars_attacks'
+
+### AssignTasksToProject
+@pytest.fixture()
+def flp_dp(tasks, wr):
+    class FLPDP(DummyPhaseInput, FixLegacyProjectPhase):
+        pass
+    dp = FLPDP(weeklyreview=wr)
+    dp.dummy_tasks = tasks
+    return dp
+def assign():
+    for t in tasks.dailyreview_tasks:
+        choices = ['1','2','3']
+        choice = None
+        prj_str = '\n'.join([f"\t\t{len(choices)+i}. {p}"for i,p in enumerate(tasks.projects)])
+        [choices.append(str(i)) for i,p in enumerate(tasks.projects)]
+        while choice not in choices:
+            print("\nDaily review Task missing prj:xxx,")
+            print("\n\n\n"+t.persist+"\n", flush=True)
+            prompt = ("Options:\n"
+                "\t1. Turn into a project\n"
+                "\t2. Create new project and assign\n\n"
+                "\tOr, assign to a project:\n\n"
+                f"{prj_str}\n\n"
+                "Choice?: "
+                )
+            choice = input(prompt)

@@ -84,7 +84,7 @@ class FixLegacyProjectPhase(Phase):
 
     @property
     def prompt(self) -> str:
-        return "@@@Project Task missing `prj:xxx`:"
+        return "@@@Project missing `prj:xxx`:"
 
     @property
     def relevant_tasks(self):
@@ -116,3 +116,61 @@ class FixLegacyProjectPhase(Phase):
             wr.assign_task_to_project(t, p.next_response())
         def preview(self, t:Task) -> str:
             return f"{t.persist} prj:???"
+
+class AssignTasksToProjects(Phase):
+    def __init__(self, weeklyreview:WeeklyReview):
+        super().__init__()
+        self.weeklyreview = weeklyreview
+        self._options = [self.Auto(),self.Manual(),AssignToExisting(), Skip()]
+
+    @property
+    def prompt(self) -> str:
+        return "Task missing `prj:xxx`:"
+
+    @property
+    def relevant_tasks(self):
+        f = FilterTasks.is_dailyreview
+        return self.weeklyreview.tasks_filtered_by(f)
+
+    class Auto(Option):
+        @property
+        def command(self) -> str:
+            return 'auto'
+        @property
+        def description(self) -> str:
+            return "Guess the project tag"
+        def action(self, wr:WeeklyReview, t:Task, p:Phase):
+            wr.convert_task_to_project(t)
+        def preview(self, t:Task) -> str:
+            nt = Task(t.persist)
+            WeeklyReview.convert_task_to_project(None, nt)
+            return nt.persist
+
+    class Manual(Option):
+        @property
+        def command(self) -> str:
+            return 'manual'
+        @property
+        def description(self) -> str:
+            return ""
+        def action(self, wr:WeeklyReview, t:Task, p:Phase):
+            wr.assign_task_to_project(t, p.next_response())
+        def preview(self, t:Task) -> str:
+            return f"{t.persist} prj:???"
+
+    class AssignToExisting(Option):
+        @property
+        def command(self) -> str:
+            return 'a'
+        @property
+        def description(self) -> str:
+            return ""
+        def action(self, wr:WeeklyReview, t:Task, p:Phase):
+            choice = '-1'
+            while int(choice) not in range(len(wr._tasks.projects)):
+                choice = p.next_response()
+            project = wr._task[choice]
+            wr.assign_task_to_project(t, project)
+        def preview(self, t:Task) -> str:
+            return f"{t.persist} prj:???"
+            # return "\n".join(
