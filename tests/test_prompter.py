@@ -163,7 +163,9 @@ def test_attp_prompts_projects(attp_dp, tasks, out):
     tasks.add_task(t:=Task("prj:fakeproj"))
     with pytest.raises(IOError):
         next(attp_dp)
-    assert 'auto create' in out()
+    o = out()
+    assert 'auto create' in o
+    assert 'new project' in o
 
 def test_flp_auto_has_correct_effect(attp_dp, tasks, out):
     attp_dp.dummy_input = ['a']

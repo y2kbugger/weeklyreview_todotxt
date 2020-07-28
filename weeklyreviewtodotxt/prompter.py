@@ -126,7 +126,7 @@ class AssignTasksToProjects(Phase):
         super().__init__()
         self.weeklyreview = weeklyreview
         # self._options = [self.Auto(),self.Manual(),self.AssignToExisting(), Skip()]
-        self._options = [self.Auto(), Skip()]
+        self._options = [self.Auto(), self.Manual(), Skip()]
 
     @property
     def prompt(self) -> str:
@@ -151,17 +151,17 @@ class AssignTasksToProjects(Phase):
             WeeklyReview.convert_task_to_project(None, nt)
             return nt.persist
 
-    # class Manual(Option):
-    #     @property
-    #     def command(self) -> str:
-    #         return 'new project'
-    #     @property
-    #     def description(self) -> str:
-    #         return ""
-    #     def action(self, wr:WeeklyReview, t:Task, p:Phase):
-    #         wr.assign_task_to_project(t, p.next_response())
-    #     def preview(self, t:Task) -> str:
-    #         return f"{t.persist} prj:???"
+    class Manual(Option):
+        @property
+        def command(self) -> str:
+            return 'new project'
+        @property
+        def description(self) -> str:
+            return ""
+        def action(self, wr:WeeklyReview, t:Task, p:Phase):
+            wr.assign_task_to_project(t, p.next_response())
+        def preview(self, t:Task) -> str:
+            return f"{t.persist} prj:???"
 
     # class AssignToExisting(Option):
     #     @property
