@@ -143,7 +143,7 @@ def test_flp_auto_has_correct_effect(flp_dp, tasks, out):
     next(flp_dp)
     assert t.persist == '@@@project prj:test'
 
-def test_flp_manual_has_correct_effect(flp_dp, tasks, out):
+def test_flp_manual_has_correct_effect(flp_dp, tasks:Tasks, out):
     flp_dp.dummy_input = ['m', 'mars_attacks']
     tasks.add_task(t:=Task("@@@project test"))
     next(flp_dp)
@@ -167,12 +167,19 @@ def test_attp_prompts_projects(attp_dp, tasks, out):
     assert 'auto create' in o
     assert 'new project' in o
 
-def test_flp_auto_has_correct_effect(attp_dp, tasks, out):
+def test_attp_auto_has_correct_effect(attp_dp, tasks, out):
     attp_dp.dummy_input = ['a']
     tasks.add_task(t:=Task("make thing"))
     next(attp_dp)
     assert t.persist == 'prj:make_thing @@@project'
     print(out())
+
+def test_attp_new_test_makes_new_and_assigns(attp_dp, tasks, out):
+    attp_dp.dummy_input = ['n','new']
+    tasks.add_task(t:=Task("make thing"))
+    next(attp_dp)
+    assert t.persist == 'make thing prj:new'
+    assert Task('prj:new @@@project') in tasks
 
 def assign():
     for t in tasks.dailyreview_tasks:
