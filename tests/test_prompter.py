@@ -165,7 +165,12 @@ def test_attp_prompts_projects(attp_dp, tasks, out):
         next(attp_dp)
     assert 'auto create' in out()
 
-
+def test_flp_auto_has_correct_effect(attp_dp, tasks, out):
+    attp_dp.dummy_input = ['a']
+    tasks.add_task(t:=Task("make thing"))
+    next(attp_dp)
+    assert t.persist == 'prj:make_thing @@@project'
+    print(out())
 
 def assign():
     for t in tasks.dailyreview_tasks:
