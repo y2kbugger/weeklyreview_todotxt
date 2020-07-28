@@ -44,9 +44,13 @@ class Phase():
         return {o.command:o for o in self._options}
 
     def run_prompt_for_task(self, task):
-        print(self.prompt, flush=True)
+        print(self.prompt, task, flush=True)
         for o in self._options:
-            print(f"  {o.command}: {o.preview(task)}")
+            if o.preview(task) != "":
+                print(f"  {o.command}: {o.preview(task)}")
+            else:
+                print(f"  {o.command}")
+
         r = self.next_response()
         print("Choice: ", r)
 
@@ -121,7 +125,8 @@ class AssignTasksToProjects(Phase):
     def __init__(self, weeklyreview:WeeklyReview):
         super().__init__()
         self.weeklyreview = weeklyreview
-        self._options = [self.Auto(),self.Manual(),AssignToExisting(), Skip()]
+        # self._options = [self.Auto(),self.Manual(),self.AssignToExisting(), Skip()]
+        self._options = [self.Auto(), Skip()]
 
     @property
     def prompt(self) -> str:
@@ -135,7 +140,7 @@ class AssignTasksToProjects(Phase):
     class Auto(Option):
         @property
         def command(self) -> str:
-            return 'auto'
+            return 'auto create'
         @property
         def description(self) -> str:
             return "Guess the project tag"
@@ -146,31 +151,31 @@ class AssignTasksToProjects(Phase):
             WeeklyReview.convert_task_to_project(None, nt)
             return nt.persist
 
-    class Manual(Option):
-        @property
-        def command(self) -> str:
-            return 'manual'
-        @property
-        def description(self) -> str:
-            return ""
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
-            wr.assign_task_to_project(t, p.next_response())
-        def preview(self, t:Task) -> str:
-            return f"{t.persist} prj:???"
+    # class Manual(Option):
+    #     @property
+    #     def command(self) -> str:
+    #         return 'new project'
+    #     @property
+    #     def description(self) -> str:
+    #         return ""
+    #     def action(self, wr:WeeklyReview, t:Task, p:Phase):
+    #         wr.assign_task_to_project(t, p.next_response())
+    #     def preview(self, t:Task) -> str:
+    #         return f"{t.persist} prj:???"
 
-    class AssignToExisting(Option):
-        @property
-        def command(self) -> str:
-            return 'a'
-        @property
-        def description(self) -> str:
-            return ""
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
-            choice = '-1'
-            while int(choice) not in range(len(wr._tasks.projects)):
-                choice = p.next_response()
-            project = wr._task[choice]
-            wr.assign_task_to_project(t, project)
-        def preview(self, t:Task) -> str:
-            return f"{t.persist} prj:???"
-            # return "\n".join(
+    # class AssignToExisting(Option):
+    #     @property
+    #     def command(self) -> str:
+    #         return 'pick'
+    #     @property
+    #     def description(self) -> str:
+    #         return ""
+    #     def action(self, wr:WeeklyReview, t:Task, p:Phase):
+    #         choice = '-1'
+    #         while int(choice) not in range(len(wr._tasks.projects)):
+    #             choice = p.next_response()
+    #         project = wr._task[choice]
+    #         wr.assign_task_to_project(t, project)
+    #     def preview(self, t:Task) -> str:
+    #         return f"{t.persist} prj:???"
+    #         # return "\n".join(

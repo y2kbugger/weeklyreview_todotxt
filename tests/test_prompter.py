@@ -1,7 +1,8 @@
 import pytest
 
 from weeklyreviewtodotxt.tasktoprojects import Tasks, Task
-from weeklyreviewtodotxt.prompter import Phase, Option, FixLegacyProjectPhase
+from weeklyreviewtodotxt.prompter import Phase, Option, FixLegacyProjectPhase, AssignTasksToProjects
+
 from test_taskstoprojects import tasks, wr
 
 # Mix-in dummies
@@ -150,12 +151,22 @@ def test_flp_manual_has_correct_effect(flp_dp, tasks, out):
 
 ### AssignTasksToProject
 @pytest.fixture()
-def flp_dp(tasks, wr):
-    class FLPDP(DummyPhaseInput, FixLegacyProjectPhase):
+def attp_dp(tasks, wr):
+    class ATTPDP(DummyPhaseInput, AssignTasksToProjects):
         pass
-    dp = FLPDP(weeklyreview=wr)
+    dp = ATTPDP(weeklyreview=wr)
     dp.dummy_tasks = tasks
     return dp
+
+def test_attp_prompts_projects(attp_dp, tasks, out):
+    tasks.add_task(t:=Task("unassigned_task"))
+    tasks.add_task(t:=Task("prj:fakeproj"))
+    with pytest.raises(IOError):
+        next(attp_dp)
+    assert 'auto create' in out()
+
+
+
 def assign():
     for t in tasks.dailyreview_tasks:
         choices = ['1','2','3']
