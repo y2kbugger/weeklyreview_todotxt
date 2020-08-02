@@ -163,9 +163,9 @@ def attp_dp(tasks, wr):
     return dp
 
 def test_attp_prompts_projects(attp_dp, tasks, out):
-    tasks.add_task(t:=Task("unassigned_task"))
-    tasks.add_task(t:=Task("@@@project prj:fakeproj1"))
-    tasks.add_task(t:=Task("an assigned task prj:fakeproj2"))
+    tasks.add_task(Task("unassigned_task"))
+    tasks.add_task(Task("@@@project prj:fakeproj1"))
+    tasks.add_task(Task("an assigned task prj:fakeproj2"))
     with pytest.raises(IOError):
         next(attp_dp)
     o = out()
@@ -188,3 +188,9 @@ def test_attp_new_test_makes_new_and_assigns(attp_dp, tasks, out):
     assert t.persist == 'make thing prj:new'
     assert Task('prj:new @@@project') in tasks
 
+def test_attp_can_assign_to_existing_prj(attp_dp, tasks, out):
+    attp_dp.dummy_input = ['p','0']
+    tasks.add_task(t:=Task("buy paint"))
+    tasks.add_task(Task("@@@project prj:guitar"))
+    next(attp_dp)
+    assert t.persist == "buy paint prj:guitar"

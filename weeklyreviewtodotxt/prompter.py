@@ -183,11 +183,11 @@ class AssignTasksToProjects(Phase):
         def description(self) -> str:
             return ""
         def action(self, t:Task):
-            choice = '-1'
-            while int(choice) not in range(len(wr._tasks.projects)):
-                choice = p.next_response()
-            project = wr._task[choice]
-            wr.assign_task_to_project(t, project)
+            choice = -1
+            while choice not in range(len(self.wr._tasks.projects)):
+                choice = int(self.phase.next_response())
+            project = self.choices()[choice]
+            self.wr.assign_task_to_project(t, project)
         def preview(self, t:Task) -> str:
             return f"{t.persist} prj:???"
             # return "\n".join(
