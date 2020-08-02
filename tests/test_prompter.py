@@ -27,12 +27,12 @@ class DummyPhaseTasks(Phase):
     def relevant_tasks(self):
         return list(self.dummy_tasks)
 
-class DummyOption(Option):
-    def __init__(self, command):
-        self._dummy_command = command
-    @property
-    def command(self) -> str:
-        return self._dummy_command
+def DummyOption(command):
+    class _(Option):
+        @property
+        def command(self) -> str:
+            return command
+    return _
 
 @pytest.fixture(scope="function")
 def dp(tasks):
@@ -90,7 +90,7 @@ def test_can_match_unique_partial_command(dp, out, tasks):
 
 def test_partial_matcher_handle_non_unique_matches(dp, out, tasks):
     tasks.add_task(Task(""))
-    dp._options = [DummyOption('kite'),DummyOption('kitten')]
+    dp._option_classes = [DummyOption('kite'),DummyOption('kitten')]
     dp.dummy_input = ['kit']
     with pytest.raises(IOError):
         next(dp)

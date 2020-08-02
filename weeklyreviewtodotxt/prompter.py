@@ -2,6 +2,15 @@ from .parser import Task
 from .tasktoprojects import WeeklyReview, FilterTasks
 
 class Option():
+    def __init__(self, wr, phase):
+        self.wr = wr
+        self.phase = phase
+    def display(self, task):
+        if self.preview(task) != "":
+            print(f"  {self.command}: {self.preview(task)}")
+        else:
+            print(f"  {self.command}")
+
     @property
     def command(self) -> str:
         raise NotImplementedError()
@@ -24,9 +33,10 @@ class Skip(Option):
         print("Skipping")
 
 class Phase():
-    def __init__(self):
+    def __init__(self, weeklyreview:WeeklyReview=None):
+        self.weeklyreview = weeklyreview
         self.current_task_ix = 0
-        self._options = [Skip()]
+        self._option_classes = [Skip]
 
     def __iter__(self):
         return self
@@ -40,16 +50,13 @@ class Phase():
         self.current_task_ix += 1
 
     @property
-    def options(self):
-        return {o.command:o for o in self._options}
+    def _options(self):
+        return [OP(self.weeklyreview, self) for OP in self._option_classes]
 
     def run_prompt_for_task(self, task):
         print(self.prompt, task, flush=True)
         for o in self._options:
-            if o.preview(task) != "":
-                print(f"  {o.command}: {o.preview(task)}")
-            else:
-                print(f"  {o.command}")
+            o.display(task)
 
         r = self.next_response()
         print("Choice: ", r)
@@ -84,7 +91,7 @@ class FixLegacyProjectPhase(Phase):
     def __init__(self, weeklyreview:WeeklyReview):
         super().__init__()
         self.weeklyreview = weeklyreview
-        self._options = [self.Auto(),self.Manual(),Skip()]
+        self._option_classes = [self.Auto, self.Manual, Skip]
 
     @property
     def prompt(self) -> str:
@@ -125,8 +132,7 @@ class AssignTasksToProjects(Phase):
     def __init__(self, weeklyreview:WeeklyReview):
         super().__init__()
         self.weeklyreview = weeklyreview
-        # self._options = [self.Auto(),self.Manual(),self.AssignToExisting(), Skip()]
-        self._options = [self.Auto(), self.Manual(), Skip()]
+        self._option_classes = [self.Auto, self.Manual, Skip]
 
     @property
     def prompt(self) -> str:
