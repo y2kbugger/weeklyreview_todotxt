@@ -32,6 +32,10 @@ def DummyOption(command):
         @property
         def command(self) -> str:
             return command
+        def preview(self, t:Task) -> str:
+            return ""
+        def action(self, t:Task):
+            pass
     return _
 
 @pytest.fixture(scope="function")

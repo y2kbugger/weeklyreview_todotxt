@@ -5,22 +5,21 @@ class Option():
     def __init__(self, wr, phase):
         self.wr = wr
         self.phase = phase
-    def display(self, task):
-        if self.preview(task) != "":
-            print(f"  {self.command}: {self.preview(task)}")
-        else:
-            print(f"  {self.command}")
-
     @property
     def command(self) -> str:
         raise NotImplementedError()
     @property
     def description(self) -> str:
-        return ""
-    def action(self, wr:WeeklyReview, t:Task, phase):
-        pass
+        raise NotImplementedError()
     def preview(self, t:Task) -> str:
-        return ""
+        raise NotImplementedError()
+    def display(self, t:Task):
+        if self.preview(t) != "":
+            print(f"  {self.command}: {self.preview(t)}")
+        else:
+            print(f"  {self.command}")
+    def action(self, t:Task):
+        raise NotImplementedError()
 
 class Skip(Option):
     @property
@@ -29,7 +28,9 @@ class Skip(Option):
     @property
     def description(self) -> str:
         return "Go on to the next Task without processing"
-    def action(self, wr:WeeklyReview, t:Task, phase):
+    def preview(self, t:Task) -> str:
+        return ""
+    def action(self, t:Task):
         print("Skipping")
 
 class Phase():
@@ -63,7 +64,7 @@ class Phase():
 
         try:
             option = self.match_option(r)
-            option.action(self.weeklyreview, task, self)
+            option.action(task)
         except KeyError as e:
             print(e.args[0])
             self.run_prompt_for_task(task)
@@ -109,8 +110,8 @@ class FixLegacyProjectPhase(Phase):
         @property
         def description(self) -> str:
             return "Guess the project tag from the legacy project contents"
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
-            wr.convert_task_to_project(t)
+        def action(self, t:Task):
+            self.wr.convert_task_to_project(t)
         def preview(self, t:Task) -> str:
             nt = Task(t.persist)
             WeeklyReview.convert_task_to_project(None, nt)
@@ -123,8 +124,8 @@ class FixLegacyProjectPhase(Phase):
         @property
         def description(self) -> str:
             return ""
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
-            wr.assign_task_to_project(t, p.next_response())
+        def action(self, t:Task):
+            self.wr.assign_task_to_project(t, self.phase.next_response())
         def preview(self, t:Task) -> str:
             return f"{t.persist} prj:???"
 
@@ -150,8 +151,8 @@ class AssignTasksToProjects(Phase):
         @property
         def description(self) -> str:
             return "Guess the project tag"
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
-            wr.convert_task_to_project(t)
+        def action(self, t:Task):
+            self.wr.convert_task_to_project(t)
         def preview(self, t:Task) -> str:
             nt = Task(t.persist)
             WeeklyReview.convert_task_to_project(None, nt)
@@ -164,8 +165,8 @@ class AssignTasksToProjects(Phase):
         @property
         def description(self) -> str:
             return ""
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
-            wr.assign_task_to_project(t, p.next_response())
+        def action(self, t:Task):
+            self.wr.assign_task_to_project(t, self.phase.next_response())
         def preview(self, t:Task) -> str:
             return f"{t.persist} prj:???"
 
@@ -176,7 +177,7 @@ class AssignTasksToProjects(Phase):
         @property
         def description(self) -> str:
             return ""
-        def action(self, wr:WeeklyReview, t:Task, p:Phase):
+        def action(self, t:Task):
             choice = '-1'
             while int(choice) not in range(len(wr._tasks.projects)):
                 choice = p.next_response()
