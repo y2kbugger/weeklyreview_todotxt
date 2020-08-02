@@ -18,8 +18,12 @@ class Option():
             print(f"  {self.command}: {self.preview(t)}")
         else:
             print(f"  {self.command}")
+        for i, c in enumerate(self.choices()):
+            print(f"    {i}. {c}")
     def action(self, t:Task):
         raise NotImplementedError()
+    def choices(self):
+        return []
 
 class Skip(Option):
     @property
@@ -134,7 +138,7 @@ class AssignTasksToProjects(Phase):
     def __init__(self, weeklyreview:WeeklyReview):
         super().__init__()
         self.weeklyreview = weeklyreview
-        self._option_classes = [self.Auto, self.Manual]
+        self._option_classes = [self.Auto, self.Manual, self.AssignToExisting]
 
     @property
     def prompt(self) -> str:
@@ -187,5 +191,5 @@ class AssignTasksToProjects(Phase):
         def preview(self, t:Task) -> str:
             return f"{t.persist} prj:???"
             # return "\n".join(
-        def _choices(self, wr):
-            return list(wr._tasks.projects)
+        def choices(self):
+            return list(self.wr._tasks.projects)

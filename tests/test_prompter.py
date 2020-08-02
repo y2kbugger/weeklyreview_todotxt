@@ -162,15 +162,17 @@ def attp_dp(tasks, wr):
     dp.dummy_tasks = tasks
     return dp
 
-# def test_attp_prompts_projects(attp_dp, tasks, out):
-#     tasks.add_task(t:=Task("unassigned_task"))
-#     tasks.add_task(t:=Task("prj:fakeproj"))
-#     with pytest.raises(IOError):
-#         next(attp_dp)
-#     o = out()
-#     assert 'auto create' in o
-#     assert 'new project' in o
-#     assert '1. fakeproj' in o
+def test_attp_prompts_projects(attp_dp, tasks, out):
+    tasks.add_task(t:=Task("unassigned_task"))
+    tasks.add_task(t:=Task("@@@project prj:fakeproj1"))
+    tasks.add_task(t:=Task("an assigned task prj:fakeproj2"))
+    with pytest.raises(IOError):
+        next(attp_dp)
+    o = out()
+    print(o)
+    assert 'auto create' in o
+    assert 'new project' in o
+    assert '0. fakeproj1' in o
 
 def test_attp_auto_has_correct_effect(attp_dp, tasks, out):
     attp_dp.dummy_input = ['a']

@@ -71,3 +71,5 @@ Todo/TDD
 -Fix Legacy Project should check for duplicate prj: tags
 -Move main to bin
 -Options can have choices
+-Add explain command which prints description (autoadd like Skip)
+-prompt reprompts when non-integer choice is picked
