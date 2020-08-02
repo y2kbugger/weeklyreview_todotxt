@@ -70,3 +70,4 @@ Todo/TDD
 -add ability to can cycle or entire step (choice = s,ss)
 -Fix Legacy Project should check for duplicate prj: tags
 -Move main to bin
+-Options can have choices

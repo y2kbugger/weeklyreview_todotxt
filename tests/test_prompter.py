@@ -158,14 +158,15 @@ def attp_dp(tasks, wr):
     dp.dummy_tasks = tasks
     return dp
 
-def test_attp_prompts_projects(attp_dp, tasks, out):
-    tasks.add_task(t:=Task("unassigned_task"))
-    tasks.add_task(t:=Task("prj:fakeproj"))
-    with pytest.raises(IOError):
-        next(attp_dp)
-    o = out()
-    assert 'auto create' in o
-    assert 'new project' in o
+# def test_attp_prompts_projects(attp_dp, tasks, out):
+#     tasks.add_task(t:=Task("unassigned_task"))
+#     tasks.add_task(t:=Task("prj:fakeproj"))
+#     with pytest.raises(IOError):
+#         next(attp_dp)
+#     o = out()
+#     assert 'auto create' in o
+#     assert 'new project' in o
+#     assert '1. fakeproj' in o
 
 def test_attp_auto_has_correct_effect(attp_dp, tasks, out):
     attp_dp.dummy_input = ['a']
@@ -181,20 +182,3 @@ def test_attp_new_test_makes_new_and_assigns(attp_dp, tasks, out):
     assert t.persist == 'make thing prj:new'
     assert Task('prj:new @@@project') in tasks
 
-def assign():
-    for t in tasks.dailyreview_tasks:
-        choices = ['1','2','3']
-        choice = None
-        prj_str = '\n'.join([f"\t\t{len(choices)+i}. {p}"for i,p in enumerate(tasks.projects)])
-        [choices.append(str(i)) for i,p in enumerate(tasks.projects)]
-        while choice not in choices:
-            print("\nDaily review Task missing prj:xxx,")
-            print("\n\n\n"+t.persist+"\n", flush=True)
-            prompt = ("Options:\n"
-                "\t1. Turn into a project\n"
-                "\t2. Create new project and assign\n\n"
-                "\tOr, assign to a project:\n\n"
-                f"{prj_str}\n\n"
-                "Choice?: "
-                )
-            choice = input(prompt)
