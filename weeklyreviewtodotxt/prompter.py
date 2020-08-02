@@ -37,7 +37,7 @@ class Phase():
     def __init__(self, weeklyreview:WeeklyReview=None):
         self.weeklyreview = weeklyreview
         self.current_task_ix = 0
-        self._option_classes = [Skip]
+        self._option_classes = []
 
     def __iter__(self):
         return self
@@ -52,7 +52,8 @@ class Phase():
 
     @property
     def _options(self):
-        return [OP(self.weeklyreview, self) for OP in self._option_classes]
+        OPs = self._option_classes + [Skip]
+        return [OP(self.weeklyreview, self) for OP in OPs]
 
     def run_prompt_for_task(self, task):
         print(self.prompt, task, flush=True)
@@ -92,7 +93,7 @@ class FixLegacyProjectPhase(Phase):
     def __init__(self, weeklyreview:WeeklyReview):
         super().__init__()
         self.weeklyreview = weeklyreview
-        self._option_classes = [self.Auto, self.Manual, Skip]
+        self._option_classes = [self.Auto, self.Manual]
 
     @property
     def prompt(self) -> str:
@@ -123,7 +124,7 @@ class FixLegacyProjectPhase(Phase):
             return 'manual'
         @property
         def description(self) -> str:
-            return ""
+            return "Supply a new name for the prj tag"
         def action(self, t:Task):
             self.wr.assign_task_to_project(t, self.phase.next_response())
         def preview(self, t:Task) -> str:
@@ -133,7 +134,7 @@ class AssignTasksToProjects(Phase):
     def __init__(self, weeklyreview:WeeklyReview):
         super().__init__()
         self.weeklyreview = weeklyreview
-        self._option_classes = [self.Auto, self.Manual, Skip]
+        self._option_classes = [self.Auto, self.Manual]
 
     @property
     def prompt(self) -> str:
@@ -150,7 +151,7 @@ class AssignTasksToProjects(Phase):
             return 'auto create'
         @property
         def description(self) -> str:
-            return "Guess the project tag"
+            return "Turn the task into a project and guess prj: tag."
         def action(self, t:Task):
             self.wr.convert_task_to_project(t)
         def preview(self, t:Task) -> str:
