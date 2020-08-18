@@ -73,3 +73,9 @@ Todo/TDD
 -Options can have choices
 -Add explain command which prints description (autoadd like Skip)
 -prompt reprompts when non-integer choice is picked
+-make all commands explain the action being done a la "Skipping"
+-can we make it use readline or similar for tag entry.
+-can we make it automatch on char entry, without require return after each one.
+-global option of quit just like skip
+-gloval option to print all tasks
+-gloval options to itemize changes so far.
