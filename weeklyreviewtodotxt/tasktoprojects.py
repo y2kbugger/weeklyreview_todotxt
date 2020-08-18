@@ -121,49 +121,8 @@ def main():
     with open(projdir/'tests'/'todo.txt') as f:
         tasks.add_tasks_from_file(f)
 
-    for t in tasks.project_tasks:
-        try:
-            t.extensions['prj']
-            continue
-        except KeyError:
-            pass
-        nt = Task(t.persist)
-        wr.convert_task_to_project(nt)
+    # flpphase
 
-        print("\n@@@Project Task missing prj:xxx:\n")
-        choices = ['1','2','3']
-        choice = None
-        while choice not in choices:
-            print(""+t.persist+"\n", flush=True)
-            prompt = ("Options:\n"
-                f"\t1. Auto: `{nt.persist}`\n"
-                "\t2. Manually enter prj:xxx\n"
-                "\t3. skip\n\n"
-                )
-            choice = input(prompt)
-        if choice == '1':
-            wr.convert_task_to_project(t)
-        elif choice == '2':
-            wr.assign_task_to_project(t, input('prj:'))
-        elif choice == '3':
-            continue
-
-    for t in tasks.dailyreview_tasks:
-        choices = ['1','2','3']
-        choice = None
-        prj_str = '\n'.join([f"\t\t{len(choices)+i}. {p}"for i,p in enumerate(tasks.projects)])
-        [choices.append(str(i)) for i,p in enumerate(tasks.projects)]
-        while choice not in choices:
-            print("\nDaily review Task missing prj:xxx,")
-            print("\n\n\n"+t.persist+"\n", flush=True)
-            prompt = ("Options:\n"
-                "\t1. Turn into a project\n"
-                "\t2. Create new project and assign\n\n"
-                "\tOr, assign to a project:\n\n"
-                f"{prj_str}\n\n"
-                "Choice?: "
-                )
-            choice = input(prompt)
 
     with open(projdir/'tests'/'todo.txt.out', 'w') as f:
         tasks.persist_task_to_file(f)
