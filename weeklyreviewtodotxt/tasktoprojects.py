@@ -111,21 +111,3 @@ class WeeklyReview:
     def assign_task_to_project(self, task : Task, project : str):
         task.add_part("prj:" + project)
         self._tasks.make_project_if_doesnt_exist(project)
-
-def main():
-    from pathlib import Path
-    projdir = Path(__file__).parent.parent
-    tasks = Tasks()
-    wr = WeeklyReview(tasks)
-
-    with open(projdir/'tests'/'todo.txt') as f:
-        tasks.add_tasks_from_file(f)
-
-    # flpphase
-
-
-    with open(projdir/'tests'/'todo.txt.out', 'w') as f:
-        tasks.persist_task_to_file(f)
-
-if __name__ == '__main__':
-    main()
