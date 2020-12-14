@@ -1,15 +1,14 @@
+import argparse
 from pathlib import Path
 
-import weeklyreviewtodotxt
 from ..tasktoprojects import WeeklyReview, Tasks
 from ..prompter import FixLegacyProjectPhase, AssignTasksToProjects
 
-def main():
-    projdir = Path(weeklyreviewtodotxt.__file__).parent.parent
+def main(todopath):
     tasks = Tasks()
     wr = WeeklyReview(tasks)
 
-    with open(projdir/'tests'/'todo.txt') as f:
+    with open(todopath) as f:
         tasks.add_tasks_from_file(f)
 
     phases = [
@@ -25,4 +24,7 @@ def main():
         tasks.persist_task_to_file(f)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='Process Weekly Review items into a calendar')
+    parser.add_argument('path', metavar='PATH', type=str, help='Path to todo.txt')
+    args = parser.parse_args()
+    main(args.path)
