@@ -37,7 +37,6 @@ def test_can_get_projects(tasks):
         "world"])
     assert tasks.projects == ['lol']
 
-
 def test_can_refine_list_to_daily_review(tasks, wr):
     tasks.add_tasks_from_list([
         "be happy @@@project",
@@ -66,6 +65,7 @@ def test_can_refine_list_projects(tasks, wr):
     assert [t.persist for t in wr.tasks_filtered_by(f)] == [
         "be happy @@@project",
         ]
+
 def test_can_filter_hidden_tasks(tasks, wr):
     tasks.add_tasks_from_list([ "c", "c h:1", "c h:0" ])
     f = FilterTasks.is_hidden
