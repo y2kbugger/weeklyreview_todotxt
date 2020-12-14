@@ -1,6 +1,6 @@
 import pytest
 
-from weeklyreviewtodotxt.tasktoprojects import Tasks, Task
+from weeklyreviewtodotxt.weeklyreviewsession import Tasks, Task
 from weeklyreviewtodotxt.prompter import Phase, Option, FixLegacyProjectPhase, AssignTasksToProjects
 
 from test_taskstoprojects import tasks, wr

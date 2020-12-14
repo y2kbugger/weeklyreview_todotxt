@@ -2,7 +2,7 @@ from io import StringIO
 import pytest
 
 from weeklyreviewtodotxt.parser import Task
-from weeklyreviewtodotxt.tasktoprojects import WeeklyReview, Tasks, FilterTasks
+from weeklyreviewtodotxt.weeklyreviewsession import WeeklyReview, Tasks, FilterTasks
 
 from test_parser import assert_tasks_equal
 

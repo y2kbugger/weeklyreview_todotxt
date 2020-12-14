@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from ..tasktoprojects import WeeklyReview, Tasks
+from ..weeklyreviewsessiog import WeeklyReview, Tasks
 from ..prompter import FixLegacyProjectPhase, AssignTasksToProjects
 
 def main(todopath):

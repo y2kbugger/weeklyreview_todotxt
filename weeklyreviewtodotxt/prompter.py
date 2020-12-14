@@ -1,5 +1,5 @@
 from .parser import Task
-from .tasktoprojects import WeeklyReview, FilterTasks
+from .weeklyreviewsession import WeeklyReview, FilterTasks
 
 class Option():
     def __init__(self, wr, phase):
