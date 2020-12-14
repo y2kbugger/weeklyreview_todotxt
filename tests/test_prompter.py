@@ -3,7 +3,7 @@ import pytest
 from weeklyreviewtodotxt.weeklyreviewsession import Tasks, Task
 from weeklyreviewtodotxt.prompter import Phase, Option, FixLegacyProjectPhase, AssignTasksToProjects
 
-from test_taskstoprojects import tasks, wr
+from test_weeklyreviewsession import tasks, wr
 
 # Mix-in dummies
 class DummyPhaseInput(Phase):
