@@ -1,12 +1,10 @@
-# from ..parser import Tasks
+from pathlib import Path
+
 import weeklyreviewtodotxt
 from ..tasktoprojects import WeeklyReview, Tasks
 from ..prompter import FixLegacyProjectPhase, AssignTasksToProjects
 
-
-
 def main():
-    from pathlib import Path
     projdir = Path(weeklyreviewtodotxt.__file__).parent.parent
     tasks = Tasks()
     wr = WeeklyReview(tasks)
