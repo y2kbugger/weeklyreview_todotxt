@@ -79,3 +79,4 @@ Todo/TDD
 -global option of quit just like skip
 -gloval option to print all tasks
 -gloval options to itemize changes so far.
+-lint for unused import, etc
