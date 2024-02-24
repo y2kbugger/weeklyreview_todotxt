@@ -8,10 +8,15 @@ then activate and run the tests via vscode or the cli:
     $ poetry shell
     $ pytest
 
+# Architecture
+# Prompter
+
 
 
 # WIP
 - reread api and tests to understand the starting point i'm at
+- make a prototype of an in-memory version of a todo list
+  - handle basic state manipulation, with undo/redo
 # Backlog
 ## Todos
 - I want lists that are backlogs of projects so that I can plan what to work on during planning.
@@ -39,6 +44,10 @@ then activate and run the tests via vscode or the cli:
 - I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
 - I want the ability to smartly merge edits after multiple users make offline edits so that when sara and I both check off items we don't have problems
 - I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
+- I want to be able to view older versions of the list so that I can see what was done in the past
+- I want an easy way to backup the list so that I can recover from a mistake
+- I want to view a historical list of projects archived tasks so that I can see what was done in the past
+- I want to view a global list of timestamped actions so that I can undo or redo actions
 
 # Legacy backlog
 - Have to handle creation date somehow --> maybe new tasks could always inherit from existing task..there are not that many cases for creating new tasks.
