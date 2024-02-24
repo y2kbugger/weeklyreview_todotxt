@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "weeklyreviewtodotxt"
+version = "0.1.0"
+description = "Guided GTD Weekly Review"
+authors = ["y2k <git@y2kbugger.com>"]
+license = "GPL3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.2"
+pytest = "^8.0.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

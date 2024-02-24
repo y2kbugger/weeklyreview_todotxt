@@ -1,16 +1,16 @@
 # Quickstart
-Ensure system has pipenv and pyenv
+Use poetry to install the dependencies:
 
-    $ pyenv install 3.9.0b3
-    $ pipenv install --dev
+    $ poetry install
 
-Then whenever you want to develop
+then activate and run the tests via vscode or the cli:
 
-    $ pipenv shell
-    $ pytest -f
+    $ poetry shell
+    $ pytest
+
+
 
 # WIP
-- convent to poetry
 - reread api and tests to understand the starting point i'm at
 # Backlog
 ## Todos
