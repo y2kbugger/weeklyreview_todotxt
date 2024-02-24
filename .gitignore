@@ -1,4 +1,5 @@
 *.egg-info
-pyproject.toml
 tests/todo.txt
 tests/todo.txt.out
+.pytest_cache
+__pycache__
