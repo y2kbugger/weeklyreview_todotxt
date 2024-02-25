@@ -9,14 +9,13 @@ then activate and run the tests via vscode or the cli:
     $ pytest
 
 # Architecture
-# Prompter
 
 
 
 # WIP
-- reread api and tests to understand the starting point i'm at
 - make a prototype of an in-memory version of a todo list
   - handle basic state manipulation, with undo/redo
+
 # Backlog
 ## Todos
 - I want lists that are backlogs of projects so that I can plan what to work on during planning.
@@ -26,6 +25,7 @@ then activate and run the tests via vscode or the cli:
 - I want a way to add an estimated cost to a task so that we can estimate the total cost of a project or tag or subtag
 - I want an guided daily weekly and monthly review process so both of us so that we don't have to think about the process steps as we do the review and we can go FAST and not miss anything
 - I want to track purchases for things like gym, baby that are expensive so that we can plan for them.....can the just be done the same as regular todo? or do we need a special distiction for them.
+- Hide projects that are not currently priority, except for the weekly review
 
 ## Checklists
 - I want a way to have an eternal checklists that can be checked off but also reset
@@ -49,23 +49,9 @@ then activate and run the tests via vscode or the cli:
 - I want to view a historical list of projects archived tasks so that I can see what was done in the past
 - I want to view a global list of timestamped actions so that I can undo or redo actions
 
-# Legacy backlog
-- Have to handle creation date somehow --> maybe new tasks could always inherit from existing task..there are not that many cases for creating new tasks.
-- add (1/23) type counted to show progress for each step
-- add ability to can cycle or entire step (choice = s,ss)
-- Fix Legacy Project should check for duplicate prj: tags
-- Options can have choices
-- Add explain command which prints description (autoadd like Skip)
-- prompt reprompts when non-integer choice is picked
-- make all commands explain the action being done a la "Skipping"
-- can we make it use readline or similar for tag entry.
-- can we make it automatch on char entry, without require return after each one.
-- global option of quit just like skip
-- global option to print all tasks
-- global options to itemize changes so far.
-- Tedium
-  - lint for unused import, etc
-  - Move main to bin
+## General
+- review cadence for high level life goals, things like "be a good parent" or "be a good spouse", "stay healthy"
+- review cadence for lists of things like "places to eat" or "vacation spots"
 
 # Brainstorm
 - working memory
@@ -105,58 +91,44 @@ then activate and run the tests via vscode or the cli:
   - our extensions
     - project-tree `+house.garage`
     - cost `$:100`
+    - effort `hours:2.5`
     - type `type:[checklist|todo|ref|checklist.onetime]`
 
-# Guided Weekly Review
-## Preparation
-Use git to snapshot before so changes can be reviewed or reverted.
 
-## Update Legacy Projects
-1. Review `@@@project` missing a `prj:codename` to add a `prj` tag.
+# Integrity checks
+Ensure all `#myproject` tasks are associated with a `prjdef:1` project definition
+1. All `#myproject` tags should have exactly one 'prjdef:1' item
+- this allow setting a priority for a project itself
+- give a place to describe the project overall
+
+# Weekly Review
+## Item Organization
+Ensure all items are associated with a project
+
+1. List out all items missing a `#myproject` tag
   - Options
-    - Auto (show preview)
-    - Manual
-
-## Tasks to Projects
-Ensure all open "daily review" tasks are associated with a project
-
-1. List out all items missing a `prj:codename`
-  - Options
-    - Assign to a project
+    - Assign to an existing project
     - Assign to new project (Create a project for it)
-    - Turn into a project (no input)
+    - Turn into a project (no input) `prjdef:1`
 
 ## Curate projects
-1. Ensure all projects have a priority
-2. Ensure all projects have a unique `prj:codename`
+1. Ensure all projects (`prjdef:1`) have a priority
+2. Ensure all projects have single `#myproject` tag
 3. Curate Projects
   - Options
     - Refine project priorities.
     - Rename projects
 
 ## Plan tasks
-1. Assign all tasks to take on the priority of it's `prj:codename` parent
-  - Automatic, but give summary and ask for confirmation
-2. Ensure all `A` or `B` projects have at least one task
+1. Ensure all `A` or `B` projects have at least one task
   - Show existing tasks for each
   - Options
     - Add task
-    - Next project (only if there is at least on task)
+    - Next project (only if minimum of one task is met for current project)
 
-
-# Guided Weekly Planning
+## Estimate Effort
 Assign hours to tasks
-1. For each `A` or `B` task prompt to add or change time estimate
+1. For each `A` or `B` task prompt to add or change time estimates
 
-## Plan week
-1. Assign task to days of week
-  - Continuously show hour many hours are assign to each day
-  - We can interactively move these around until an appropriate amount is assign to each day.
-2. Save it out to make threshold match the assigned day.
-
-# Other Stuff/Future Reviews:
-- review for places
-- break some of the non-todos out to their own files...
-  - maybe this would elimiate need for @^ or @~
-  - It should also help reduce tag proliferation
-- tag curation assistant (combine/eliminate/add) tags
+# Daily Review
+TBD
