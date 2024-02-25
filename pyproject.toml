@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "weeklyreviewtodotxt"
+name = "insync"
 version = "0.1.0"
 description = "Todo, Checklist, Reference with Guided GTD Review"
 authors = ["y2k <git@y2kbugger.com>"]
@@ -16,3 +16,9 @@ pytest = "^8.0.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+python_files = "*.test.py"
