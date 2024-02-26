@@ -23,9 +23,10 @@ class ConnectionManager:
     def __init__(self):
         self.active_connections: List[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket, state: CurrentState):
         await websocket.accept()
         self.active_connections.append(websocket)
+        await websocket.send_text(render_updated_state(state))
 
     def disconnect(self, websocket: WebSocket):
         self.active_connections.remove(websocket)
@@ -38,12 +39,12 @@ manager = ConnectionManager()
 
 @app.websocket("/hellowebsocket")
 async def hello_ws(websocket: WebSocket, state: Annotated[CurrentState, Depends(make_global_state)]):
-    await manager.connect(websocket)
+    await manager.connect(websocket, state)
 
     try:
         async for htmx_json in websocket.iter_text():
             print("RX from htmx", htmx_json)
-            state.message = HtmxMessage.model_validate_json(htmx_json).message
+            state.message += '\n' + HtmxMessage.model_validate_json(htmx_json).message
             await manager.broadcast(render_updated_state(state))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
@@ -52,7 +53,9 @@ def render_updated_state(state: CurrentState):
     print(f"TX from python {state.message}")
     html = f"""
     <div id="current-message" hx-swap-oob="true">
+        <pre>
         {state.message}
+        </pre>
     </div>
     """
     return html
