@@ -76,6 +76,6 @@ jobs:
           app-name: 'insync-lists'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_A1F75560B2144497BCBC1ACEDF4FE1A4 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6AEE5077478F4F04A346C1D151144096 }}
           scm-do-build-during-deployment: true
           enable-oryx-build: true
