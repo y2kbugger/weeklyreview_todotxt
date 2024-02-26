@@ -16,8 +16,9 @@ class HtmxMessage(BaseModel):
     message: str
     HEADERS: Dict[str,str|None]
 
-def make_global_state() -> CurrentState:
-    return CurrentState(message="<3")
+_current_global_state = CurrentState(message="<3")
+def get_global_state() -> CurrentState:
+    return _current_global_state
 
 class ConnectionManager:
     def __init__(self):
@@ -37,7 +38,7 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 @app.websocket("/hellowebsocket")
-async def hello_ws(websocket: WebSocket, state: Annotated[CurrentState, Depends(make_global_state)]):
+async def hello_ws(websocket: WebSocket, state: Annotated[CurrentState, Depends(get_global_state)]):
     await manager.connect(websocket, state)
 
     try:
