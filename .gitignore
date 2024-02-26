@@ -1,5 +1,6 @@
 *.egg-info
 tests/todo.txt
 tests/todo.txt.out
+.venv
 .pytest_cache
 __pycache__
