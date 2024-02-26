@@ -13,6 +13,8 @@ then activate and run the tests via vscode or the cli:
 
 
 # WIP
+- make prototype of fastapi ws endpoint helloworls
+- deploy to azure
 - make a prototype of an in-memory version of a todo list
   - handle basic state manipulation, with undo/redo
 
@@ -52,6 +54,9 @@ then activate and run the tests via vscode or the cli:
 ## General
 - review cadence for high level life goals, things like "be a good parent" or "be a good spouse", "stay healthy"
 - review cadence for lists of things like "places to eat" or "vacation spots"
+- I want to capture photos via share images so that I can quickly capture reminders and references for later.
+- I want to quickly capture notes via ok Google so that I can effortlessly capture todos.
+
 
 # Brainstorm
 - working memory
@@ -68,6 +73,9 @@ then activate and run the tests via vscode or the cli:
 - do I enforce one `#project` tag per line?
   - pros: simpifies parsing, indexing, and display and UI complexity
   - cons: can't slice in to dimensions, might not really be important
+- animating reordering using oob for each list element (guid based tasks?)
+  - https://gist.github.com/Thomasparsley/b818e59a6733c40116816cf78f406e96
+  - can still research other methods
 
 # Existing List Pardigms
 - GTD - https://todoist.com/productivity-methods/getting-things-done
