@@ -59,4 +59,5 @@ def render_updated_state(state: CurrentState):
 
 @app.get("/")
 def hello(request: Request) -> HTMLResponse:
+    print("running hello.html template")
     return templates.TemplateResponse(request, "hello.html", {})
