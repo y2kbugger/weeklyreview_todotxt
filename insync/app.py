@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends, WebSocket, WebSocketDisconnect
+from starlette.websockets import WebSocketState
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -33,7 +34,10 @@ class ConnectionManager:
 
     async def broadcast(self, message: str):
         for connection in self.active_connections:
-            await connection.send_text(message)
+            if connection.client_state == WebSocketState.DISCONNECTED:
+                self.disconnect(connection)
+            else:
+                await connection.send_text(message)
 
 manager = ConnectionManager()
 
