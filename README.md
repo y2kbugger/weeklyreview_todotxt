@@ -10,24 +10,35 @@ then activate and run the tests via vscode or the cli:
 
 # Architecture
 
+ - FastAPI/Jinja(X) backend
+ - Leverage FastAPI websockets for real-time collaboration of lists
+ - HTMX for dynamic parts of the UI
+ - SQLite for persistence
+  - use a service that will backup/persist the sqlite db
+  - also have a service that will create a todo.txt replica of the db either on google docs or github
 
 
 # WIP
-- make prototype of fastapi ws endpoint helloworls
-- deploy to azure
-- make a prototype of an in-memory version of a todo list
+- try build without oryx
+- try build witout requirements.txt
+- make a prototype of an in-memory version of a todo list in pure python/notebook
   - handle basic state manipulation, with undo/redo
+- try a jinjaX template for the lists UI
+  - Start with checklists using grocery as the test case.
 
 # Backlog
-## Todos
-- I want lists that are backlogs of projects so that I can plan what to work on during planning.
-- I want a quick view of planned items for the day/week so that I can work on them.
-- I want tag a todo with a tag and subtag as first class ability e.g. `#house.garage.garendingcorner`
-- I want to be able to set a priorty of backlog items so that the most critical can be viewed first
-- I want a way to add an estimated cost to a task so that we can estimate the total cost of a project or tag or subtag
-- I want an guided daily weekly and monthly review process so both of us so that we don't have to think about the process steps as we do the review and we can go FAST and not miss anything
-- I want to track purchases for things like gym, baby that are expensive so that we can plan for them.....can the just be done the same as regular todo? or do we need a special distiction for them.
-- Hide projects that are not currently priority, except for the weekly review
+## System
+- I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
+- I want the ability to smartly merge edits after multiple users make offline edits so that when sara and I both check off items we don't have problems
+- I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
+- I want to be able to view older versions of the list so that I can see what was done in the past
+- I want an easy way to backup the list so that I can recover from a mistake
+- I want to view a historical list of projects archived tasks so that I can see what was done in the past
+- I want to view a global list of timestamped actions so that I can undo or redo actions
+
+## Capture
+- I want to capture photos via share images so that I can quickly capture reminders and references for later.
+- I want to quickly capture notes via ok Google so that I can effortlessly capture todos.
 
 ## Checklists
 - I want a way to have an eternal checklists that can be checked off but also reset
@@ -39,24 +50,20 @@ then activate and run the tests via vscode or the cli:
 - I want a way to archive an item from the eternal list
   - move from checklist to checklist.archived ?
 
-## Reference
-- I want a list type that doesn't have the concept of required completion, but as a reference. e.g. places to eat. vacation spot. These don't end up in up in reviews, but can be referenced specifically.
-
-## System
-- I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
-- I want the ability to smartly merge edits after multiple users make offline edits so that when sara and I both check off items we don't have problems
-- I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
-- I want to be able to view older versions of the list so that I can see what was done in the past
-- I want an easy way to backup the list so that I can recover from a mistake
-- I want to view a historical list of projects archived tasks so that I can see what was done in the past
-- I want to view a global list of timestamped actions so that I can undo or redo actions
-
-## General
+## Todos
+- I want lists that are backlogs of projects so that I can plan what to work on during planning.
+- I want a quick view of planned items for the day/week so that I can work on them.
+- I want tag a todo with a tag and subtag as first class ability e.g. `#house.garage.garendingcorner`
+- I want to be able to set a priorty of backlog items so that the most critical can be viewed first
+- I want a way to add an estimated cost to a task so that we can estimate the total cost of a project or tag or subtag
+- I want an guided daily weekly and monthly review process so both of us so that we don't have to think about the process steps as we do the review and we can go FAST and not miss anything
+- I want to track purchases for things like gym, baby that are expensive so that we can plan for them.....can the just be done the same as regular todo? or do we need a special distiction for them.
+- Hide projects that are not currently priority, except for the weekly review
 - review cadence for high level life goals, things like "be a good parent" or "be a good spouse", "stay healthy"
 - review cadence for lists of things like "places to eat" or "vacation spots"
-- I want to capture photos via share images so that I can quickly capture reminders and references for later.
-- I want to quickly capture notes via ok Google so that I can effortlessly capture todos.
 
+## Reference
+- I want a list type that doesn't have the concept of required completion, but as a reference. e.g. places to eat. vacation spot. These don't end up in up in reviews, but can be referenced specifically.
 
 # Brainstorm
 - working memory
