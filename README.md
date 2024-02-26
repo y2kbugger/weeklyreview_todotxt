@@ -19,8 +19,6 @@ then activate and run the tests via vscode or the cli:
 
 
 # WIP
-- try build without oryx
-- try build witout requirements.txt
 - make a prototype of an in-memory version of a todo list in pure python/notebook
   - handle basic state manipulation, with undo/redo
 - try a jinjaX template for the lists UI
