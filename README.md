@@ -19,8 +19,6 @@ then activate and run the tests via vscode or the cli:
 
 
 # WIP
-- make a prototype of an in-memory version of a todo list in pure python/notebook
-  - handle basic state manipulation, with undo/redo
 - try a jinjaX template for the lists UI
   - Start with checklists using grocery as the test case.
 
