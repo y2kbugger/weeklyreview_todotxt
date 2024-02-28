@@ -1054,6 +1054,17 @@ files = [
 ]
 
 [[package]]
+name = "uuid6"
+version = "2024.1.12"
+description = "New time-based UUID formats which are suited for use as a database key"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "uuid6-2024.1.12-py3-none-any.whl", hash = "sha256:8150093c8d05a331bc0535bc5ef6cf57ac6eceb2404fd319bc10caee2e02c065"},
+    {file = "uuid6-2024.1.12.tar.gz", hash = "sha256:ed0afb3a973057575f9883201baefe402787ca5e11e1d24e377190f0c43f1993"},
+]
+
+[[package]]
 name = "uvicorn"
 version = "0.27.1"
 description = "The lightning-fast ASGI server."
@@ -1166,4 +1177,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "2e9e82e5d5d4e15abedd06a2144bd2f75eac2bba44f2dfb95face4cc6f671bc1"
+content-hash = "154eee1a351f34e92fabc024882650dfb382403091abc8bc93ccab0b53af94ae"
