@@ -44,9 +44,9 @@ manager = ConnectionManager()
 @app.websocket("/hellowebsocket")
 async def hello_ws(websocket: WebSocket, state: Annotated[CurrentState, Depends(get_global_state)]):
     await manager.connect(websocket, state)
+    await manager.broadcast(render_updated_state(state))
 
     try:
-        await manager.broadcast(render_updated_state(state))
         async for htmx_json in websocket.iter_text():
             print("RX from htmx", htmx_json)
             state.message += '\n' + HtmxMessage.model_validate_json(htmx_json).message
