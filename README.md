@@ -19,20 +19,24 @@ then activate and run the tests via vscode or the cli:
 
 
 # WIP
+- read from db into the ListRegistry
+- use ListRegistry to back the web UI
 - try a jinjaX template for the lists UI
   - Start with checklists using grocery as the test case.
+- think about whether archived is separate from completed or just a manifestation of same thing.
+- think about how to handle the "one time" vs "recuring" items in the checklist
 
 # Backlog
 ## System
-- I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
-- I want the ability to smartly merge edits after multiple users make offline edits so that when sara and I both check off items we don't have problems
-- I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
-- I want to be able to view older versions of the list so that I can see what was done in the past
-- I want an easy way to backup the list so that I can recover from a mistake
-- I want to view a historical list of projects archived tasks so that I can see what was done in the past
+- I want the ability to smartly merge edits of mulitple users so that we can work on the same list at the same time
 - I want to view a global list of timestamped actions so that I can undo or redo actions
+- I want completed items to automatically be archived (at least eventuall) so that I can focus on what's left
+- I want to view list of archived lists so that I can reference historical lists
+- I want an routine backups of the list in todo.txt format so that I can recover from a disaster
+- I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
 
 ## Capture
+- I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
 - I want to capture photos via share images so that I can quickly capture reminders and references for later.
 - I want to quickly capture notes via ok Google so that I can effortlessly capture todos.
 
@@ -45,6 +49,7 @@ then activate and run the tests via vscode or the cli:
   - one time can be default with a star or other method to make it permanent
 - I want a way to archive an item from the eternal list
   - move from checklist to checklist.archived ?
+  - or maybe make not reccuring and then complete it.
 
 ## Todos
 - I want lists that are backlogs of projects so that I can plan what to work on during planning.
