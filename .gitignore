@@ -1,4 +1,5 @@
 *.egg-info
+*.db
 tests/todo.txt
 tests/todo.txt.out
 .venv
