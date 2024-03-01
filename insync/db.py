@@ -46,3 +46,25 @@ class ListDB:
 
         self.conn.commit()
         self.conn.close()
+
+    def load(self) -> ListRegistry:
+        self.conn = sqlite3.connect(self.db_path)
+        cursor = self.conn.execute("""
+            SELECT
+                uuid,
+                description,
+                completed,
+                context
+            FROM list
+            """)
+        reg = ListRegistry()
+        for row in cursor:
+            li = ListItem(
+                uuid=row[0],
+                description=row[1],
+                completed=row[2],
+                context=row[3], #TODO: this is totally the wrong type but looks correct in the the scratch.py
+            )
+            reg.add(li)
+        self.conn.close()
+        return reg
