@@ -24,10 +24,12 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
+minversion = "8.0"
+python_files = "*_test.py"
 addopts = [
     "--import-mode=importlib",
-]
-python_files = "*.test.py"
+    ]
+testpaths = ["insync"]
 
 [tool.ruff]
 
