@@ -8,6 +8,13 @@ then activate and run the tests via vscode or the cli:
     $ poetry shell
     $ pytest
 
+Interactively code with the python API in the `scratch.ipynb` notebook. This should include many examples.
+
+Run the webapp (FastAPI) UI
+
+    $ uvicorn insync.app:app --reload
+
+
 # Architecture
 
  - FastAPI/Jinja(X) backend
