@@ -1,12 +1,14 @@
 import sqlite3
+import sys
 
 from insync.list import ListItem, ListRegistry
 
 
 class ListDB:
     def __init__(self, db_path: str):
-        self.db_path = db_path or ':memory:'
         self.conn = sqlite3.connect(db_path)
+
+    def ensure_tables_created(self) -> None:
         try:
             self.conn.execute(
                 """
@@ -19,16 +21,13 @@ class ListDB:
                 """,
             )
         except sqlite3.OperationalError:
-            # table already exists
-            pass
+            print("Table already exists", file=sys.stderr)
+
         self.conn.commit()
-        self.conn.close()
 
     def patch(self, reg: ListRegistry) -> None:
         # TODO: Track mutations and only upsert those
-        # TODO: dont
 
-        self.conn = sqlite3.connect(self.db_path)
         sql = """
             INSERT INTO list (uuid, description, context, completed)
                 VALUES (?, ?, ?, ?)
@@ -45,10 +44,8 @@ class ListDB:
         )
 
         self.conn.commit()
-        self.conn.close()
 
     def load(self) -> ListRegistry:
-        self.conn = sqlite3.connect(self.db_path)
         cursor = self.conn.execute("""
             SELECT
                 uuid,
@@ -66,5 +63,8 @@ class ListDB:
                 context=row[3], #TODO: this is totally the wrong type but looks correct in the the scratch.py
             )
             reg.add(li)
-        self.conn.close()
+
         return reg
+
+    def close(self) -> None:
+        self.conn.close()

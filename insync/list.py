@@ -78,6 +78,10 @@ class ListRegistry:
     def __str__(self) -> str:
         return '\n'.join(str(item) for item in self._list.values()) + '\n'
 
+    @property
+    def items(self) -> List[ListItem]:
+        return list(self._list.values())
+
     def add(self, item: ListItem) -> None:
         self._list[item.uuid] = item
 
