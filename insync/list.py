@@ -82,10 +82,6 @@ class ListRegistry:
     def items(self) -> Iterable[ListItem]:
         return self._list.values()
 
-    @property
-    def undo_stack(self) -> Iterable[Command]:
-        yield from reversed(self._history)
-
     def add(self, item: ListItem) -> None:
         self._list[item.uuid] = item
 
@@ -94,10 +90,18 @@ class ListRegistry:
         command.do(item)
         self._history.append(command)
 
-    def undo(self, command: Command) -> None:
+    @property
+    def undo_stack(self) -> Iterable[Command]:
+        yield from reversed(self._history)
+
+    def _undo(self, command: Command) -> None:
         item = self._list[command.uuid]
         command.undo(item)
         self._history.remove(command)
+
+    def undo(self, command: Command | None = None) -> None:
+        """Undo specific command or else the most recent command in the history."""
+        self._undo(command or self._history[-1])
 
 
 @dataclass
