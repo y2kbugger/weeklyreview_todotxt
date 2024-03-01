@@ -3,7 +3,6 @@ from __future__ import annotations
 import datetime as dt
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Dict, List
 
 from uuid6 import UUID, uuid7
 
@@ -72,14 +71,14 @@ class ListItem:
 
 @dataclass
 class ListRegistry:
-    _list: Dict[UUID,ListItem] = field(default_factory=dict)
-    _history: List[Command] = field(default_factory=list)
+    _list: dict[UUID, ListItem] = field(default_factory=dict)
+    _history: list[Command] = field(default_factory=list)
 
     def __str__(self) -> str:
         return '\n'.join(str(item) for item in self._list.values()) + '\n'
 
     @property
-    def items(self) -> List[ListItem]:
+    def items(self) -> list[ListItem]:
         return list(self._list.values())
 
     def add(self, item: ListItem) -> None:
@@ -97,7 +96,7 @@ class ListRegistry:
 
 
 @dataclass
-class Command():
+class Command:
     """Command to do and undo a mutation to the list
 
     - It must be initialized with all the information it needs to do its job.
