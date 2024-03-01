@@ -1,9 +1,11 @@
 from __future__ import annotations
-from dataclasses import dataclass, field
+
 import datetime as dt
+from dataclasses import dataclass, field
 from enum import Enum
-from uuid6 import uuid7, UUID
-from typing import List, Dict
+from typing import Dict, List
+
+from uuid6 import UUID, uuid7
 
 """
 - map our concepts to todo.txt
@@ -59,13 +61,13 @@ class ListItem:
     def __str__(self) -> str:
         # x (A) 2016-05-20 2016-04-30 measure space for +chapelShelving @chapel due:2016-05-30
         pieces = [
-            'x' if self.completed else '',
-            f'({self.priority.value})' if self.priority else '',
-            str(self.completion_date) if self.completion_date else '',
+            "x" if self.completed else "",
+            f"({self.priority.value})" if self.priority else "",
+            str(self.completion_date) if self.completion_date else "",
             str(self.creation_date),
             self.description,
-            str(self.context) if self.context else ''
-            ]
+            str(self.context) if self.context else "",
+        ]
         return ' '.join(p for p in pieces if p != '')
 
 @dataclass
@@ -76,15 +78,15 @@ class ListRegistry:
     def __str__(self) -> str:
         return '\n'.join(str(item) for item in self._list.values()) + '\n'
 
-    def add(self, item: ListItem):
+    def add(self, item: ListItem) -> None:
         self._list[item.id] = item
 
-    def do(self, command: Command):
+    def do(self, command: Command) -> None:
         item = self._list[command.id]
         command.do(item)
         self._history.append(command)
 
-    def undo(self, command: Command):
+    def undo(self, command: Command) -> None:
         item = self._list[command.id]
         command.undo(item)
         self._history.remove(command)
@@ -99,10 +101,11 @@ class Command():
     - It is not legal to undo a command that has not been done.
     """
     id: UUID
-    def do(self, item: ListItem) -> ListItem:
+
+    def do(self, item: ListItem) -> None:
         raise NotImplementedError
 
-    def undo(self, item: ListItem) -> ListItem:
+    def undo(self, item: ListItem) -> None:
         raise NotImplementedError
 
 class ImpotentCommandError(Exception):
@@ -113,17 +116,18 @@ class ImpotentCommandError(Exception):
 class CompletionCommand(Command):
     completed_new: bool
     completed_orig: bool | None = None
-    def __init__(self, id: UUID, completed: bool):
-        self.id = id
+
+    def __init__(self, uuid: UUID, completed: bool):
+        self.id = uuid
         self.completed_new = completed
 
-    def do(self, item: ListItem):
+    def do(self, item: ListItem) -> None:
         if self.completed_new == item.completed:
             raise ImpotentCommandError(self)
         self.completed_orig = item.completed
         item.completed = self.completed_new
 
-    def undo(self, item: ListItem):
+    def undo(self, item: ListItem) -> None:
         assert self.completed_orig is not None, "Undoing a command that has not been done"
         item.completed = self.completed_orig
 

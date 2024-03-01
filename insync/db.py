@@ -2,6 +2,7 @@ import sqlite3
 
 from insync.list import ListRegistry
 
+
 class ListDB:
     def __init__(self, db_path: str):
         self.db_path = db_path or ':memory:'
@@ -15,7 +16,7 @@ class ListDB:
                     context TEXT,
                     completed INTEGER
                     )
-                """
+                """,
             )
         except sqlite3.OperationalError:
             # table already exists
@@ -23,17 +24,25 @@ class ListDB:
         self.conn.commit()
         self.conn.close()
 
-    def patch(self, reg: ListRegistry):
+    def patch(self, reg: ListRegistry) -> None:
+        # TODO: Track mutations and only upsert those
+        # TODO: dont
+
         self.conn = sqlite3.connect(self.db_path)
         sql = """
             INSERT INTO list (id, description, context, completed)
-            VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, ?)
+            ON CONFLICT (id)
+                DO UPDATE SET
+                    description = excluded.description,
+                    context = excluded.context,
+                    completed = excluded.completed
             """
-        # can you do this in a single statement?
+
         self.conn.executemany(
             sql,
-            ((str(item.id), item.description, str(item.context), item.completed) for item in reg._list.values())
-            )
+            ((str(item.id), item.description, str(item.context), item.completed) for item in reg._list.values()),
+        )
 
         self.conn.commit()
         self.conn.close()
