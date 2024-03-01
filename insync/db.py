@@ -1,6 +1,6 @@
 import sqlite3
 
-from insync.list import ListRegistry
+from insync.list import ListItem, ListRegistry
 
 
 class ListDB:
@@ -11,7 +11,7 @@ class ListDB:
             self.conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS list (
-                    id TEXT PRIMARY KEY,
+                    uuid TEXT PRIMARY KEY,
                     description TEXT,
                     context TEXT,
                     completed INTEGER
@@ -30,9 +30,9 @@ class ListDB:
 
         self.conn = sqlite3.connect(self.db_path)
         sql = """
-            INSERT INTO list (id, description, context, completed)
+            INSERT INTO list (uuid, description, context, completed)
                 VALUES (?, ?, ?, ?)
-            ON CONFLICT (id)
+            ON CONFLICT (uuid)
                 DO UPDATE SET
                     description = excluded.description,
                     context = excluded.context,
@@ -41,7 +41,7 @@ class ListDB:
 
         self.conn.executemany(
             sql,
-            ((str(item.id), item.description, str(item.context), item.completed) for item in reg._list.values()),
+            ((str(item.uuid), item.description, str(item.context), item.completed) for item in reg._list.values()),
         )
 
         self.conn.commit()

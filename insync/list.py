@@ -50,7 +50,7 @@ class Context:
 class ListItem:
     description: str
 
-    id: UUID = field(default_factory=uuid7)
+    uuid: UUID = field(default_factory=uuid7)
     completed: bool = False
     priority: Priority | None = None
     completion_date: dt.date | None = None
@@ -79,15 +79,15 @@ class ListRegistry:
         return '\n'.join(str(item) for item in self._list.values()) + '\n'
 
     def add(self, item: ListItem) -> None:
-        self._list[item.id] = item
+        self._list[item.uuid] = item
 
     def do(self, command: Command) -> None:
-        item = self._list[command.id]
+        item = self._list[command.uuid]
         command.do(item)
         self._history.append(command)
 
     def undo(self, command: Command) -> None:
-        item = self._list[command.id]
+        item = self._list[command.uuid]
         command.undo(item)
         self._history.remove(command)
 
@@ -100,7 +100,8 @@ class Command():
     - It can collect the info it needs to undo while doing its job.
     - It is not legal to undo a command that has not been done.
     """
-    id: UUID
+
+    uuid: UUID
 
     def do(self, item: ListItem) -> None:
         raise NotImplementedError
@@ -118,7 +119,7 @@ class CompletionCommand(Command):
     completed_orig: bool | None = None
 
     def __init__(self, uuid: UUID, completed: bool):
-        self.id = uuid
+        self.uuid = uuid
         self.completed_new = completed
 
     def do(self, item: ListItem) -> None:
