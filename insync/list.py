@@ -83,7 +83,7 @@ class ListRegistry:
         return self._list.values()
 
     @property
-    def undo_history(self) -> Iterable[Command]:
+    def undo_stack(self) -> Iterable[Command]:
         yield from reversed(self._history)
 
     def add(self, item: ListItem) -> None:
