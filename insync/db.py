@@ -6,11 +6,11 @@ from insync.list import ListItem, ListRegistry
 
 class ListDB:
     def __init__(self, db_path: str):
-        self.conn = sqlite3.connect(db_path)
+        self._conn = sqlite3.connect(db_path)
 
     def ensure_tables_created(self) -> None:
         try:
-            self.conn.execute(
+            self._conn.execute(
                 """
                 CREATE TABLE IF NOT EXISTS list (
                     uuid TEXT PRIMARY KEY,
@@ -23,7 +23,7 @@ class ListDB:
         except sqlite3.OperationalError:
             print("Table already exists", file=sys.stderr)
 
-        self.conn.commit()
+        self._conn.commit()
 
     def patch(self, reg: ListRegistry) -> None:
         # TODO: Track mutations and only upsert those
@@ -38,15 +38,15 @@ class ListDB:
                     completed = excluded.completed
             """
 
-        self.conn.executemany(
+        self._conn.executemany(
             sql,
-            ((str(item.uuid), item.description, str(item.context), item.completed) for item in reg._list.values()),
+            ((str(item.uuid), item.description, str(item.context), item.completed) for item in reg.items),
         )
 
-        self.conn.commit()
+        self._conn.commit()
 
     def load(self) -> ListRegistry:
-        cursor = self.conn.execute("""
+        cursor = self._conn.execute("""
             SELECT
                 uuid,
                 description,
@@ -67,4 +67,4 @@ class ListDB:
         return reg
 
     def close(self) -> None:
-        self.conn.close()
+        self._conn.close()
