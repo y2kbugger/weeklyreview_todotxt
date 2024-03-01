@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import sys
 
@@ -5,7 +6,7 @@ from insync.list import ListItem, ListRegistry
 
 
 class ListDB:
-    def __init__(self, db_path: str):
+    def __init__(self, db_path: str | os.PathLike):
         self._conn = sqlite3.connect(db_path)
 
     def ensure_tables_created(self) -> None:
