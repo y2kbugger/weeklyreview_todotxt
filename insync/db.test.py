@@ -1,4 +1,5 @@
-from typing import Iterator
+
+from collections.abc import Iterable
 
 import pytest
 
@@ -6,7 +7,7 @@ from insync.db import ListDB
 
 
 @pytest.fixture()
-def db() -> Iterator[ListDB]:
+def db() -> Iterable[ListDB]:
     _db = ListDB(':memory:')
     _db.ensure_tables_created()
     yield _db
@@ -23,4 +24,4 @@ def test_prexisting_tables_doesnt_raise(db: ListDB) -> None:
 
 def test_can_retrieve_empty_list(db: ListDB) -> None:
     reg = db.load()
-    assert len(reg.items) == 0
+    assert len(list(reg.items)) == 0

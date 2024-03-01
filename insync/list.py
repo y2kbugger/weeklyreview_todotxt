@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -78,8 +79,12 @@ class ListRegistry:
         return '\n'.join(str(item) for item in self._list.values()) + '\n'
 
     @property
-    def items(self) -> list[ListItem]:
-        return list(self._list.values())
+    def items(self) -> Iterable[ListItem]:
+        return self._list.values()
+
+    @property
+    def undo_history(self) -> Iterable[Command]:
+        yield from reversed(self._history)
 
     def add(self, item: ListItem) -> None:
         self._list[item.uuid] = item
