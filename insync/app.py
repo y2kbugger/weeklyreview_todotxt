@@ -11,24 +11,22 @@ from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
 from insync.db import ListDB
-from insync.list import CompletionCommand, ListItem, ListItemContext, ListItemContextType, ListRegistry
+from insync.list import CompletionCommand, ListItem, ListRegistry
 
 
-def _add_dummy_data(reg: ListRegistry) -> None:
-    descs = ['eggs', 'milk', 'bread', 'butter']
-    for desc in descs:
-        i = ListItem(desc, context=ListItemContext('grocery', ListItemContextType.CHECKLIST))
-        reg.add(i)
-    milk_item = list(reg.items)[1]
-    reg.do(CompletionCommand(milk_item.uuid, True))
+def persist_to_db():
+    app.state.db.patch(app.state.registry)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.registry = ListRegistry()
-    _add_dummy_data(app.state.registry)
-    app.state.db = ListDB(':memory:')
+    app.state.db = ListDB('list.db')
+    app.state.db.ensure_tables_created()
+    app.state.registry = app.state.db.load()
+
     yield
+
+    persist_to_db()
     app.state.db.close()
 
 
@@ -71,7 +69,11 @@ manager = ConnectionManager()
 
 
 @app.websocket("/hellowebsocket")
-async def hello_ws(websocket: WebSocket, registry: Annotated[ListRegistry, Depends(get_registry)]) -> None:
+async def hello_ws(
+    websocket: WebSocket,
+    registry: Annotated[ListRegistry, Depends(get_registry)],
+    db: Annotated[ListDB, Depends(get_db)],
+) -> None:
     await manager.connect(websocket)
     await manager.broadcast(render_updated_state(registry.items))
 
@@ -80,6 +82,7 @@ async def hello_ws(websocket: WebSocket, registry: Annotated[ListRegistry, Depen
             msg = HtmxMessage.model_validate_json(htmx_json).message
             if msg != '':
                 registry.add(ListItem(msg))
+                db.patch(registry)
             await manager.broadcast(render_updated_state(registry.items))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
@@ -98,6 +101,7 @@ def hello(request: Request) -> HTMLResponse:
 async def patch_list(
     uuid: str,
     registry: Annotated[ListRegistry, Depends(get_registry)],
+    db: Annotated[ListDB, Depends(get_db)],
     completed: Annotated[bool, Form()] = False,
 ) -> None:
     print(f'patch_list({uuid=}, {completed=})')
@@ -105,4 +109,5 @@ async def patch_list(
     item = next(i for i in registry.items if str(i.uuid) == uuid)
     cmd = CompletionCommand(item.uuid, completed)
     registry.do(cmd)
+    db.patch(registry)
     await manager.broadcast(render_updated_state(registry.items))
