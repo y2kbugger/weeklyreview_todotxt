@@ -10,12 +10,12 @@
   </head>
   <body>
   <div hx-ext="ws" ws-connect="/hellowebsocket" ws-reconnect="true">
-    <div id="current-message">Loading...</div>
     <form id="form" ws-send hx-trigger="submit, load"
       _='on htmx:wsAfterSend
                   get the first <input[name="message"]/>
                   then set its value to ""'>
       <input name="message" value="">
     </form>
+    <div id="current-message">Loading...</div>
   </body>
 </html>
