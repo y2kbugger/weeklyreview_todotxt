@@ -24,27 +24,35 @@ from uuid6 import UUID, uuid7
 
 Priority = Enum('Priority', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
 
-class ContextType(Enum):
-    TODO = 0
-    CHECKLIST = 1
-    REF = 2
+class ListItemContextType(Enum):
+    NULL = 0
+    TODO = 1
+    CHECKLIST = 2
+    REF = 3
 
-class Context:
-    def __init__(self, name: str, context_type: ContextType):
-        self.name = name
-        self.context_type = context_type
+
+@dataclass
+class ListItemContext:
+    name: str
+    context_type: ListItemContextType
 
     def __str__(self) -> str:
-        if self.context_type == ContextType.TODO:
+        if self.context_type == ListItemContextType.TODO:
             prefix = "@"
-        elif self.context_type == ContextType.CHECKLIST:
+        elif self.context_type == ListItemContextType.CHECKLIST:
             prefix = "@^"
-        elif self.context_type == ContextType.REF:
+        elif self.context_type == ListItemContextType.REF:
             prefix = "@#"
+        elif self.context_type == ListItemContextType.NULL:
+            prefix = ""
         else:
             raise ValueError(f"Unknown context type: {self.context_type}")
 
         return f'{prefix}{self.name}'
+
+def null_listitemcontext() -> ListItemContext:
+    return ListItemContext("", ListItemContextType.NULL)
+
 
 @dataclass
 class ListItem:
@@ -55,7 +63,7 @@ class ListItem:
     priority: Priority | None = None
     completion_date: dt.date | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
-    context: Context | None = None
+    context: ListItemContext = field(default_factory=null_listitemcontext)
     # project: Project
 
     def __str__(self) -> str:

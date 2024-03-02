@@ -1,4 +1,15 @@
-from insync.list import CompletionCommand, ListItem, ListRegistry
+from insync.list import CompletionCommand, ListItem, ListItemContext, ListItemContextType, ListRegistry
+
+
+def test_instantiate_listitem() -> None:
+    item = ListItem('test')
+    assert item.description == 'test'
+
+
+def test_instantiate_listitem_with_context() -> None:
+    itemcontext = ListItemContext('grocery', ListItemContextType.CHECKLIST)
+    item = ListItem('test', context=itemcontext)
+    assert item.context.name == 'grocery'
 
 
 def test_add_item() -> None:
@@ -29,3 +40,4 @@ def test_can_undo_completion() -> None:
     reg.undo()
 
     assert not item.completed
+
