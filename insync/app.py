@@ -20,7 +20,7 @@ def persist_to_db():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.db = ListDB('list.db')
+    app.state.db = ListDB('/home/list.db')
     app.state.db.ensure_tables_created()
     app.state.registry = app.state.db.load()
 
