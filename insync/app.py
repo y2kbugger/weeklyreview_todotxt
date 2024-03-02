@@ -1,37 +1,58 @@
+from collections.abc import Iterable
+from contextlib import asynccontextmanager
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, WebSocket, WebSocketDisconnect
+import jinja2
+from fastapi import Depends, FastAPI, Form, WebSocket, WebSocketDisconnect
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
-app = FastAPI()
+from insync.db import ListDB
+from insync.list import CompletionCommand, ListItem, ListItemContext, ListItemContextType, ListRegistry
+
+
+def _add_dummy_data(reg: ListRegistry) -> None:
+    descs = ['eggs', 'milk', 'bread', 'butter']
+    for desc in descs:
+        i = ListItem(desc, context=ListItemContext('grocery', ListItemContextType.CHECKLIST))
+        reg.add(i)
+    milk_item = list(reg.items)[1]
+    reg.do(CompletionCommand(milk_item.uuid, True))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    app.state.registry = ListRegistry()
+    _add_dummy_data(app.state.registry)
+    app.state.db = ListDB(':memory:')
+    yield
+    app.state.db.close()
+
+
+app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="insync")
-
-
-class CurrentState(BaseModel):
-    message: str
 
 
 class HtmxMessage(BaseModel):
     message: str
     HEADERS: dict[str, str | None]
 
+def get_registry() -> ListRegistry:
+    return app.state.registry
 
-_current_global_state = CurrentState(message="<3")
 
-
-def get_global_state() -> CurrentState:
-    return _current_global_state
+def get_db() -> ListDB:
+    return app.state.db
 
 
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket, state: CurrentState) -> None:
+    async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
         self.active_connections.append(websocket)
 
@@ -50,32 +71,38 @@ manager = ConnectionManager()
 
 
 @app.websocket("/hellowebsocket")
-async def hello_ws(websocket: WebSocket, state: Annotated[CurrentState, Depends(get_global_state)]) -> None:
-    await manager.connect(websocket, state)
-    await manager.broadcast(render_updated_state(state))
+async def hello_ws(websocket: WebSocket, registry: Annotated[ListRegistry, Depends(get_registry)]) -> None:
+    await manager.connect(websocket)
+    await manager.broadcast(render_updated_state(registry.items))
 
     try:
         async for htmx_json in websocket.iter_text():
-            print("RX from htmx", htmx_json)
-            state.message += '\n' + HtmxMessage.model_validate_json(htmx_json).message
-            await manager.broadcast(render_updated_state(state))
+            msg = HtmxMessage.model_validate_json(htmx_json).message
+            if msg != '':
+                registry.add(ListItem(msg))
+            await manager.broadcast(render_updated_state(registry.items))
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 
 
-def render_updated_state(state: CurrentState) -> str:
-    print(f"TX from python {state.message}")
-    html = f"""
-    <div id="current-message" hx-swap-oob="true">
-        <pre>
-        {state.message}
-        </pre>
-    </div>
-    """
-    return html
+def render_updated_state(listitems: Iterable[ListItem]) -> str:
+    template: jinja2.Template = templates.get_template("list.html")
+    return template.render(listitems=listitems)
 
 
 @app.get("/")
 def hello(request: Request) -> HTMLResponse:
-    print("running hello.html template")
     return templates.TemplateResponse(request, "hello.html", {})
+
+@app.patch("/list/{uuid}/completed")
+async def patch_list(
+    uuid: str,
+    registry: Annotated[ListRegistry, Depends(get_registry)],
+    completed: Annotated[bool, Form()] = False,
+) -> None:
+    print(f'patch_list({uuid=}, {completed=})')
+
+    item = next(i for i in registry.items if str(i.uuid) == uuid)
+    cmd = CompletionCommand(item.uuid, completed)
+    registry.do(cmd)
+    await manager.broadcast(render_updated_state(registry.items))
