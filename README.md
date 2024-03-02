@@ -26,7 +26,6 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- read from db into the ListRegistry
 - use ListRegistry to back the web UI
 - try a jinjaX template for the lists UI
   - Start with checklists using grocery as the test case.
