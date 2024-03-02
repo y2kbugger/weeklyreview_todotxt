@@ -88,7 +88,7 @@ class ListRegistry:
 
     @property
     def items(self) -> Iterable[ListItem]:
-        return self._list.values()
+        return sorted(self._list.values(), key=lambda item: (item.completed, item.description.lower()))
 
     def add(self, item: ListItem) -> None:
         self._list[item.uuid] = item
