@@ -26,9 +26,14 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- use ListRegistry to back the web UI
-- try a jinjaX template for the lists UI
-  - Start with checklists using grocery as the test case.
+- Start with checklists using grocery as the test case.
+  - Clarify completed items
+  - Add ability to reset a checklist
+  - Separate sections of a checklist
+  - Add ability to add a new section
+  - make new item a post instead of ws
+  - order completed items by completion datetime
+  - ability to update an item
 - think about whether archived is separate from completed or just a manifestation of same thing.
 - think about how to handle the "one time" vs "recuring" items in the checklist
 
