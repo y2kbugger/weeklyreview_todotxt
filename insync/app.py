@@ -1,3 +1,4 @@
+import os
 from collections.abc import Iterable
 from contextlib import asynccontextmanager
 from typing import Annotated
@@ -20,7 +21,8 @@ def persist_to_db():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.db = ListDB('/home/list.db')
+    DB_STR = os.environ.get('INSYNC_DB_STR', ':memory:')
+    app.state.db = ListDB(DB_STR)
     app.state.db.ensure_tables_created()
     app.state.registry = app.state.db.load()
 
