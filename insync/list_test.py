@@ -1,4 +1,4 @@
-from insync.list import CompletionCommand, ListItem, ListItemContext, ListItemContextType, ListRegistry
+from insync.list import CompletionCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 def test_instantiate_listitem() -> None:
@@ -6,10 +6,10 @@ def test_instantiate_listitem() -> None:
     assert item.description == 'test'
 
 
-def test_instantiate_listitem_with_context() -> None:
-    itemcontext = ListItemContext('grocery', ListItemContextType.CHECKLIST)
-    item = ListItem('test', context=itemcontext)
-    assert item.context.name == 'grocery'
+def test_instantiate_listitem_with_project() -> None:
+    itemproject = ListItemProject('grocery', ListItemProjectType.CHECKLIST)
+    item = ListItem('test', project=itemproject)
+    assert item.project.name == 'grocery'
 
 
 def test_add_item() -> None:

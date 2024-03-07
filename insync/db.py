@@ -4,13 +4,13 @@ import sys
 
 from uuid6 import UUID
 
-from insync.list import ListItem, ListItemContext, ListItemContextType, ListRegistry
+from insync.list import ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 sqlite3.register_adapter(UUID, lambda u: u.bytes_le)
 sqlite3.register_converter('UUIDLE', lambda b: UUID(bytes_le=b))
 
-sqlite3.register_adapter(ListItemContextType, lambda c: c.value.to_bytes(1, 'little'))
-sqlite3.register_converter('LISTITEMCONTEXTTYPE', lambda b: ListItemContextType(int.from_bytes(b, 'little')))
+sqlite3.register_adapter(ListItemProjectType, lambda c: c.value.to_bytes(1, 'little'))
+sqlite3.register_converter('LISTITEMPROJECTTYPE', lambda b: ListItemProjectType(int.from_bytes(b, 'little')))
 
 
 class ListDB:
@@ -25,8 +25,8 @@ class ListDB:
                 CREATE TABLE IF NOT EXISTS list (
                     uuid UUIDLE PRIMARY KEY,
                     description TEXT,
-                    context_name TEXT,
-                    context_type LISTITEMCONTEXTTYPE,
+                    project_name TEXT,
+                    project_type LISTITEMPROJECTTYPE,
                     completed INTEGER
                     )
                 """,
@@ -40,19 +40,19 @@ class ListDB:
         # TODO: Track mutations and only upsert those
 
         sql = """
-            INSERT INTO list (uuid, description, context_name, context_type, completed)
+            INSERT INTO list (uuid, description, project_name, project_type, completed)
                 VALUES (?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
                 DO UPDATE SET
                     description = excluded.description,
-                    context_name = excluded.context_name,
-                    context_type = excluded.context_type,
+                    project_name = excluded.project_name,
+                    project_type = excluded.project_type,
                     completed = excluded.completed
             """
 
         self._conn.executemany(
             sql,
-            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.context.name, item.context.context_type, item.completed) for item in reg.items),
+            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.project.name, item.project.project_type, item.completed) for item in reg.items),
         )
 
         self._conn.commit()
@@ -64,8 +64,8 @@ class ListDB:
                 uuid,
                 description,
                 completed,
-                context_name,
-                context_type
+                project_name,
+                project_type
             FROM list
             """)
         reg = ListRegistry()
@@ -75,7 +75,7 @@ class ListDB:
                 uuid=row[0],
                 description=row[1],
                 completed=row[2],
-                context=ListItemContext(row[3], row[4]),
+                project=ListItemProject(row[3], row[4]),
             )
             reg.add(li)
 

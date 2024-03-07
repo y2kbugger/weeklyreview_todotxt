@@ -24,7 +24,7 @@ from uuid6 import UUID, uuid7
 
 Priority = Enum('Priority', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
 
-class ListItemContextType(Enum):
+class ListItemProjectType(Enum):
     NULL = 0
     TODO = 1
     CHECKLIST = 2
@@ -32,26 +32,26 @@ class ListItemContextType(Enum):
 
 
 @dataclass
-class ListItemContext:
+class ListItemProject:
     name: str
-    context_type: ListItemContextType
+    project_type: ListItemProjectType
 
     def __str__(self) -> str:
-        if self.context_type == ListItemContextType.TODO:
-            prefix = "@"
-        elif self.context_type == ListItemContextType.CHECKLIST:
-            prefix = "@^"
-        elif self.context_type == ListItemContextType.REF:
-            prefix = "@#"
-        elif self.context_type == ListItemContextType.NULL:
+        if self.project_type == ListItemProjectType.TODO:
+            prefix = "+"
+        elif self.project_type == ListItemProjectType.CHECKLIST:
+            prefix = "+^"
+        elif self.project_type == ListItemProjectType.REF:
+            prefix = "+#"
+        elif self.project_type == ListItemProjectType.NULL:
             prefix = ""
         else:
-            raise ValueError(f"Unknown context type: {self.context_type}")
+            raise ValueError(f"Unknown project type: {self.project_type}")
 
         return f'{prefix}{self.name}'
 
-def null_listitemcontext() -> ListItemContext:
-    return ListItemContext("", ListItemContextType.NULL)
+def null_listitemproject() -> ListItemProject:
+    return ListItemProject("", ListItemProjectType.NULL)
 
 
 @dataclass
@@ -63,8 +63,7 @@ class ListItem:
     priority: Priority | None = None
     completion_date: dt.date | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
-    context: ListItemContext = field(default_factory=null_listitemcontext)
-    # project: Project
+    project: ListItemProject = field(default_factory=null_listitemproject)
 
     def __str__(self) -> str:
         # x (A) 2016-05-20 2016-04-30 measure space for +chapelShelving @chapel due:2016-05-30
@@ -74,7 +73,7 @@ class ListItem:
             str(self.completion_date) if self.completion_date else "",
             str(self.creation_date),
             self.description,
-            str(self.context) if self.context else "",
+            str(self.project) if self.project else "",
         ]
         return ' '.join(p for p in pieces if p != '')
 
