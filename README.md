@@ -45,6 +45,13 @@ Run the webapp (FastAPI) UI
 - I want to view list of archived lists so that I can reference historical lists
 - I want an routine backups of the list in todo.txt format so that I can recover from a disaster
 - I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
+- I want an admin page that display meta system info like:
+  - connected websockets
+  - database size
+  - last backup
+  - export to todo.txt
+  - undo/redo history
+  - snapshots in time of db
 
 ## Capture
 - I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
