@@ -4,7 +4,7 @@ import sys
 
 from uuid6 import UUID
 
-from insync.list import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 sqlite3.register_adapter(UUID, lambda u: u.bytes_le)
 sqlite3.register_converter('UUIDLE', lambda b: UUID(bytes_le=b))

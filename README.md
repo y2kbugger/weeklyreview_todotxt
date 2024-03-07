@@ -26,6 +26,11 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
+- cleanup structure of the app
+  - make the websocket connection aware of:
+    1. the meta-type of list it is connected to (checklist, todo, reference)
+    2. which specific root "+PROJECT" it is connected to.
+    3. logic to handle when an update needs to be sent to the a specific client
 - Start with checklists using grocery as the test case.
   - Clarify completed items
   - Add ability to reset a checklist
@@ -52,6 +57,7 @@ Run the webapp (FastAPI) UI
   - export to todo.txt
   - undo/redo history
   - snapshots in time of db
+- configure htmx not to send headers
 
 ## Capture
 - I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.

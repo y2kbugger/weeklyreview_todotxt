@@ -3,7 +3,7 @@ from collections.abc import Iterable
 import pytest
 
 from insync.db import ListDB
-from insync.list import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 @pytest.fixture()
@@ -42,7 +42,7 @@ def test_can_retrieve_persisted_item(db: ListDB) -> None:
 
 def test_can_retrieve_persisted_item_with_project(db: ListDB) -> None:
     reg = ListRegistry()
-    item = ListItem('test', project=ListItemProject('grocery', ListItemProjectType.CHECKLIST))
+    item = ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist))
     reg.add(item)
     db.patch(reg)
 

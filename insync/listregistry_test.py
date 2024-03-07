@@ -1,4 +1,4 @@
-from insync.list import CompletionCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import CompletionCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 def test_instantiate_listitem() -> None:
@@ -7,7 +7,7 @@ def test_instantiate_listitem() -> None:
 
 
 def test_instantiate_listitem_with_project() -> None:
-    itemproject = ListItemProject('grocery', ListItemProjectType.CHECKLIST)
+    itemproject = ListItemProject('grocery', ListItemProjectType.checklist)
     item = ListItem('test', project=itemproject)
     assert item.project.name == 'grocery'
 
@@ -40,4 +40,3 @@ def test_can_undo_completion() -> None:
     reg.undo()
 
     assert not item.completed
-

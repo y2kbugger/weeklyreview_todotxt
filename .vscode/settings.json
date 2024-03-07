@@ -18,4 +18,7 @@
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.inlayHints.pytestParameters": true,
   "python.analysis.typeCheckingMode": "standard",
+  "html.format.templating": true,
+  "html.format.wrapAttributes": "preserve-aligned",
+  "html.format.wrapLineLength": 0,
 }

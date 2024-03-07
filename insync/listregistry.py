@@ -24,11 +24,12 @@ from uuid6 import UUID, uuid7
 
 Priority = Enum('Priority', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
 
+
 class ListItemProjectType(Enum):
-    NULL = 0
-    TODO = 1
-    CHECKLIST = 2
-    REF = 3
+    null = 0
+    todo = 1
+    checklist = 2
+    ref = 3
 
 
 @dataclass
@@ -37,21 +38,22 @@ class ListItemProject:
     project_type: ListItemProjectType
 
     def __str__(self) -> str:
-        if self.project_type == ListItemProjectType.TODO:
+        if self.project_type == ListItemProjectType.todo:
             prefix = "+"
-        elif self.project_type == ListItemProjectType.CHECKLIST:
+        elif self.project_type == ListItemProjectType.checklist:
             prefix = "+^"
-        elif self.project_type == ListItemProjectType.REF:
+        elif self.project_type == ListItemProjectType.ref:
             prefix = "+#"
-        elif self.project_type == ListItemProjectType.NULL:
+        elif self.project_type == ListItemProjectType.null:
             prefix = ""
         else:
             raise ValueError(f"Unknown project type: {self.project_type}")
 
         return f'{prefix}{self.name}'
 
+
 def null_listitemproject() -> ListItemProject:
-    return ListItemProject("", ListItemProjectType.NULL)
+    return ListItemProject("", ListItemProjectType.null)
 
 
 @dataclass
@@ -76,6 +78,7 @@ class ListItem:
             str(self.project) if self.project else "",
         ]
         return ' '.join(p for p in pieces if p != '')
+
 
 @dataclass
 class ListRegistry:
@@ -128,9 +131,11 @@ class Command:
     def undo(self, item: ListItem) -> None:
         raise NotImplementedError
 
+
 class ImpotentCommandError(Exception):
     def __init__(self, command: Command):
         super().__init__(f"Command {command} is impotent")
+
 
 @dataclass
 class CompletionCommand(Command):
@@ -150,4 +155,3 @@ class CompletionCommand(Command):
     def undo(self, item: ListItem) -> None:
         assert self.completed_orig is not None, "Undoing a command that has not been done"
         item.completed = self.completed_orig
-

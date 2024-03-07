@@ -1,13 +1,12 @@
-<div
-     id="current-message"
-     hx-swap-oob="true">
+<div id="current-message" hx-swap-oob="true">
   {% for item in listitems %}
   <div class="card">
     <div class="card-body">
       <input name="completed"
              type="checkbox"
-             hx-patch="/list/{{ item.uuid }}/completed"
+             hx-patch="/checklist/{{ item.uuid }}/completed"
              {{ "checked" if item.completed else "" }}>
+
       <span class="card-title">{{ item.description }}</span>
     </div>
   </div>
