@@ -22,14 +22,18 @@ from uuid6 import UUID, uuid7
     - type `type:[checklist|todo|ref|checklist.onetime]`
 """
 
-Priority = Enum('Priority', ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'])
+Priority = Enum(
+    'Priority',
+    ((p, p) for p in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']),
+    type=str,
+)
 
 
-class ListItemProjectType(Enum):
-    null = 0
-    todo = 1
-    checklist = 2
-    ref = 3
+class ListItemProjectType(str, Enum):
+    null = "null"
+    todo = "todo"
+    checklist = "checklist"
+    ref = "ref"
 
 
 @dataclass
