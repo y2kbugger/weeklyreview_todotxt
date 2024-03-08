@@ -1,6 +1,7 @@
 import os
 import sqlite3
 import sys
+from enum import Enum
 
 from uuid6 import UUID
 
@@ -9,8 +10,18 @@ from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, 
 sqlite3.register_adapter(UUID, lambda u: u.bytes_le)
 sqlite3.register_converter('UUIDLE', lambda b: UUID(bytes_le=b))
 
-sqlite3.register_adapter(ListItemProjectType, lambda c: c.value.to_bytes(1, 'little'))
-sqlite3.register_converter('LISTITEMPROJECTTYPE', lambda b: ListItemProjectType(int.from_bytes(b, 'little')))
+
+class _ListItemProjectTypeInt(Enum):
+    """Encode ListItemProjectType as an integer for storage in SQLite."""
+
+    null = 0
+    todo = 1
+    checklist = 2
+    ref = 3
+
+
+sqlite3.register_adapter(ListItemProjectType, lambda c: _ListItemProjectTypeInt[c.value].value.to_bytes(1, 'little'))
+sqlite3.register_converter('LISTITEMPROJECTTYPE', lambda b: ListItemProjectType(_ListItemProjectTypeInt(int.from_bytes(b, 'little')).name))
 
 
 class ListDB:
