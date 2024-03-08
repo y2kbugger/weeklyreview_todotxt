@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from starlette.websockets import WebSocketState
 
 from insync.db import ListDB
-from insync.listregistry import ListItem, ListRegistry
+from insync.listregistry import ListItem, ListItemProjectType, ListRegistry
 
 from . import app, get_db, get_registry
 
@@ -38,14 +38,14 @@ ws_manager = ConnectionManager()
 from .checklist import render_checklist  # TODO: fix circular import problem
 
 
-# @app.websocket("/ws/{list_type}/")
-@app.websocket("/ws/checklist")
+@app.websocket("/ws/{list_type}")
 async def ws(
+    list_type: ListItemProjectType,
     websocket: WebSocket,
     registry: Annotated[ListRegistry, Depends(get_registry)],
     db: Annotated[ListDB, Depends(get_db)],
 ) -> None:
-    # assert list_type == ListItemProjectType.checklist, f"Only {ListItemProjectType.checklist} is supported currently"
+    assert list_type == ListItemProjectType.checklist, f"Only {ListItemProjectType.checklist} is supported currently"
     # TODO: add support for other list types
     # TODO: add support for filtering to a specific "Project" e.g. +^grocery
 
