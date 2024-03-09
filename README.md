@@ -26,11 +26,6 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- cleanup structure of the app
-  - make the websocket connection aware of:
-    1. the meta-type of list it is connected to (checklist, todo, reference)
-    2. which specific root "+PROJECT" it is connected to.
-    3. logic to handle when an update needs to be sent to the a specific client
 - Start with checklists using grocery as the test case.
   - Clarify completed items
   - Add ability to reset a checklist
@@ -41,6 +36,7 @@ Run the webapp (FastAPI) UI
   - ability to update an item
 - think about whether archived is separate from completed or just a manifestation of same thing.
 - think about how to handle the "one time" vs "recuring" items in the checklist
+- batch patches to db for performance, don't wait for each one to complete before returning
 
 # Backlog
 ## System

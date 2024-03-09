@@ -2,12 +2,12 @@ from typing import Annotated
 
 from fastapi import Depends, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
-from starlette.websockets import WebSocketState
 
 from insync.db import ListDB
-from insync.listregistry import ListItem, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
-from . import app, get_db, get_registry
+from . import app, get_db, get_registry, get_ws_list_updater
+from .ws_list_updater import WebsocketListUpdater
 
 
 class HtmxMessage(BaseModel):
@@ -15,49 +15,28 @@ class HtmxMessage(BaseModel):
     HEADERS: dict[str, str | None]
 
 
-class ConnectionManager:
-    def __init__(self):
-        self.active_connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket) -> None:
-        await websocket.accept()
-        self.active_connections.append(websocket)
-
-    def disconnect(self, websocket: WebSocket) -> None:
-        self.active_connections.remove(websocket)
-
-    async def broadcast(self, message: str) -> None:
-        for connection in self.active_connections:
-            if connection.client_state == WebSocketState.DISCONNECTED:
-                self.disconnect(connection)
-            else:
-                await connection.send_text(message)
-
-
-ws_manager = ConnectionManager()
-from .checklist import render_checklist  # TODO: fix circular import problem
-
-
-@app.websocket("/ws/{list_type}")
+@app.websocket("/ws/{list_project_type}/{list_project_name}")
 async def ws(
-    list_type: ListItemProjectType,
+    list_project_type: ListItemProjectType,
+    list_project_name: str,
     websocket: WebSocket,
+    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
     registry: Annotated[ListRegistry, Depends(get_registry)],
     db: Annotated[ListDB, Depends(get_db)],
 ) -> None:
-    assert list_type == ListItemProjectType.checklist, f"Only {ListItemProjectType.checklist} is supported currently"
+    assert list_project_type == ListItemProjectType.checklist, f"Only {ListItemProjectType.checklist} is supported currently"
+    project = ListItemProject(list_project_name, list_project_type)
     # TODO: add support for other list types
-    # TODO: add support for filtering to a specific "Project" e.g. +^grocery
 
-    await ws_manager.connect(websocket)
-    await ws_manager.broadcast(render_checklist(registry.items))
+    await ws_list_updater.subscribe(websocket, project)
+    await ws_list_updater.broadcast_update(project)
 
     try:
         async for htmx_json in websocket.iter_text():
             msg = HtmxMessage.model_validate_json(htmx_json).message
             if msg != '':
-                registry.add(ListItem(msg))
+                registry.add(ListItem(msg, project=project))
                 db.patch(registry)
-            await ws_manager.broadcast(render_checklist(registry.items))
+            await ws_list_updater.broadcast_update(project)
     except WebSocketDisconnect:
-        ws_manager.disconnect(websocket)
+        ws_list_updater.disconnect(websocket)

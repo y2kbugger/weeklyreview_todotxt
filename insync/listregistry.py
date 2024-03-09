@@ -36,7 +36,7 @@ class ListItemProjectType(str, Enum):
     ref = "ref"
 
 
-@dataclass
+@dataclass(frozen=True)
 class ListItemProject:
     name: str
     project_type: ListItemProjectType

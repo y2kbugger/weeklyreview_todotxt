@@ -11,11 +11,12 @@
 </head>
 
 <body>
-  <div hx-ext="ws" ws-connect="/ws/checklist" ws-reconnect="true">
+  <div hx-ext="ws" ws-connect="/ws/checklist/grocery" ws-reconnect="true">
     <form id="form" ws-send hx-trigger="submit, load"
           _='on htmx:wsAfterSend
              get the first <input[name="message"]/>
              then set its value to ""'>
+      <input name="project_name" type="hidden" value="grocery">
       <input name="message" value="">
     </form>
     <div id="current-message">Loading...</div>
