@@ -1,9 +1,8 @@
-from fastapi import Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import RedirectResponse
 
-from . import app, templates
+from . import app
 
 
 @app.get("/")
-def hello(request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(request, "index.html", {})
+def hello() -> RedirectResponse:
+    return RedirectResponse("/checklist/grocery")  # TODO: make this dynamic

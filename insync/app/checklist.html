@@ -1,14 +1,25 @@
-<div id="current-message" hx-swap-oob="true">
-  {% for item in listitems %}
-  <div class="card">
-    <div class="card-body">
-      <input name="completed"
-             type="checkbox"
-             hx-patch="/checklist/{{ item.uuid }}/completed"
-             {{ "checked" if item.completed else "" }}>
+<!doctype html>
+<html lang="en-US">
 
-      <span class="card-title">{{ item.description }}</span>
-    </div>
-  </div>
-  {% endfor %}
-</div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>InSync Lists</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
+  <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/_hyperscript.min.js"></script>
+</head>
+
+<body>
+  <div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}" ws-reconnect="true">
+    <form id="form" ws-send hx-trigger="submit, load"
+          _='on htmx:wsAfterSend
+             get the first <input[name="message"]/>
+             then set its value to ""'>
+      <input name="project_name" type="hidden" value="{{ project_name }}">
+      <input name="message" value="">
+    </form>
+    <div id="current-message">Loading...</div>
+</body>
+
+</html>
