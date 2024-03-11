@@ -27,13 +27,17 @@ Run the webapp (FastAPI) UI
 
 # WIP
 - Start with checklists using grocery as the test case.
-  - Clarify completed items
-  - Add ability to reset a checklist
-  - Separate sections of a checklist
-  - Add ability to add a new section
   - make new item a post instead of ws
+  - Clarify completed items
+  - Add ability to add a new section
+  - Separate sections of a checklist
+    - sections can be sorted by integer subproject e.g. `+grocery.1.produce` `+grocery.2.dairy`
+  - Add ability to reset a checklist
   - order completed items by completion datetime
   - ability to update an item
+- todo.txt debug endpoint
+- undo history debug endpoint
+- Add precommit hook for cleaning notebook output and running tests
 - think about whether archived is separate from completed or just a manifestation of same thing.
 - think about how to handle the "one time" vs "recuring" items in the checklist
 - batch patches to db for performance, don't wait for each one to complete before returning
