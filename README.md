@@ -12,7 +12,7 @@ Interactively code with the python API in the `scratch.ipynb` notebook. This sho
 
 Run the webapp (FastAPI) UI
 
-    $ uvicorn insync.app:app --reload
+    $ uvicorn insync.app:app --reload --reload-dir insync --reload-include='*.css' --reload-include='*.html
 
 
 # Architecture
@@ -26,20 +26,33 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- Start with checklists using grocery as the test case.
-  - Clarify completed items
-  - Add ability to add a new section
-  - Separate sections of a checklist
-    - sections can be sorted by integer subproject e.g. `+grocery.1.produce` `+grocery.2.dairy`
-  - Add ability to reset a checklist
-  - order completed items by completion datetime
-  - ability to update an item
+- test and fix bug about +grocery vs +^grocery
+- renderer should be tied to subscription and not just the project
+- for initial connection, only send update to the newly connected client
+  - this could be part of the subscription projecess or we could be explicit about it
 - todo.txt debug endpoint
+  - use null project to get all items
+- Clarify completed items
+- Add ability to add a new section
+- Separate sections of a checklist
+  - sections can be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
 - undo history debug endpoint
-- Add precommit hook for cleaning notebook output and running tests
-- think about whether archived is separate from completed or just a manifestation of same thing.
-- think about how to handle the "one time" vs "recuring" items in the checklist
-- batch patches to db for performance, don't wait for each one to complete before returning
+- Add ability to reset a checklist
+- add ability to mark only some items as recurring
+- order completed items by completion datetime
+- ability to update an item
+Tedium
+  - Add precommit hook for cleaning notebook output and running tests
+  - think about whether archived is separate from completed or just a manifestation of same thing.
+    - I think non-recurring items should just stay archived.
+    - states completed | recurring, this is order they will show on page
+      - False | False = active-onetime
+      - False | True = active-recurable
+      - True | True = ready-to-reset
+      - True | False = completed
+  - batch patches to db for performance, don't wait for each one to complete before returning
+    - did a benchmark with like 4000+ items saving to DB and it's not really necessary
+  - make db patch async
 
 # Backlog
 ## System
