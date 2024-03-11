@@ -1,7 +1,7 @@
 from collections.abc import Iterable
 from typing import Annotated
 
-from fastapi import Depends, Form, Request
+from fastapi import Depends, Form, Request, Response
 from fastapi.responses import HTMLResponse
 
 from insync.app.ws import WebsocketListUpdater, get_ws_list_updater
@@ -28,7 +28,7 @@ async def patch_checklist_completed(
     db: Annotated[ListDB, Depends(get_db)],
     ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
     completed: Annotated[bool, Form()] = False,
-) -> None:
+) -> Response:
     print(f'patch_list({uuid=}, {completed=})')
 
     item = next(i for i in registry.items if str(i.uuid) == uuid)
@@ -37,3 +37,4 @@ async def patch_checklist_completed(
     db.patch(registry)
 
     await ws_list_updater.broadcast_update(item.project)
+    return Response(status_code=204)
