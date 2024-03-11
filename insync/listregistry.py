@@ -96,12 +96,17 @@ class ListRegistry:
     def items(self) -> Iterable[ListItem]:
         return sorted(self._list.values(), key=lambda item: (item.completed, item.description.lower()))
 
+    def get_item(self, uuid: UUID) -> ListItem:
+        return self._list[uuid]
+
     def add(self, item: ListItem) -> None:
         self._list[item.uuid] = item
 
+    def remove(self, uuid: UUID) -> None:
+        self._list.pop(uuid)
+
     def do(self, command: Command) -> None:
-        item = self._list[command.uuid]
-        command.do(item)
+        command.do(self)
         self._history.append(command)
 
     @property
@@ -109,8 +114,7 @@ class ListRegistry:
         yield from reversed(self._history)
 
     def _undo(self, command: Command) -> None:
-        item = self._list[command.uuid]
-        command.undo(item)
+        command.undo(self)
         self._history.remove(command)
 
     def undo(self, command: Command | None = None) -> None:
@@ -129,20 +133,32 @@ class Command:
 
     uuid: UUID
 
-    def do(self, item: ListItem) -> None:
+    def do(self, reg: ListRegistry) -> None:
         raise NotImplementedError
 
-    def undo(self, item: ListItem) -> None:
+    def undo(self, reg: ListRegistry) -> None:
         raise NotImplementedError
 
 
-class ImpotentCommandError(Exception):
-    def __init__(self, command: Command):
-        super().__init__(f"Command {command} is impotent")
+@dataclass
+class CreateCommand(Command):
+    uuid: UUID
+    item: ListItem
+
+    def __init__(self, uuid: UUID, item: ListItem):
+        self.uuid = uuid
+        self.item = item
+
+    def do(self, reg: ListRegistry) -> None:
+        reg.add(self.item)
+
+    def undo(self, reg: ListRegistry) -> None:
+        reg.remove(self.uuid)
 
 
 @dataclass
 class CompletionCommand(Command):
+    uuid: UUID
     completed_new: bool
     completed_orig: bool | None = None
 
@@ -150,12 +166,12 @@ class CompletionCommand(Command):
         self.uuid = uuid
         self.completed_new = completed
 
-    def do(self, item: ListItem) -> None:
-        if self.completed_new == item.completed:
-            raise ImpotentCommandError(self)
+    def do(self, reg: ListRegistry) -> None:
+        item = reg.get_item(self.uuid)
         self.completed_orig = item.completed
         item.completed = self.completed_new
 
-    def undo(self, item: ListItem) -> None:
+    def undo(self, reg: ListRegistry) -> None:
+        item = reg.get_item(self.uuid)
         assert self.completed_orig is not None, "Undoing a command that has not been done"
         item.completed = self.completed_orig

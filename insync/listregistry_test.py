@@ -1,4 +1,4 @@
-from insync.listregistry import CompletionCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 def test_instantiate_listitem() -> None:
@@ -40,3 +40,23 @@ def test_can_undo_completion() -> None:
     reg.undo()
 
     assert not item.completed
+
+def test_can_create_item_using_command() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+
+    reg.do(CreateCommand(item.uuid, item))
+
+    assert len(list(reg.items)) == 1
+    assert item in reg.items
+
+
+def test_can_undo_create_item() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.do(CreateCommand(item.uuid, item))
+
+    reg.undo()
+
+    assert len(list(reg.items)) == 0
+    assert item not in reg.items
