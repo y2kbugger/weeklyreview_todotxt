@@ -1,18 +1,12 @@
 from typing import Annotated
 
 from fastapi import Depends, WebSocket, WebSocketDisconnect
-from pydantic import BaseModel
 
 from insync.db import ListDB
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItemProject, ListItemProjectType, ListRegistry
 
 from . import app, get_db, get_registry, get_ws_list_updater
 from .ws_list_updater import WebsocketListUpdater
-
-
-class HtmxMessage(BaseModel):
-    message: str
-    HEADERS: dict[str, str | None]
 
 
 @app.websocket("/ws/{list_project_type}/{list_project_name}")
@@ -32,11 +26,8 @@ async def ws(
     await ws_list_updater.broadcast_update(project)
 
     try:
-        async for htmx_json in websocket.iter_text():
-            msg = HtmxMessage.model_validate_json(htmx_json).message
-            if msg != '':
-                registry.add(ListItem(msg, project=project))
-                db.patch(registry)
-            await ws_list_updater.broadcast_update(project)
+        async for _htmx_json in websocket.iter_text():
+            raise RuntimeError("Message received, but this websocket is mean only to transmit updates.")
     except WebSocketDisconnect:
         ws_list_updater.disconnect(websocket)
+

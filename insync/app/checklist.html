@@ -11,15 +11,13 @@
 </head>
 
 <body>
+  <form id="form" hx-post="/checklist/{{ project_name }}/new"
+        hx-on::after-request="if(event.detail.successful) this.reset()">
+    <input name="description" value="">
+  </form>
   <div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}" ws-reconnect="true">
-    <form id="form" ws-send hx-trigger="submit, load"
-          _='on htmx:wsAfterSend
-             get the first <input[name="message"]/>
-             then set its value to ""'>
-      <input name="project_name" type="hidden" value="{{ project_name }}">
-      <input name="message" value="">
-    </form>
-    <div id="current-message">Loading...</div>
+    <div id="current-checklist">Loading...</div>
+    </div>
 </body>
 
 </html>

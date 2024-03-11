@@ -27,7 +27,6 @@ Run the webapp (FastAPI) UI
 
 # WIP
 - Start with checklists using grocery as the test case.
-  - make new item a post instead of ws
   - Clarify completed items
   - Add ability to add a new section
   - Separate sections of a checklist

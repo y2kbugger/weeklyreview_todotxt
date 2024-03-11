@@ -28,6 +28,7 @@ class WebsocketListUpdater:
 
     async def broadcast_update(self, project: ListItemProject) -> None:
         self.garbage_collect_closed_connections()
+
         items = [item for item in self.registry.items if project.name in item.project.name]
         html = self.renderer[project.project_type](items)
 

@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from insync.app.ws import WebsocketListUpdater, get_ws_list_updater
 from insync.db import ListDB
-from insync.listregistry import CompletionCommand, ListItem, ListRegistry
+from insync.listregistry import CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 from . import app, get_db, get_registry, templates
 
@@ -19,6 +19,25 @@ def checklist(project_name: str, request: Request) -> HTMLResponse:
 
 def render_checklist(listitems: Iterable[ListItem]) -> str:
     return templates.get_template("checklist_items.html").render(listitems=listitems)
+
+@app.post("/checklist/{project_name}/new")
+async def post_checklist(
+    project_name: str,
+    registry: Annotated[ListRegistry, Depends(get_registry)],
+    db: Annotated[ListDB, Depends(get_db)],
+    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
+    description: Annotated[str, Form()],
+) -> Response:
+    print(f'post_checklist({project_name=}, {description=})')
+    project = ListItemProject(project_name, ListItemProjectType.checklist)
+    item = ListItem(description, project=project)
+
+    cmd = CreateCommand(item.uuid, item)
+    registry.do(cmd)
+    db.patch(registry)
+
+    await ws_list_updater.broadcast_update(item.project)
+    return Response(status_code=204)
 
 
 @app.patch("/checklist/{uuid}/completed")
