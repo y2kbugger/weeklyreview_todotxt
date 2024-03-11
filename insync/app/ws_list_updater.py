@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Callable
 
 from fastapi import WebSocket
+from fastapi.websockets import WebSocketState
 
 from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
@@ -20,9 +21,16 @@ class WebsocketListUpdater:
         await websocket.accept()
         self.subscriptions[project].append(websocket)
 
+    def garbage_collect_closed_connections(self) -> None:
+        for project, ws_list in self.subscriptions.items():
+            self.subscriptions[project] = [ws for ws in ws_list if ws.application_state != WebSocketState.DISCONNECTED]
+            self.subscriptions[project] = [ws for ws in ws_list if ws.client_state != WebSocketState.DISCONNECTED]
+
     async def broadcast_update(self, project: ListItemProject) -> None:
+        self.garbage_collect_closed_connections()
         items = [item for item in self.registry.items if project.name in item.project.name]
         html = self.renderer[project.project_type](items)
+
         for ws in self.subscriptions[project]:
             await self.send_message(ws, html)
 
@@ -30,7 +38,7 @@ class WebsocketListUpdater:
         try:
             await ws.send_text(message)
         except RuntimeError:
-            self.disconnect(ws)
+            print("Failed to send message, this should not happen regularly as state is checked before sending")
 
     def disconnect(self, websocket: WebSocket) -> None:
         for _project, ws_list in self.subscriptions.items():
