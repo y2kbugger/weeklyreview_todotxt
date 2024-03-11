@@ -81,7 +81,6 @@ class ListDB:
             """)
         reg = ListRegistry()
         for row in cursor:
-            print(row[0])
             li = ListItem(
                 uuid=row[0],
                 description=row[1],

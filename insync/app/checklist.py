@@ -13,7 +13,6 @@ from . import app, get_db, get_registry, templates
 
 @app.get("/checklist/{project_name}")
 def checklist(project_name: str, request: Request) -> HTMLResponse:
-    print(f'checklist/({project_name=})')
     return templates.TemplateResponse(request, "checklist.html", {"project_name": project_name})
 
 
@@ -28,7 +27,6 @@ async def post_checklist(
     ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
     description: Annotated[str, Form()],
 ) -> Response:
-    print(f'post_checklist({project_name=}, {description=})')
     project = ListItemProject(project_name, ListItemProjectType.checklist)
     item = ListItem(description, project=project)
 
@@ -48,8 +46,6 @@ async def patch_checklist_completed(
     ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
     completed: Annotated[bool, Form()] = False,
 ) -> Response:
-    print(f'patch_list({uuid=}, {completed=})')
-
     item = next(i for i in registry.items if str(i.uuid) == uuid)
     cmd = CompletionCommand(item.uuid, completed)
     registry.do(cmd)

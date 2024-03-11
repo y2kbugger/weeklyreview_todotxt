@@ -39,7 +39,7 @@ class WebsocketListUpdater:
         try:
             await ws.send_text(message)
         except RuntimeError:
-            print("Failed to send message, this should not happen regularly as state is checked before sending")
+            print("Failed to send message, this should not happen regularly as connections are garbage collected before broadcasts.")
 
     def disconnect(self, websocket: WebSocket) -> None:
         for _project, ws_list in self.subscriptions.items():
