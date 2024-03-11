@@ -13,7 +13,7 @@ from insync.listregistry import ListItemProjectType, ListRegistry
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
-    DB_STR = os.environ.get('INSYNC_DB_STR', ':memory:')
+    DB_STR = os.environ.get('INSYNC_DB_STR', 'test.db')
     app.state.db = ListDB(DB_STR)
     app.state.db.ensure_tables_created()
 
