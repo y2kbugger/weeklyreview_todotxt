@@ -16,7 +16,7 @@ def checklist(project_name: str, request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "checklist.html", {"project_name": project_name})
 
 
-def render_checklist(listitems: Iterable[ListItem]) -> str:
+def render_checklist_items(listitems: Iterable[ListItem]) -> str:
     return templates.get_template("checklist_items.html").render(listitems=listitems)
 
 @app.post("/checklist/{project_name}/new")
