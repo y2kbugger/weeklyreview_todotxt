@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 
 from insync.app.ws_list_updater import WebsocketListUpdater
 from insync.db import ListDB
-from insync.listregistry import ListItemProjectType, ListRegistry
+from insync.listregistry import ListRegistry
 
 
 @asynccontextmanager
@@ -19,13 +19,7 @@ async def _lifespan(app: FastAPI):
 
     app.state.registry = app.state.db.load()
 
-    from insync.app.ws import WebsocketListUpdater
-
     app.state.ws_list_updater = WebsocketListUpdater(app.state.registry)
-
-    from insync.app.checklist import render_checklist
-
-    app.state.ws_list_updater.register_renderer(ListItemProjectType.checklist, render_checklist)
 
     yield
 

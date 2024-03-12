@@ -28,8 +28,6 @@ Run the webapp (FastAPI) UI
 # WIP
 - test and fix bug about +grocery vs +^grocery
 - renderer should be tied to subscription and not just the project
-- for initial connection, only send update to the newly connected client
-  - this could be part of the subscription projecess or we could be explicit about it
 - todo.txt debug endpoint
   - use null project to get all items
   - add a rich text version of the todo.txt to identify fields vs descriptions

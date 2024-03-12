@@ -2,6 +2,8 @@ from typing import Annotated
 
 from fastapi import Depends, WebSocket, WebSocketDisconnect
 
+from insync.app.checklist import render_checklist_items
+from insync.app.todotxt import render_todotxt_items
 from insync.listregistry import ListItemProject, ListItemProjectType, null_listitemproject
 
 from . import app, get_ws_list_updater
@@ -25,7 +27,32 @@ async def ws(
 ) -> None:
     project = ListItemProject(list_project_name, list_project_type)
 
-    await ws_list_updater.subscribe(websocket, project)
-    await ws_list_updater.broadcast_update(project)
+    print(f"wsproj: {project}")
+    print(f"existing renderers: {ws_list_updater.renderers}")
+    if project not in ws_list_updater.renderers:
+        print(f"registering {project}")
+        if list_project_type == ListItemProjectType.checklist:
+            renderer = render_checklist_items
+        else:
+            raise NotImplementedError(f"Renderer for {list_project_type} not implemented")
+
+        ws_list_updater.register_project_channel(project, renderer)
+
+    await ws_list_updater.subscribe_to_channel(websocket, project)
+    await ws_list_updater.send_update(websocket, project)
     await _ws_keep_alive(ws_list_updater, websocket)
 
+
+@app.websocket("/ws/all")
+async def ws_all(
+    websocket: WebSocket,
+    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
+) -> None:
+    project = null_listitemproject()
+
+    if project not in ws_list_updater.renderers:
+        ws_list_updater.register_project_channel(project, render_todotxt_items)
+
+    await ws_list_updater.subscribe_to_channel(websocket, project)
+    await ws_list_updater.send_update(websocket, project)
+    await _ws_keep_alive(ws_list_updater, websocket)

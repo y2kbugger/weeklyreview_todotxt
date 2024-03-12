@@ -1,47 +1,72 @@
 from collections import defaultdict
-from typing import Callable
+from typing import Callable, TypeAlias
 
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItem, ListItemProject, ListRegistry
+
+Channel: TypeAlias = str | ListItemProject
 
 
 class WebsocketListUpdater:
     def __init__(self, registry: ListRegistry):
-        self.subscriptions: dict[ListItemProject, list[WebSocket]] = defaultdict(list)
-        self.renderer: dict[ListItemProjectType, Callable[[list[ListItem]], str]] = {}
         self.registry = registry
 
-    def register_renderer(self, project_type: ListItemProjectType, renderer: Callable[[list[ListItem]], str]) -> None:
-        assert project_type not in self.renderer, f"Renderer for {project_type} already registered"
-        self.renderer[project_type] = renderer
+        self.subscriptions: dict[Channel, list[WebSocket]] = defaultdict(list)
+        self.renderers: dict[Channel, Callable[[list[ListItem]], str]] = {}
+        self.filters: dict[Channel, Callable[[ListItem], bool]] = {}
 
-    async def subscribe(self, websocket: WebSocket, project: ListItemProject) -> None:
+    def register_channel(
+        self,
+        channel: str | ListItemProject,
+        renderer: Callable[[list[ListItem]], str],
+        item_filter: Callable[[ListItem], bool],
+    ) -> None:
+        assert channel not in self.renderers, f"Subscription for {channel} already registered"
+        self.renderers[channel] = renderer
+        self.filters[channel] = item_filter
+
+    def register_project_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
+        self.register_channel(project, renderer, lambda item: str(project) in str(item.project))
+
+    def render_channel(self, channel: str | ListItemProject) -> str:
+        renderer = self.renderers[channel]
+        item_filter = self.filters[channel]
+        items = [item for item in self.registry.items if item_filter(item)]
+        return renderer(items)
+
+    async def subscribe_to_channel(self, websocket: WebSocket, channel: str | ListItemProject) -> None:
         await websocket.accept()
-        self.subscriptions[project].append(websocket)
+        self.subscriptions[channel].append(websocket)
 
     def garbage_collect_closed_connections(self) -> None:
+        """Remove all disconnected websockets from the subscriptions."""
         for project, ws_list in self.subscriptions.items():
             self.subscriptions[project] = [ws for ws in ws_list if ws.application_state != WebSocketState.DISCONNECTED]
             self.subscriptions[project] = [ws for ws in ws_list if ws.client_state != WebSocketState.DISCONNECTED]
 
-    async def broadcast_update(self, project: ListItemProject) -> None:
+    async def send_update(self, ws: WebSocket, channel: str | ListItemProject) -> None:
+        """Send an update to a single websocket. This is useful for initial updates."""
+        update = self.render_channel(channel)
+        await self._send_message(ws, update)
+
+    async def broadcast_update(self, channel: str | ListItemProject) -> None:
+        """Broadcast an update to all websockets subscribed to a given subscription."""
         self.garbage_collect_closed_connections()
 
-        items = [item for item in self.registry.items if project.name in item.project.name]
-        html = self.renderer[project.project_type](items)
+        update = self.render_channel(channel)
 
-        for ws in self.subscriptions[project]:
-            await self.send_message(ws, html)
+        for ws in self.subscriptions[channel]:
+            await self._send_message(ws, update)
 
-    async def send_message(self, ws: WebSocket, message: str) -> None:
+    async def _send_message(self, ws: WebSocket, message: str) -> None:
         try:
             await ws.send_text(message)
         except RuntimeError:
             print("Failed to send message, this should not happen regularly as connections are garbage collected before broadcasts.")
 
     def disconnect(self, websocket: WebSocket) -> None:
-        for _project, ws_list in self.subscriptions.items():
+        for _channel, ws_list in self.subscriptions.items():
             if websocket in ws_list:
                 ws_list.remove(websocket)

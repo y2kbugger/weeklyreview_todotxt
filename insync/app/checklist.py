@@ -4,11 +4,11 @@ from typing import Annotated
 from fastapi import Depends, Form, Request, Response
 from fastapi.responses import HTMLResponse
 
-from insync.app.ws import WebsocketListUpdater, get_ws_list_updater
+from insync.app.ws_list_updater import WebsocketListUpdater
 from insync.db import ListDB
 from insync.listregistry import CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
-from . import app, get_db, get_registry, templates
+from . import app, get_db, get_registry, get_ws_list_updater, templates
 
 
 @app.get("/checklist/{project_name}")
