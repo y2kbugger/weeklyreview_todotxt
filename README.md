@@ -32,16 +32,18 @@ Run the webapp (FastAPI) UI
   - this could be part of the subscription projecess or we could be explicit about it
 - todo.txt debug endpoint
   - use null project to get all items
+  - add a rich text version of the todo.txt to identify fields vs descriptions
 - Clarify completed items
 - Add ability to add a new section
 - Separate sections of a checklist
   - sections can be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
-- undo history debug endpoint
 - Add ability to reset a checklist
 - add ability to mark only some items as recurring
 - order completed items by completion datetime
 - ability to update an item
 Tedium
+  - extract base.html to common folder
+  - undo history debug endpoint
   - Add precommit hook for cleaning notebook output and running tests
   - think about whether archived is separate from completed or just a manifestation of same thing.
     - I think non-recurring items should just stay archived.
