@@ -39,4 +39,4 @@ def get_ws_list_updater() -> WebsocketListUpdater:
 app = FastAPI(lifespan=_lifespan, debug=True, title="InSync", version="0.1.0")
 templates = Jinja2Templates(directory="insync/app")
 
-from . import index, ws, checklist  # noqa endpoint imports
+from . import index, ws, checklist, todotxt  # noqa endpoint imports

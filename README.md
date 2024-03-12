@@ -29,7 +29,6 @@ Run the webapp (FastAPI) UI
 - test and fix bug about +grocery vs +^grocery
 - renderer should be tied to subscription and not just the project
 - todo.txt debug endpoint
-  - use null project to get all items
   - add a rich text version of the todo.txt to identify fields vs descriptions
 - Clarify completed items
 - Add ability to add a new section
