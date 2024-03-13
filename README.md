@@ -26,7 +26,18 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- renderer should be tied to channel and not just the project
+- Bug: ListUpdater doesn't notify more general project when a specific project is updated
+  - Add tests for this
+  - do we do this implicitly using project tree?, or do we do it explicitly?
+  - how do we handly string channels
+    - maybe channel is doing two things (filting and rendering)
+      - is this why we need str based channels?
+      - how could be eliminate the need for str based channels?
+        - separate channel from renderer
+    - UPDATE: OK we don't need to have str channels
+  - how does this previous thought come into play?
+    - renderer should be tied to channel and not just the project overall
+  - I think we can go "pure Project" based channels now that "contains" is reliable and null is wildcard
 - todo.txt debug endpoint
   - add a rich text version of the todo.txt to identify fields vs descriptions
 - Clarify completed items
