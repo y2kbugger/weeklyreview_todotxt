@@ -1,25 +1,23 @@
 from collections import defaultdict
-from typing import Callable, TypeAlias
+from typing import Callable
 
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
 from insync.listregistry import ListItem, ListItemProject, ListRegistry
 
-Channel: TypeAlias = ListItemProject
-
 
 class WebsocketListUpdater:
     def __init__(self, registry: ListRegistry):
         self.registry = registry
 
-        self.subscriptions: dict[Channel, list[WebSocket]] = defaultdict(list)
-        self.renderers: dict[Channel, Callable[[list[ListItem]], str]] = {}
-        self.filters: dict[Channel, Callable[[ListItem], bool]] = {}
+        self.subscriptions: dict[ListItemProject, list[WebSocket]] = defaultdict(list)
+        self.renderers: dict[ListItemProject, Callable[[list[ListItem]], str]] = {}
+        self.filters: dict[ListItemProject, Callable[[ListItem], bool]] = {}
 
     def register_channel(
         self,
-        channel: Channel,
+        channel: ListItemProject,
         renderer: Callable[[list[ListItem]], str],
         item_filter: Callable[[ListItem], bool],
     ) -> None:
@@ -30,13 +28,13 @@ class WebsocketListUpdater:
     def register_project_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
         self.register_channel(project, renderer, lambda x: x.project in project)
 
-    def render_channel(self, channel: Channel) -> str:
+    def render_channel(self, channel: ListItemProject) -> str:
         renderer = self.renderers[channel]
         item_filter = self.filters[channel]
         items = [item for item in self.registry.items if item_filter(item)]
         return renderer(items)
 
-    async def subscribe_to_channel(self, websocket: WebSocket, channel: Channel) -> None:
+    async def subscribe_to_channel(self, websocket: WebSocket, channel: ListItemProject) -> None:
         await websocket.accept()
         self.subscriptions[channel].append(websocket)
 
@@ -46,12 +44,12 @@ class WebsocketListUpdater:
             self.subscriptions[project] = [ws for ws in ws_list if ws.application_state != WebSocketState.DISCONNECTED]
             self.subscriptions[project] = [ws for ws in ws_list if ws.client_state != WebSocketState.DISCONNECTED]
 
-    async def send_update(self, ws: WebSocket, channel: Channel) -> None:
+    async def send_update(self, ws: WebSocket, channel: ListItemProject) -> None:
         """Send an update to a single websocket. This is useful for initial updates."""
         update = self.render_channel(channel)
         await self._send_message(ws, update)
 
-    async def broadcast_update(self, channel: Channel) -> None:
+    async def broadcast_update(self, channel: ListItemProject) -> None:
         """Broadcast an update to all websockets subscribed to a given subscription."""
         self.garbage_collect_closed_connections()
 

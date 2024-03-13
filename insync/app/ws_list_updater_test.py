@@ -1,12 +1,11 @@
 import pytest
 
 from insync.app.ws_list_updater import WebsocketListUpdater
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry, NullListItemProject
 
 
 class MockWebSocket:
     pass
-
 
 @pytest.fixture
 def reg() -> ListRegistry:
@@ -27,23 +26,23 @@ def test_can_initialize(reg: ListRegistry) -> None:
 def test_can_register_subscription(reg: ListRegistry) -> None:
     updater = WebsocketListUpdater(reg)
 
-    updater.register_channel('test', lambda x: 'test', lambda x: True)
+    updater.register_channel(NullListItemProject(), lambda x: 'test', lambda x: True)
 
 
 def test_can_render_subscriptions(reg: ListRegistry) -> None:
     updater = WebsocketListUpdater(reg)
-    updater.register_channel('test', lambda x: str(len(x)), lambda x: True)
+    updater.register_channel(NullListItemProject(), lambda x: str(len(x)), lambda x: True)
 
-    result = updater.render_channel('test')
+    result = updater.render_channel(NullListItemProject())
 
     assert result == '6'
 
 
 def test_can_filter_subscriptions(reg: ListRegistry) -> None:
     updater = WebsocketListUpdater(reg)
-    updater.register_channel('test', lambda x: str(len(x)), lambda x: 'A' in x.description)
+    updater.register_channel(NullListItemProject(), lambda x: str(len(x)), lambda x: 'A' in x.description)
 
-    result = updater.render_channel('test')
+    result = updater.render_channel(NullListItemProject())
 
     assert result == '3'
 
