@@ -26,6 +26,8 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
+- bug: broadcasting a channel doesn't broadcast to more inclusive channels
+  - e.g. +grocery doesn't get updates when +grocery.produce does, also for todotxt, '' (nullproj) doesn't get updates when '+grocery' does
 - test and fix bug about +grocery vs +^grocery
 - renderer should be tied to subscription and not just the project
 - todo.txt debug endpoint
@@ -38,6 +40,7 @@ Run the webapp (FastAPI) UI
 - add ability to mark only some items as recurring
 - order completed items by completion datetime
 - ability to update an item
+- fix bug regarging allowing typographic subsets of project names e.g. +free and +freedom are two different projects but stil allow +free to be a subset of +free.dom
 Tedium
   - extract base.html to common folder
   - undo history debug endpoint
