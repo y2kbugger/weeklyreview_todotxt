@@ -17,7 +17,7 @@ Run the webapp (FastAPI) UI
 
 # Architecture
 
- - FastAPI/Jinja(X) backend
+ - FastAPI/Jinja backend
  - Leverage FastAPI websockets for real-time collaboration of lists
  - HTMX for dynamic parts of the UI
  - SQLite for persistence
@@ -27,17 +27,16 @@ Run the webapp (FastAPI) UI
 
 # WIP
 - Bug: ListUpdater doesn't notify more general project when a specific project is updated
-  - Add tests for this
-  - do we do this implicitly using project tree?, or do we do it explicitly?
-  - how do we handly string channels
-    - maybe channel is doing two things (filting and rendering)
-      - is this why we need str based channels?
-      - how could be eliminate the need for str based channels?
-        - separate channel from renderer
-    - UPDATE: OK we don't need to have str channels
-  - how does this previous thought come into play?
-    - renderer should be tied to channel and not just the project overall
   - I think we can go "pure Project" based channels now that "contains" is reliable and null is wildcard
+  - Add tests for subscribing and who gets notified
+    - do we do this implicitly using project tree?, or do we do it explicitly?
+    - observer pattern with registry
+  - use tests to figure out how these are coupled
+    1. Who rx updates when an item is changed
+    2. Which items get sent in the update
+    2. What renderer to used to render the update
+
+  - renderer should be tied to channel and not just the project overall
 - todo.txt debug endpoint
   - add a rich text version of the todo.txt to identify fields vs descriptions
 - Clarify completed items

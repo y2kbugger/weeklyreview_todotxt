@@ -6,7 +6,7 @@ from fastapi.websockets import WebSocketState
 
 from insync.listregistry import ListItem, ListItemProject, ListRegistry
 
-Channel: TypeAlias = str | ListItemProject
+Channel: TypeAlias = ListItemProject
 
 
 class WebsocketListUpdater:
@@ -19,7 +19,7 @@ class WebsocketListUpdater:
 
     def register_channel(
         self,
-        channel: str | ListItemProject,
+        channel: Channel,
         renderer: Callable[[list[ListItem]], str],
         item_filter: Callable[[ListItem], bool],
     ) -> None:
@@ -30,13 +30,13 @@ class WebsocketListUpdater:
     def register_project_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
         self.register_channel(project, renderer, lambda x: x.project in project)
 
-    def render_channel(self, channel: str | ListItemProject) -> str:
+    def render_channel(self, channel: Channel) -> str:
         renderer = self.renderers[channel]
         item_filter = self.filters[channel]
         items = [item for item in self.registry.items if item_filter(item)]
         return renderer(items)
 
-    async def subscribe_to_channel(self, websocket: WebSocket, channel: str | ListItemProject) -> None:
+    async def subscribe_to_channel(self, websocket: WebSocket, channel: Channel) -> None:
         await websocket.accept()
         self.subscriptions[channel].append(websocket)
 
@@ -46,12 +46,12 @@ class WebsocketListUpdater:
             self.subscriptions[project] = [ws for ws in ws_list if ws.application_state != WebSocketState.DISCONNECTED]
             self.subscriptions[project] = [ws for ws in ws_list if ws.client_state != WebSocketState.DISCONNECTED]
 
-    async def send_update(self, ws: WebSocket, channel: str | ListItemProject) -> None:
+    async def send_update(self, ws: WebSocket, channel: Channel) -> None:
         """Send an update to a single websocket. This is useful for initial updates."""
         update = self.render_channel(channel)
         await self._send_message(ws, update)
 
-    async def broadcast_update(self, channel: str | ListItemProject) -> None:
+    async def broadcast_update(self, channel: Channel) -> None:
         """Broadcast an update to all websockets subscribed to a given subscription."""
         self.garbage_collect_closed_connections()
 
