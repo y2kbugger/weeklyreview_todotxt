@@ -55,6 +55,25 @@ class ListItemProject:
 
         return f'{prefix}{self.name}'
 
+    @property
+    def name_parts(self) -> list[str]:
+        if len(self.name) == 0:
+            return []
+        else:
+            return self.name.split('.')
+
+    def __contains__(self, other: ListItemProject) -> bool:
+        # null acts as a wildcard
+        if self.project_type != ListItemProjectType.null and self.project_type != other.project_type:
+            return False
+
+        # project cannot contain a project which is more general
+        # e.g grocery.produce does not include all grocery, (but grocery does include grocery.produce)
+        if len(self.name_parts) > len(other.name_parts):
+            return False
+
+        return all(a == b for a, b in zip(self.name_parts, other.name_parts))
+
 
 def null_listitemproject() -> ListItemProject:
     return ListItemProject("", ListItemProjectType.null)

@@ -26,10 +26,7 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- bug: broadcasting a channel doesn't broadcast to more inclusive channels
-  - e.g. +grocery doesn't get updates when +grocery.produce does, also for todotxt, '' (nullproj) doesn't get updates when '+grocery' does
-- test and fix bug about +grocery vs +^grocery
-- renderer should be tied to subscription and not just the project
+- renderer should be tied to channel and not just the project
 - todo.txt debug endpoint
   - add a rich text version of the todo.txt to identify fields vs descriptions
 - Clarify completed items

@@ -53,8 +53,32 @@ def test_can_project_subscriptions_gets_all_with_matching_root_project(reg: List
     project = ListItemProject('grocery', ListItemProjectType.checklist)
     updater.register_project_channel(project, lambda x: '\n'.join([item.description for item in x]))
 
-    result = updater.render_channel('+^grocery')
+    result = updater.render_channel(project)
 
     # 2c is excluded because it's a different checklist
     # 4b is excluded because it's not a checklist
     assert result == 'test2A\ntest3A'
+
+def test_projects_can_be_a_subset() -> None:
+    """This was a bug caused by using the raw str contains as the filter method for projects."""
+    reg = ListRegistry()
+    reg.add(ListItem('t1', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+    reg.add(ListItem('t2', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+    reg.add(ListItem('t3', project=ListItemProject('gro', ListItemProjectType.checklist)))
+    reg.add(ListItem('xx', project=ListItemProject('gro', ListItemProjectType.todo)))
+
+    updater = WebsocketListUpdater(reg)
+
+    project_grocery = ListItemProject('grocery', ListItemProjectType.checklist)
+    updater.register_project_channel(project_grocery, lambda x: '\n'.join([item.description for item in x]))
+
+    project_gro = ListItemProject('gro', ListItemProjectType.checklist)
+    updater.register_project_channel(project_gro, lambda x: '\n'.join([item.description for item in x]))
+
+    # Act
+    result_grocery = updater.render_channel(project_grocery)
+    result_gro = updater.render_channel(project_gro)
+
+    # Assert
+    assert result_grocery == 't1\nt2'
+    assert result_gro == 't3'

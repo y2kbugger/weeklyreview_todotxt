@@ -28,7 +28,7 @@ class WebsocketListUpdater:
         self.filters[channel] = item_filter
 
     def register_project_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
-        self.register_channel(project, renderer, lambda item: str(project) in str(item.project))
+        self.register_channel(project, renderer, lambda x: x.project in project)
 
     def render_channel(self, channel: str | ListItemProject) -> str:
         renderer = self.renderers[channel]
