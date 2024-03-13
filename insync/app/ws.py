@@ -4,7 +4,7 @@ from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from insync.app.checklist import render_checklist_items
 from insync.app.todotxt import render_todotxt_items
-from insync.listregistry import ListItemProject, ListItemProjectType, null_listitemproject
+from insync.listregistry import ListItemProject, ListItemProjectType, NullListItemProject
 
 from . import app, get_ws_list_updater
 from .ws_list_updater import WebsocketListUpdater
@@ -48,7 +48,7 @@ async def ws_all(
     websocket: WebSocket,
     ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
 ) -> None:
-    project = null_listitemproject()
+    project = NullListItemProject()
 
     if project not in ws_list_updater.renderers:
         ws_list_updater.register_project_channel(project, render_todotxt_items)

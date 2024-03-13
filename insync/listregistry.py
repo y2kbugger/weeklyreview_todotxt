@@ -74,9 +74,15 @@ class ListItemProject:
 
         return all(a == b for a, b in zip(self.name_parts, other.name_parts))
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ListItemProject):
+            return False
+        return self.name == other.name and self.project_type == other.project_type
 
-def null_listitemproject() -> ListItemProject:
-    return ListItemProject("", ListItemProjectType.null)
+
+class NullListItemProject(ListItemProject):
+    def __init__(self):
+        super().__init__("", ListItemProjectType.null)
 
 
 @dataclass
@@ -88,7 +94,7 @@ class ListItem:
     priority: Priority | None = None
     completion_date: dt.date | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
-    project: ListItemProject = field(default_factory=null_listitemproject)
+    project: ListItemProject = field(default_factory=NullListItemProject)
 
     def __str__(self) -> str:
         # x (A) 2016-05-20 2016-04-30 measure space for +chapelShelving @chapel due:2016-05-30
