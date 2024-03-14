@@ -1,5 +1,7 @@
+from typing import Any
 
 import pytest
+from fastapi import WebSocket
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry, NullListItemProject
@@ -29,13 +31,27 @@ def renderer() -> MockRenderer:
     return MockRenderer()
 
 
-# class MockWebSocket(Protocol):
 class MockWebSocket:
-    pass
+    def __init__(self):
+        self.sent = None
+        self.accepted = False
+
+    async def accept(self) -> None:
+        self.accepted = True
+
+    async def send_text(self, message: str) -> None:
+        assert self.accepted, "Cannot send text before accepting the connection"
+        assert self.sent is None, "Mock can only can handle a single sent message"
+        self.sent = message
+
+    def spy_sent_text(self) -> str:
+        assert self.accepted, "Cannot spy on sent text before accepting the connection"
+        assert self.sent is not None, "No text has been sent"
+        return self.sent
 
 
 @pytest.fixture
-def ws() -> MockWebSocket:
+def ws(anyio_backend: tuple[str, dict[str, Any]]) -> MockWebSocket:
     return MockWebSocket()
 
 
@@ -44,10 +60,11 @@ def test_can_render_channel_subscription(
     updater: WebSocketListUpdater,
     renderer: MockRenderer,
 ) -> None:
-    reg.add(ListItem('test1A'))
-    updater.register_project_channel(NullListItemProject(), renderer)
+    item = ListItem('test1A')
+    reg.add(item)
+    updater.register_project_channel(item.project, renderer)
 
-    result = updater.render_channel(NullListItemProject())
+    result = updater.render_channel(item.project)
 
     assert len(renderer.calls) == 1
     assert result == 'test1A'
@@ -115,3 +132,21 @@ def test_projects_can_be_a_subset(
     # Assert
     assert result_grocery == 't1,t2'
     assert result_gro == 't3'
+
+
+async def test_broadcast_to_channel(
+    reg: ListRegistry,
+    updater: WebSocketListUpdater,
+    renderer: MockRenderer,
+    ws: MockWebSocket,
+) -> None:
+    item = ListItem('test1A')
+    reg.add(item)
+    _ws: WebSocket = ws  # type: ignore
+    await updater.subscribe(_ws, NullListItemProject(), renderer)
+
+    await updater.broadcast_update(NullListItemProject())
+    result = ws.spy_sent_text()
+
+    assert len(renderer.calls) == 1
+    assert result == 'test1A'

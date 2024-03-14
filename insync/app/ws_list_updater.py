@@ -26,8 +26,9 @@ class WebSocketListUpdater:
         items = [item for item in self.registry.items if item_filter(item)]
         return renderer(items)
 
-    async def subscribe_to_channel(self, websocket: WebSocket, channel: ListItemProject) -> None:
+    async def subscribe(self, websocket: WebSocket, channel: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
         await websocket.accept()
+        self.register_project_channel(channel, renderer)
         self.subscriptions[channel].append(websocket)
 
     def garbage_collect_closed_connections(self) -> None:
