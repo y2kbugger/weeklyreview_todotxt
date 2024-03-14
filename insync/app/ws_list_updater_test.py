@@ -1,7 +1,7 @@
 
 import pytest
 
-from insync.app.ws_list_updater import WebsocketListUpdater
+from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry, NullListItemProject
 
 
@@ -11,8 +11,8 @@ def reg() -> ListRegistry:
 
 
 @pytest.fixture
-def updater(reg: ListRegistry) -> WebsocketListUpdater:
-    return WebsocketListUpdater(reg)
+def updater(reg: ListRegistry) -> WebSocketListUpdater:
+    return WebSocketListUpdater(reg)
 
 
 class MockRenderer:
@@ -41,7 +41,7 @@ def ws() -> MockWebSocket:
 
 def test_can_render_channel_subscription(
     reg: ListRegistry,
-    updater: WebsocketListUpdater,
+    updater: WebSocketListUpdater,
     renderer: MockRenderer,
 ) -> None:
     reg.add(ListItem('test1A'))
@@ -55,7 +55,7 @@ def test_can_render_channel_subscription(
 
 def test_when_rendered_only_matched_item_included(
     reg: ListRegistry,
-    updater: WebsocketListUpdater,
+    updater: WebSocketListUpdater,
     renderer: MockRenderer,
 ) -> None:
     reg.add(ListItem('test'))
@@ -72,7 +72,7 @@ def test_when_rendered_only_matched_item_included(
 
 def test_can_project_channel_gets_all_with_matching_root_project(
     reg: ListRegistry,
-    updater: WebsocketListUpdater,
+    updater: WebSocketListUpdater,
     renderer: MockRenderer,
 ) -> None:
     reg.add(ListItem('test1A'))
@@ -93,7 +93,7 @@ def test_can_project_channel_gets_all_with_matching_root_project(
 
 def test_projects_can_be_a_subset(
     reg: ListRegistry,
-    updater: WebsocketListUpdater,
+    updater: WebSocketListUpdater,
     renderer: MockRenderer,
 ) -> None:
     """This was a bug caused by using the raw str contains as the filter method for projects."""

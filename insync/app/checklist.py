@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import Depends, Form, Request, Response
 from fastapi.responses import HTMLResponse
 
-from insync.app.ws_list_updater import WebsocketListUpdater
+from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
 from insync.listregistry import CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
@@ -24,7 +24,7 @@ async def post_checklist(
     project_name: str,
     registry: Annotated[ListRegistry, Depends(get_registry)],
     db: Annotated[ListDB, Depends(get_db)],
-    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
     description: Annotated[str, Form()],
 ) -> Response:
     project = ListItemProject(project_name, ListItemProjectType.checklist)
@@ -43,7 +43,7 @@ async def patch_checklist_completed(
     uuid: str,
     registry: Annotated[ListRegistry, Depends(get_registry)],
     db: Annotated[ListDB, Depends(get_db)],
-    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
     completed: Annotated[bool, Form()] = False,
 ) -> Response:
     item = next(i for i in registry.items if str(i.uuid) == uuid)

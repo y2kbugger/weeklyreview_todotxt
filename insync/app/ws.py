@@ -7,10 +7,10 @@ from insync.app.todotxt import render_todotxt_items
 from insync.listregistry import ListItemProject, ListItemProjectType, NullListItemProject
 
 from . import app, get_ws_list_updater
-from .ws_list_updater import WebsocketListUpdater
+from .ws_list_updater import WebSocketListUpdater
 
 
-async def _ws_keep_alive(ws_list_updater: WebsocketListUpdater, websocket: WebSocket) -> None:
+async def _ws_keep_alive(ws_list_updater: WebSocketListUpdater, websocket: WebSocket) -> None:
     try:
         async for _htmx_json in websocket.iter_text():
             raise RuntimeError("Message received, but this websocket is mean only to transmit updates.")
@@ -23,7 +23,7 @@ async def ws(
     list_project_type: ListItemProjectType,
     list_project_name: str,
     websocket: WebSocket,
-    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
 ) -> None:
     project = ListItemProject(list_project_name, list_project_type)
 
@@ -46,7 +46,7 @@ async def ws(
 @app.websocket("/ws/all")
 async def ws_all(
     websocket: WebSocket,
-    ws_list_updater: Annotated[WebsocketListUpdater, Depends(get_ws_list_updater)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
 ) -> None:
     project = NullListItemProject()
 

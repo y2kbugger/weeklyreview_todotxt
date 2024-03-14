@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 
-from insync.app.ws_list_updater import WebsocketListUpdater
+from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
 from insync.listregistry import ListRegistry
 
@@ -19,7 +19,7 @@ async def _lifespan(app: FastAPI):
 
     app.state.registry = app.state.db.load()
 
-    app.state.ws_list_updater = WebsocketListUpdater(app.state.registry)
+    app.state.ws_list_updater = WebSocketListUpdater(app.state.registry)
 
     yield
 
@@ -32,7 +32,7 @@ def get_registry() -> ListRegistry:
 def get_db() -> ListDB:
     return app.state.db
 
-def get_ws_list_updater() -> WebsocketListUpdater:
+def get_ws_list_updater() -> WebSocketListUpdater:
     return app.state.ws_list_updater
 
 

@@ -7,7 +7,7 @@ from fastapi.websockets import WebSocketState
 from insync.listregistry import ListItem, ListItemProject, ListRegistry
 
 
-class WebsocketListUpdater:
+class WebSocketListUpdater:
     def __init__(self, registry: ListRegistry):
         self.registry = registry
 
