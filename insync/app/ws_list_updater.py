@@ -15,18 +15,10 @@ class WebsocketListUpdater:
         self.renderers: dict[ListItemProject, Callable[[list[ListItem]], str]] = {}
         self.filters: dict[ListItemProject, Callable[[ListItem], bool]] = {}
 
-    def register_channel(
-        self,
-        channel: ListItemProject,
-        renderer: Callable[[list[ListItem]], str],
-        item_filter: Callable[[ListItem], bool],
-    ) -> None:
-        assert channel not in self.renderers, f"Subscription for {channel} already registered"
-        self.renderers[channel] = renderer
-        self.filters[channel] = item_filter
-
     def register_project_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
-        self.register_channel(project, renderer, lambda x: x.project in project)
+        assert project not in self.renderers, f"Subscription for {project} already registered"
+        self.renderers[project] = renderer
+        self.filters[project] = lambda x: x.project in project
 
     def render_channel(self, channel: ListItemProject) -> str:
         renderer = self.renderers[channel]

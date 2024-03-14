@@ -27,16 +27,17 @@ Run the webapp (FastAPI) UI
 
 # WIP
 - Bug: ListUpdater doesn't notify more general project when a specific project is updated
-  - I think we can go "pure Project" based channels now that "contains" is reliable and null is wildcard
-  - Add tests for subscribing and who gets notified
-    - do we do this implicitly using project tree?, or do we do it explicitly?
-    - observer pattern with registry
-  - use tests to figure out how these are coupled
-    1. Who rx updates when an item is changed
-    2. Which items get sent in the update
-    2. What renderer to used to render the update
+  - use tests think through this
+  1. `WS`: a connection to the client
+  2. `Renderer`: What renderer to used to render the update
+  3. `Filter`: Which items are associated with the update.
+    - Which items trigger the channel
+    - And, which items are sent to the client
+  - `Subscription`:
+    - map a `WS` to a `Filter` + `Renderer`
+  - `Channel`:
+    - a `Filter` + `Subscription`
 
-  - renderer should be tied to channel and not just the project overall
 - todo.txt debug endpoint
   - add a rich text version of the todo.txt to identify fields vs descriptions
 - Clarify completed items
