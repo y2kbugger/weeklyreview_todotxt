@@ -6,6 +6,7 @@
   "editor.formatOnPaste": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
   "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
     "source.fixAll": "always"
   },
 
