@@ -63,6 +63,11 @@ Tedium
   - batch patches to db for performance, don't wait for each one to complete before returning
     - did a benchmark with like 4000+ items saving to DB and it's not really necessary
   - make db patch async
+  - todo.txt constructors
+  - ensure that all endpoints sync vs async are correct
+    - https://github.com/omnilib/aiosqlite
+    - turn on this lint when available https://github.com/astral-sh/ruff/pull/9966
+  - ensure we are using uvloop in production
 
 # Backlog
 ## System
