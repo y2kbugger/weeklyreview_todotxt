@@ -26,8 +26,8 @@ Run the webapp (FastAPI) UI
 
 
 # WIP
-- todo.txt debug endpoint
-  - add a rich text version of the todo.txt to identify fields vs descriptions
+- completion date persist to db
+- creation date persist to db
 - Clarify completed items
 - Add ability to add a new section
 - Separate sections of a checklist
@@ -36,7 +36,6 @@ Run the webapp (FastAPI) UI
 - add ability to mark only some items as recurring
 - order completed items by completion datetime
 - ability to update an item
-- fix bug regarging allowing typographic subsets of project names e.g. +free and +freedom are two different projects but stil allow +free to be a subset of +free.dom
 Tedium
   - extract base.html to common folder
   - undo history debug endpoint
@@ -73,6 +72,7 @@ Tedium
   - undo/redo history
   - snapshots in time of db
 - configure htmx not to send headers
+- priority persist to db
 
 ## Capture
 - I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.

@@ -22,7 +22,7 @@ from uuid6 import UUID, uuid7
     - type `type:[checklist|todo|ref|checklist.onetime]`
 """
 
-Priority = Enum(
+ListItemPriority = Enum(
     'Priority',
     ((p, p) for p in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']),
     type=str,
@@ -91,7 +91,7 @@ class ListItem:
 
     uuid: UUID = field(default_factory=uuid7)
     completed: bool = False
-    priority: Priority | None = None
+    priority: ListItemPriority | None = None
     completion_date: dt.date | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
     project: ListItemProject = field(default_factory=NullListItemProject)
