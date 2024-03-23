@@ -66,7 +66,7 @@ def test_can_render_channel_subscription(
 ) -> None:
     item = ListItem('test1A')
     reg.add(item)
-    updater.register_project_channel(item.project, renderer)
+    updater.register_channel(item.project, renderer)
 
     result = updater.render_channel(item.project)
 
@@ -83,7 +83,7 @@ def test_when_rendered_only_matched_item_included(
     reg.add(ListItem('testT', project=ListItemProject('travel', ListItemProjectType.checklist)))
     reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
     project = ListItemProject('grocery', ListItemProjectType.checklist)
-    updater.register_project_channel(project, renderer)
+    updater.register_channel(project, renderer)
 
     result = updater.render_channel(project)
 
@@ -103,7 +103,7 @@ def test_can_project_channel_gets_all_with_matching_root_project(
     reg.add(ListItem('test4B', project=ListItemProject('grocery.camping', ListItemProjectType.todo)))
 
     project = ListItemProject('grocery', ListItemProjectType.checklist)
-    updater.register_project_channel(project, renderer)
+    updater.register_channel(project, renderer)
 
     result = updater.render_channel(project)
 
@@ -124,10 +124,10 @@ def test_projects_can_be_a_subset(
     reg.add(ListItem('xx', project=ListItemProject('gro', ListItemProjectType.todo)))
 
     project_grocery = ListItemProject('grocery', ListItemProjectType.checklist)
-    updater.register_project_channel(project_grocery, renderer)
+    updater.register_channel(project_grocery, renderer)
 
     project_gro = ListItemProject('gro', ListItemProjectType.checklist)
-    updater.register_project_channel(project_gro, renderer)
+    updater.register_channel(project_gro, renderer)
 
     # Act
     result_grocery = updater.render_channel(project_grocery)
