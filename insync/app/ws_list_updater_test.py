@@ -2,6 +2,7 @@ from typing import Any
 
 import pytest
 from fastapi import WebSocket
+from fastapi.websockets import WebSocketState
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry, NullListItemProject
@@ -32,6 +33,8 @@ def renderer() -> MockRenderer:
 
 
 class MockWebSocket:
+    client_state = WebSocketState.CONNECTED
+
     def __init__(self):
         self.sent = None
         self.accepted = False
@@ -48,6 +51,7 @@ class MockWebSocket:
         assert self.accepted, "Cannot spy on sent text before accepting the connection"
         assert self.sent is not None, "No text has been sent"
         return self.sent
+
 
 
 @pytest.fixture
