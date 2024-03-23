@@ -138,6 +138,10 @@ class TestBroadcasting:
     def ws(self, anyio_backend: tuple[str, dict[str, Any]]) -> MockWebSocket:
         return self.MockWebSocket()
 
+    @pytest.fixture
+    def ws2(self, anyio_backend: tuple[str, dict[str, Any]]) -> MockWebSocket:
+        return self.MockWebSocket()
+
     async def test_broadcast_to_channel(
         self,
         reg: ListRegistry,
@@ -224,4 +228,23 @@ class TestBroadcasting:
         assert len(renderer.calls) == 1
         assert result == 'testGP'
 
-    # TODO: test that renderer is only called once per broadcast
+    async def test_renderer_is_called_only_once_per_broadcast_with_two_identical_subscribers(
+        self,
+        reg: ListRegistry,
+        updater: WebSocketListUpdater,
+        renderer: MockRenderer,
+        ws: MockWebSocket,
+        ws2: MockWebSocket,
+    ) -> None:
+        reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+        reg.add(ListItem('testGP', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+        await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
+        await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
+
+        await updater.broadcast_update(ListItemProject('grocery.produce', ListItemProjectType.checklist))
+        result = ws.spy_sent_text()
+        result2 = ws.spy_sent_text()
+
+        assert len(renderer.calls) == 1
+        assert result == result2 == 'testGP'
+
