@@ -248,3 +248,24 @@ class TestBroadcasting:
         assert len(renderer.calls) == 1
         assert result == result2 == 'testGP'
 
+    async def test_two_subcribers_can_have_different_renderers(
+        self,
+        reg: ListRegistry,
+        updater: WebSocketListUpdater,
+        renderer: MockRenderer,
+        ws: MockWebSocket,
+        ws2: MockWebSocket,
+    ) -> None:
+        reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+        reg.add(ListItem('testGP', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+        reg.add(ListItem('testGP2', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+        await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
+        await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), lambda items: ';'.join([item.description for item in items]))
+
+        await updater.broadcast_update(ListItemProject('grocery.produce', ListItemProjectType.checklist))
+        result = ws.spy_sent_text()
+        result2 = ws2.spy_sent_text()
+
+        assert result != result2
+        assert result == 'testGP,testGP2'
+        assert result2 == 'testGP;testGP2'
