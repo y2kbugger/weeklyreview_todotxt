@@ -25,8 +25,8 @@ class ProjectChannel:
     def item_filter(self, item: ListItem) -> bool:
         return item.project in self.project
 
-    def recipient_filter(self, recipient: ListItemProject) -> bool:
-        return recipient == self.project
+    def broadcast_filter(self, broadcast: ListItemProject) -> bool:
+        return broadcast in self.project
 
 
 class WebSocketListUpdater:
@@ -72,7 +72,7 @@ class WebSocketListUpdater:
         self._garbage_collect_closed_connections()
 
         for channel in self._channels:
-            if not channel.recipient_filter(project):
+            if not channel.broadcast_filter(project):
                 continue
 
             update = self.render_channel(channel)
