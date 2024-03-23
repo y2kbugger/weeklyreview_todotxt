@@ -153,3 +153,22 @@ class TestBroadcasting:
 
         assert len(renderer.calls) == 1
         assert result == 'test1A'
+
+    async def test_broadcast_to_channel_updates_only_same_channel(
+        self,
+        reg: ListRegistry,
+        updater: WebSocketListUpdater,
+        renderer: MockRenderer,
+        ws: MockWebSocket,
+    ) -> None:
+        reg.add(ListItem('test'))
+        reg.add(ListItem('testT', project=ListItemProject('travel', ListItemProjectType.checklist)))
+        reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+        project = ListItemProject('grocery', ListItemProjectType.checklist)
+        await updater.subscribe(ws, project, renderer)
+
+        await updater.broadcast_update(project)
+        result = ws.spy_sent_text()
+
+        assert len(renderer.calls) == 1
+        assert result == 'testG'
