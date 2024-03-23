@@ -34,9 +34,11 @@ Run the webapp (FastAPI) UI
     - Which items trigger the channel
     - And, which items are sent to the client
   - `Subscription`:
-    - map a `WS` to a `Filter` + `Renderer`
+    - map a `WS` to a `Channel`
   - `Channel`:
-    - a `Filter` + `Subscription`
+    - a `RenderFilter` + `Renderer` + `RecipientsFilter`
+    - `RenderFilter` & `RecipientsFilter` can be dirived from the `ListItemProject`
+    - therefore `Channel` = `Renderer` + `ListItemProject`
 
 - todo.txt debug endpoint
   - add a rich text version of the todo.txt to identify fields vs descriptions

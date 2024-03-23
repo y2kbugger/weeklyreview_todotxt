@@ -41,9 +41,9 @@ class TestRendering:
     ) -> None:
         item = ListItem('test1A')
         reg.add(item)
-        updater.register_channel(item.project, renderer)
+        channel = updater.register_projectchannel(item.project, renderer)
 
-        result = updater.render_channel(item.project)
+        result = updater.render_channel(channel)
 
         assert len(renderer.calls) == 1
         assert result == 'test1A'
@@ -58,9 +58,9 @@ class TestRendering:
         reg.add(ListItem('testT', project=ListItemProject('travel', ListItemProjectType.checklist)))
         reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
         project = ListItemProject('grocery', ListItemProjectType.checklist)
-        updater.register_channel(project, renderer)
+        channel = updater.register_projectchannel(project, renderer)
 
-        result = updater.render_channel(project)
+        result = updater.render_channel(channel)
 
         assert len(renderer.calls) == 1
         assert result == 'testG'
@@ -78,9 +78,9 @@ class TestRendering:
         reg.add(ListItem('test4B', project=ListItemProject('grocery.camping', ListItemProjectType.todo)))
 
         project = ListItemProject('grocery', ListItemProjectType.checklist)
-        updater.register_channel(project, renderer)
+        channel = updater.register_projectchannel(project, renderer)
 
-        result = updater.render_channel(project)
+        result = updater.render_channel(channel)
 
         # 2c is excluded because it's a different checklist
         # 4b is excluded because it's not a checklist
@@ -99,14 +99,14 @@ class TestRendering:
         reg.add(ListItem('xx', project=ListItemProject('gro', ListItemProjectType.todo)))
 
         project_grocery = ListItemProject('grocery', ListItemProjectType.checklist)
-        updater.register_channel(project_grocery, renderer)
+        channel_grocery = updater.register_projectchannel(project_grocery, renderer)
 
         project_gro = ListItemProject('gro', ListItemProjectType.checklist)
-        updater.register_channel(project_gro, renderer)
+        channel_gro = updater.register_projectchannel(project_gro, renderer)
 
         # Act
-        result_grocery = updater.render_channel(project_grocery)
-        result_gro = updater.render_channel(project_gro)
+        result_grocery = updater.render_channel(channel_grocery)
+        result_gro = updater.render_channel(channel_gro)
 
         # Assert
         assert result_grocery == 't1,t2'

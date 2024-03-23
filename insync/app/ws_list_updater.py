@@ -1,37 +1,56 @@
 from collections import defaultdict
-from typing import Callable
+from typing import Callable, TypeAlias
 
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
 from insync.listregistry import ListItem, ListItemProject, ListRegistry
 
+Renderer: TypeAlias = Callable[[list[ListItem]], str]
+
+
+class ProjectChannel:
+    def __init__(self, project: ListItemProject, renderer: Renderer):
+        self.project = project
+        self.renderer = renderer
+
+    def __hash__(self) -> int:
+        return hash((self.project, self.renderer))
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ProjectChannel):
+            return False
+        return self.project == other.project and self.renderer == other.renderer
+
+    def item_filter(self, item: ListItem) -> bool:
+        return item.project in self.project
+
+    def recipient_filter(self, recipient: ListItemProject) -> bool:
+        return recipient == self.project
+
 
 class WebSocketListUpdater:
     def __init__(self, registry: ListRegistry):
         self.registry = registry
 
-        self.subscriptions: dict[ListItemProject, list[WebSocket]] = defaultdict(list)
-        self.renderers: dict[ListItemProject, Callable[[list[ListItem]], str]] = {}
-        self.filters: dict[ListItemProject, Callable[[ListItem], bool]] = {}
+        self.subscriptions: dict[ProjectChannel, list[WebSocket]] = defaultdict(list)
+        self._channels: set[ProjectChannel] = set()
 
-    def register_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
-        if project in self.renderers:
-            # This is a no-op if the project is already registered
-            return
-        self.renderers[project] = renderer
-        self.filters[project] = lambda x: x.project in project
+    def register_projectchannel(self, project: ListItemProject, renderer: Renderer) -> ProjectChannel:
+        """No-op if already registered, handled by the nature of sets."""
+        channel = ProjectChannel(project, renderer)
+        self._channels.add(channel)
+        return channel
 
-    def render_channel(self, channel: ListItemProject) -> str:
-        renderer = self.renderers[channel]
-        item_filter = self.filters[channel]
-        items = [item for item in self.registry.items if item_filter(item)]
-        return renderer(items)
+    def render_channel(self, channel: ProjectChannel) -> str:
+        items = [item for item in self.registry.items if channel.item_filter(item)]
+        return channel.renderer(items)
 
-    async def subscribe(self, websocket: WebSocket, channel: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
+    async def subscribe(self, websocket: WebSocket, project: ListItemProject, renderer: Renderer) -> ProjectChannel:
         await websocket.accept()
-        self.register_channel(channel, renderer)
+        channel = self.register_projectchannel(project, renderer)
         self.subscriptions[channel].append(websocket)
+        return channel
 
     def disconnect(self, websocket: WebSocket) -> None:
         for _channel, ws_list in self.subscriptions.items():
@@ -43,19 +62,23 @@ class WebSocketListUpdater:
         for project, ws_list in self.subscriptions.items():
             self.subscriptions[project] = [ws for ws in ws_list if ws.client_state != WebSocketState.DISCONNECTED]
 
-    async def send_update(self, ws: WebSocket, channel: ListItemProject) -> None:
+    async def send_update(self, ws: WebSocket, channel: ProjectChannel) -> None:
         """Send an update to a single websocket. This is useful for initial updates."""
         update = self.render_channel(channel)
         await self._send_message(ws, update)
 
-    async def broadcast_update(self, channel: ListItemProject) -> None:
+    async def broadcast_update(self, project: ListItemProject) -> None:
         """Broadcast an update to all websockets subscribed to a given subscription."""
         self._garbage_collect_closed_connections()
 
-        update = self.render_channel(channel)
+        for channel in self._channels:
+            if not channel.recipient_filter(project):
+                continue
 
-        for ws in self.subscriptions[channel]:
-            await self._send_message(ws, update)
+            update = self.render_channel(channel)
+
+            for ws in self.subscriptions[channel]:
+                await self._send_message(ws, update)
 
     async def _send_message(self, ws: WebSocket, message: str) -> None:
         try:

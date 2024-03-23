@@ -32,8 +32,8 @@ async def ws(
     else:
         raise NotImplementedError(f"Renderer for {list_project_type} not implemented")
 
-    await ws_list_updater.subscribe(websocket, project, renderer)
-    await ws_list_updater.send_update(websocket, project)
+    channel = await ws_list_updater.subscribe(websocket, project, renderer)
+    await ws_list_updater.send_update(websocket, channel)
     await _ws_keep_alive(ws_list_updater, websocket)
 
 
@@ -44,6 +44,6 @@ async def ws_all(
 ) -> None:
     project = NullListItemProject()
 
-    await ws_list_updater.subscribe(websocket, project, render_todotxt_items)
-    await ws_list_updater.send_update(websocket, project)
+    channel = await ws_list_updater.subscribe(websocket, project, render_todotxt_items)
+    await ws_list_updater.send_update(websocket, channel)
     await _ws_keep_alive(ws_list_updater, websocket)
