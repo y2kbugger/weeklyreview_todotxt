@@ -1,7 +1,7 @@
 from typing import Any
+from unittest.mock import Mock
 
 import pytest
-from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
 from insync.app.ws_list_updater import WebSocketListUpdater
@@ -112,12 +112,12 @@ class TestRendering:
         assert result_grocery == 't1,t2'
         assert result_gro == 't3'
 
-
 class TestBroadcasting:
-    class MockWebSocket:
+    class MockWebSocket(Mock):
         client_state = WebSocketState.CONNECTED
 
         def __init__(self):
+            super().__init__()
             self.sent = None
             self.accepted = False
 
@@ -145,10 +145,8 @@ class TestBroadcasting:
         renderer: MockRenderer,
         ws: MockWebSocket,
     ) -> None:
-        item = ListItem('test1A')
-        reg.add(item)
-        _ws: WebSocket = ws  # type: ignore
-        await updater.subscribe(_ws, NullListItemProject(), renderer)
+        reg.add(ListItem('test1A'))
+        await updater.subscribe(ws, NullListItemProject(), renderer)
 
         await updater.broadcast_update(NullListItemProject())
         result = ws.spy_sent_text()
