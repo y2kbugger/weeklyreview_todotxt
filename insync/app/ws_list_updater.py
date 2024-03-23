@@ -16,7 +16,9 @@ class WebSocketListUpdater:
         self.filters: dict[ListItemProject, Callable[[ListItem], bool]] = {}
 
     def register_project_channel(self, project: ListItemProject, renderer: Callable[[list[ListItem]], str]) -> None:
-        assert project not in self.renderers, f"Subscription for {project} already registered"
+        if project in self.renderers:
+            # This is a no-op if the project is already registered
+            return
         self.renderers[project] = renderer
         self.filters[project] = lambda x: x.project in project
 
@@ -34,7 +36,6 @@ class WebSocketListUpdater:
     def garbage_collect_closed_connections(self) -> None:
         """Remove all disconnected websockets from the subscriptions."""
         for project, ws_list in self.subscriptions.items():
-            self.subscriptions[project] = [ws for ws in ws_list if ws.application_state != WebSocketState.DISCONNECTED]
             self.subscriptions[project] = [ws for ws in ws_list if ws.client_state != WebSocketState.DISCONNECTED]
 
     async def send_update(self, ws: WebSocket, channel: ListItemProject) -> None:
