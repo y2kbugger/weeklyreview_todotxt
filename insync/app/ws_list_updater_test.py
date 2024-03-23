@@ -190,4 +190,38 @@ class TestBroadcasting:
         assert len(renderer.calls) == 1
         assert result == 'testG,testGP'
 
+    async def test_broadcast_to_parent_channel_spares_child_subscription(
+        self,
+        reg: ListRegistry,
+        updater: WebSocketListUpdater,
+        renderer: MockRenderer,
+        ws: MockWebSocket,
+    ) -> None:
+        reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+        reg.add(ListItem('testGP', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+        await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
+
+        await updater.broadcast_update(ListItemProject('grocery', ListItemProjectType.checklist))
+        with pytest.raises(AssertionError):
+            ws.spy_sent_text()
+
+        assert len(renderer.calls) == 0
+
+    async def test_broadcast_to_child_channel_renders_only_child(
+        self,
+        reg: ListRegistry,
+        updater: WebSocketListUpdater,
+        renderer: MockRenderer,
+        ws: MockWebSocket,
+    ) -> None:
+        reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+        reg.add(ListItem('testGP', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+        await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
+
+        await updater.broadcast_update(ListItemProject('grocery.produce', ListItemProjectType.checklist))
+        result = ws.spy_sent_text()
+
+        assert len(renderer.calls) == 1
+        assert result == 'testGP'
+
     # TODO: test that renderer is only called once per broadcast
