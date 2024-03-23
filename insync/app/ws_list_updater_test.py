@@ -172,3 +172,22 @@ class TestBroadcasting:
 
         assert len(renderer.calls) == 1
         assert result == 'testG'
+
+    async def test_broadcast_to_channel_updates_parent_subscription(
+        self,
+        reg: ListRegistry,
+        updater: WebSocketListUpdater,
+        renderer: MockRenderer,
+        ws: MockWebSocket,
+    ) -> None:
+        reg.add(ListItem('testG', project=ListItemProject('grocery', ListItemProjectType.checklist)))
+        reg.add(ListItem('testGP', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
+        await updater.subscribe(ws, ListItemProject('grocery', ListItemProjectType.checklist), renderer)
+
+        await updater.broadcast_update(ListItemProject('grocery.produce', ListItemProjectType.checklist))
+        result = ws.spy_sent_text()
+
+        assert len(renderer.calls) == 1
+        assert result == 'testG,testGP'
+
+    # TODO: test that renderer is only called once per broadcast
