@@ -1,6 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, WebSocket, WebSocketDisconnect
+from fastapi.params import Query
 
 from insync.app.checklist import render_checklist_items
 from insync.app.todotxt import render_todotxt_items
@@ -17,35 +18,32 @@ async def _ws_keep_alive(ws_list_updater: WebSocketListUpdater, websocket: WebSo
     except WebSocketDisconnect:
         ws_list_updater.disconnect(websocket)
 
+renderers = {
+    "checklist": render_checklist_items,
+    "todotxt": render_todotxt_items,
+}
 
-@app.websocket("/ws/{list_project_type}/{list_project_name}")
+
+@app.websocket("/ws/{project_type}/{project_name}")
 async def ws(
-    list_project_type: ListItemProjectType,
-    list_project_name: str,
+    project_type: Literal['*'] | ListItemProjectType,
+    project_name: Literal['*'] | str,
+    renderer_name: Annotated[str, Query()],
     websocket: WebSocket,
     ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
 ) -> None:
-    project = ListItemProject(list_project_name, list_project_type)
+    if project_type == "*":
+        project_type = ListItemProjectType.null
+    if project_name == "*":
+        project_name = ""
+    project = ListItemProject(project_name, project_type)
 
-    if list_project_type == ListItemProjectType.checklist:
-        renderer = render_checklist_items
-    else:
-        raise NotImplementedError(f"Renderer for {list_project_type} not implemented")
+    try:
+        renderer = renderers[renderer_name]
+    except KeyError as e:
+        raise NotImplementedError(f"Renderer for {renderer_name} not implemented") from e
 
     channel = await ws_list_updater.subscribe(websocket, project, renderer)
     await ws_list_updater.send_update(websocket, channel)
     await _ws_keep_alive(ws_list_updater, websocket)
 
-
-@app.websocket("/ws/todotxt/{list_project_type}/{list_project_name}")
-async def ws_all(
-    list_project_type: ListItemProjectType,
-    list_project_name: str,
-    websocket: WebSocket,
-    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
-) -> None:
-    project = ListItemProject(list_project_name, list_project_type)
-
-    channel = await ws_list_updater.subscribe(websocket, project, render_todotxt_items)
-    await ws_list_updater.send_update(websocket, channel)
-    await _ws_keep_alive(ws_list_updater, websocket)

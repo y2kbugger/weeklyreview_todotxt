@@ -72,6 +72,7 @@ Tedium
   - snapshots in time of db
 - configure htmx not to send headers
 - priority persist to db
+- I want a gui in the todo.txt endpoint so that I can easily navigate to different list types, and names e.g. `*`, `project`, `checklist`, `todo` and `*`, `travel`, `gro`, `grocery`, etc 
 
 ## Capture
 - I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.

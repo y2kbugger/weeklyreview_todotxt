@@ -7,7 +7,7 @@
       hx-on::after-request="if(event.detail.successful) this.reset()">
   <input name="description" value="">
 </form>
-<div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}" ws-reconnect="true">
+<div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}?renderer_name=checklist" ws-reconnect="true">
   <div id="checklist-items">Loading...</div>
 </div>
 {% endblock %}

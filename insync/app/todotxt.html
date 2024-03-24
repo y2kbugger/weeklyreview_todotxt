@@ -1,11 +1,9 @@
 {% extends "common/layout.html" %}
 {% block styles %}
 <style>
-  div {
+  pre {
     white-space: nowrap;
-    line-height: 80%;
-    font-size: smaller;
-    font-family: monospace;
+    padding: .5rem;
   }
 
   u {
@@ -19,13 +17,16 @@
   b {
     color: #0e997b;
   }
+  p {
+    margin: 0;
+  }
 </style>
 {% endblock styles %}
 
 {% block title %}todo.txt{% endblock %}
 
 {% block content %}
-<div hx-ext="ws" ws-connect="/ws/todotxt/{{ list_project_type.value }}/{{ list_project_name }}" ws-reconnect="true">
+<div hx-ext="ws" ws-connect="/ws/{{ project.project_type.value if project.project_type.value != 'null' else '*'}}/{{ project.name if project.name != '' else '*' }}?renderer_name=todotxt" ws-reconnect="true">
   <pre id="todotxt-items">Loading...</pre>
 </div>
 {% endblock content %}

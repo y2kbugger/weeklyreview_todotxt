@@ -1,27 +1,26 @@
 from collections.abc import Iterable
+from typing import Literal
 
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 
-from insync.listregistry import ListItem, ListItemProjectType
+from insync.listregistry import ListItem, ListItemProject, ListItemProjectType
 
 from . import app, templates
 
 
-@app.get("/todotxt/{list_project_type}/{list_project_name}")
+@app.get("/todotxt/{project_type}/{project_name}")
 def todotxt(
-    list_project_type: ListItemProjectType,
-    list_project_name: str,
+    project_type: Literal['*'] | ListItemProjectType,
+    project_name: Literal['*'] | str,
     request: Request,
 ) -> HTMLResponse:
-    return templates.TemplateResponse(
-        request,
-        "todotxt.html",
-        {
-            'list_project_type': list_project_type,
-            'list_project_name': list_project_name,
-        },
-    )
+    if project_type == '*':
+        project_type = ListItemProjectType.null
+    if project_name == '*':
+        project_name = ''
+    project = ListItemProject(project_name, project_type)
+    return templates.TemplateResponse(request, "todotxt.html", {'project': project})
 
 
 def render_todotxt_items(listitems: Iterable[ListItem]) -> str:
