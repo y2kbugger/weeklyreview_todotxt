@@ -1,23 +1,13 @@
-<!doctype html>
-<html lang="en-US">
+{% extends "common/layout.html" %}
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <title>InSync Lists</title>
-  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
-  <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/_hyperscript.min.js"></script>
-</head>
+{% block title %}Checklist{% endblock %}
 
-<body>
-  <form id="form" hx-post="/checklist/{{ project_name }}/new"
-        hx-on::after-request="if(event.detail.successful) this.reset()">
-    <input name="description" value="">
-  </form>
-  <div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}" ws-reconnect="true">
-    <div id="checklist-items">Loading...</div>
-    </div>
-</body>
-
-</html>
+{% block content %}
+<form id="form" hx-post="/checklist/{{ project_name }}/new"
+      hx-on::after-request="if(event.detail.successful) this.reset()">
+  <input name="description" value="">
+</form>
+<div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}" ws-reconnect="true">
+  <div id="checklist-items">Loading...</div>
+</div>
+{% endblock %}

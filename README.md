@@ -37,7 +37,6 @@ Run the webapp (FastAPI) UI
 - order completed items by completion datetime
 - ability to update an item
 Tedium
-  - extract base.html to common folder
   - undo history debug endpoint
   - Add precommit hook for cleaning notebook output and running tests
   - think about whether archived is separate from completed or just a manifestation of same thing.

@@ -4,7 +4,7 @@ from fastapi import Depends, WebSocket, WebSocketDisconnect
 
 from insync.app.checklist import render_checklist_items
 from insync.app.todotxt import render_todotxt_items
-from insync.listregistry import ListItemProject, ListItemProjectType, NullListItemProject
+from insync.listregistry import ListItemProject, ListItemProjectType
 
 from . import app, get_ws_list_updater
 from .ws_list_updater import WebSocketListUpdater
@@ -37,12 +37,14 @@ async def ws(
     await _ws_keep_alive(ws_list_updater, websocket)
 
 
-@app.websocket("/ws/all")
+@app.websocket("/ws/todotxt/{list_project_type}/{list_project_name}")
 async def ws_all(
+    list_project_type: ListItemProjectType,
+    list_project_name: str,
     websocket: WebSocket,
     ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
 ) -> None:
-    project = NullListItemProject()
+    project = ListItemProject(list_project_name, list_project_type)
 
     channel = await ws_list_updater.subscribe(websocket, project, render_todotxt_items)
     await ws_list_updater.send_update(websocket, channel)

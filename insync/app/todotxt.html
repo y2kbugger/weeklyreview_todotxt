@@ -1,36 +1,31 @@
-<!doctype html>
-<html lang="en-US">
+{% extends "common/layout.html" %}
+{% block styles %}
+<style>
+  div {
+    white-space: nowrap;
+    line-height: 80%;
+    font-size: smaller;
+    font-family: monospace;
+  }
 
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width" />
-  <title>todo.txt</title>
-  <style>
-    div {
-      white-space: nowrap;
-      line-height: 80%;
-      font-size: smaller;
-      font-family: monospace;
-    }
-    u {
-      color: #ad0f0f;
-    }
-    i {
-      color: #87b815;
-    }
-    b {
-      color: #0e997b;
-    }
-  </style>
-  <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
-  <script src="https://unpkg.com/hyperscript.org@0.9.12/dist/_hyperscript.min.js"></script>
-</head>
+  u {
+    color: #ad0f0f;
+  }
 
-<body>
-  <div hx-ext="ws" ws-connect="/ws/all" ws-reconnect="true">
-    <pre id="todotxt-items">Loading...</pre>
-  </div>
-</body>
+  i {
+    color: #87b815;
+  }
 
-</html>
+  b {
+    color: #0e997b;
+  }
+</style>
+{% endblock styles %}
+
+{% block title %}todo.txt{% endblock %}
+
+{% block content %}
+<div hx-ext="ws" ws-connect="/ws/todotxt/{{ list_project_type.value }}/{{ list_project_name }}" ws-reconnect="true">
+  <pre id="todotxt-items">Loading...</pre>
+</div>
+{% endblock content %}
