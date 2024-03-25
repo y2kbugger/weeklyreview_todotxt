@@ -1,14 +1,28 @@
 <div id="checklist-items" hx-swap-oob="true">
-  {% for item in listitems %}
-  <div class="card">
-    <div class="card-body">
-      <input name="completed"
-             type="checkbox"
-             hx-patch="/checklist/{{ item.uuid }}/completed"
-             {{ "checked" if item.completed else "" }}>
+  <section>
+    <ul class="incomplete">
+      {% for item in listitems if not item.completed %}
+      <li>
+        <input name="completed"
+          type="checkbox"
+          hx-patch="/checklist/{{ item.uuid }}/completed">
+        <label for="completed">{{ item.description }}</label>
+      </li>
+      {% endfor %}
+  </section>
 
-      <span class="card-title">{{ item.description }}</span>
-    </div>
-  </div>
-  {% endfor %}
+  <h2>Completed</h2>
+  <section>
+    <ul class="completed">
+      {% for item in listitems if item.completed %}
+      <li>
+        <input name="completed"
+          type="checkbox"
+          hx-patch="/checklist/{{ item.uuid }}/completed"
+          checked>
+        <label for="completed">{{ item.description }} </label>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
 </div>

@@ -13,7 +13,8 @@ from . import app, get_db, get_registry, get_ws_list_updater, templates
 
 @app.get("/checklist/{project_name}")
 def checklist(project_name: str, request: Request) -> HTMLResponse:
-    return templates.TemplateResponse(request, "checklist.html", {"project_name": project_name})
+    project = ListItemProject(project_name, ListItemProjectType.checklist)
+    return templates.TemplateResponse(request, "checklist.html", {"project": project})
 
 
 def render_checklist_items(listitems: Iterable[ListItem]) -> str:

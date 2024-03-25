@@ -1,13 +1,44 @@
 {% extends "common/layout.html" %}
+{% block style %}
+<style>
+  #checklist-items {
+    h2 {
+      font-size: 1.1em;
+    }
+
+    ul {
+      padding-left: 0;
+    }
+
+    ul li {
+      list-style: none;
+      margin: 0;
+    }
+
+    ul.completed li {
+      opacity: var(--pico-form-element-disabled-opacity);
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+  }
+</style>
+{% endblock style %}
 
 {% block title %}Checklist{% endblock %}
 
 {% block content %}
-<form id="form" hx-post="/checklist/{{ project_name }}/new"
-      hx-on::after-request="if(event.detail.successful) this.reset()">
-  <input name="description" value="">
+<hgroup>
+  <h1>{{ project.name }}</h1>
+  <p>Checklist</p>
+</hgroup>
+<form id="form" hx-post="/checklist/{{ project.name }}/new"
+  hx-on::after-request="if(event.detail.successful) this.reset()">
+  <input name="description" value="" placeholder="e.g. refried beans">
 </form>
-<div hx-ext="ws" ws-connect="/ws/checklist/{{ project_name }}?renderer_name=checklist" ws-reconnect="true">
+<div hx-ext="ws" ws-connect="/ws/checklist/{{ project.name }}?renderer_name=checklist" ws-reconnect="true">
   <div id="checklist-items">Loading...</div>
 </div>
-{% endblock %}
+{% endblock content %}
