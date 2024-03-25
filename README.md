@@ -53,7 +53,7 @@ Tedium
   - ensure that all endpoints sync vs async are correct
     - https://github.com/omnilib/aiosqlite
     - turn on this lint when available https://github.com/astral-sh/ruff/pull/9966
-  - ensure we are using uvloop in production
+  - ensure we are using uvloop in production (especially now that we gotta gunicorn)
 
 # Backlog
 ## System
