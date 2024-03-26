@@ -61,6 +61,28 @@ def test_can_undo_create_item() -> None:
     assert len(list(reg.items)) == 0
     assert item not in reg.items
 
+def test_can_archive_item() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.add(item)
+    assert not item.completed
+
+    reg.do(ArchiveCommand(item.uuid, True))
+
+    assert item.archived
+
+
+def test_can_undo_archival() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.add(item)
+    reg.do(ArchiveCommand(item.uuid, True))
+
+    reg.undo()
+
+    assert not item.archived
+
+
 class TestProjectCanContainProject:
     def test_different_types_never_are_never_contained(self) -> None:
         assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('grocery', ListItemProjectType.todo)
