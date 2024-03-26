@@ -99,6 +99,7 @@ class ListItem:
 
     def __str__(self) -> str:
         # x (A) 2016-05-20 2016-04-30 measure space for +chapelShelving @chapel due:2016-05-30
+        # TODO: add archived and recurring flags to the string representation (and in todo.txt web page)
         pieces = [
             "x" if self.completed else "",
             f"({self.priority.value})" if self.priority else "",
@@ -163,8 +164,6 @@ class Command:
     - It is not legal to undo a command that has not been done.
     """
 
-    uuid: UUID
-
     def do(self, reg: ListRegistry) -> None:
         raise NotImplementedError
 
@@ -227,3 +226,25 @@ class ArchiveCommand(Command):
         item = reg.get_item(self.uuid)
         assert self.archived_orig is not None, "Undoing a ArchiveCommand that has not been done"
         item.archived = self.archived_orig
+
+@dataclass
+class ChecklistResetCommand(Command):
+    archived: list[UUID]
+    project: ListItemProject
+
+    def __init__(self, project: ListItemProject):
+        assert project.project_type == ListItemProjectType.checklist, "ResetChecklistCommand only works with checklists"
+        self.archived = []
+        self.project = project
+
+    def do(self, reg: ListRegistry) -> None:
+        for item in reg.items:
+            if item.completed and item.project == self.project:
+                # archive completed items
+                item.archived = True
+                self.archived.append(item.uuid)
+                # TODO: make recurring items recur
+
+    def undo(self, reg: ListRegistry) -> None:
+        for uuid in self.archived:
+            reg.get_item(uuid).archived = False

@@ -1,4 +1,4 @@
-from insync.listregistry import ArchiveCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ArchiveCommand, ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 def test_instantiate_listitem() -> None:
@@ -70,6 +70,22 @@ def test_can_archive_item() -> None:
     reg.do(ArchiveCommand(item.uuid, True))
 
     assert item.archived
+
+def test_can_reset_checklist() -> None:
+    reg = ListRegistry()
+    item1 = ListItem('test1', project=ListItemProject('grocery', ListItemProjectType.checklist))
+    item2 = ListItem('test2', project=ListItemProject('grocery', ListItemProjectType.checklist))
+    reg.add(item1)
+    reg.add(item2)
+    reg.do(CompletionCommand(item1.uuid, True))
+
+    reg.do(ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)))
+
+    assert item1.archived
+    assert item1.completed
+    assert not item2.archived
+    assert not item2.completed
+
 
 def test_archived_item_is_not_in_items() -> None:
     reg = ListRegistry()
