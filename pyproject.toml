@@ -21,6 +21,7 @@ ipykernel = "^6.29.2"
 pytest = "^8.0.1"
 pandas = "^2.2.1"
 ruff = "^0.3.2"
+pre-commit = "^3.7.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -66,7 +67,7 @@ exclude = [
 ]
 
 # Same as Black.
-line-length = 190 
+line-length = 190
 indent-width = 4
 
 [tool.ruff.lint]
