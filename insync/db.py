@@ -38,7 +38,8 @@ class ListDB:
                     description TEXT,
                     project_name TEXT,
                     project_type LISTITEMPROJECTTYPE,
-                    completed INTEGER
+                    completed INTEGER,
+                    archived INTEGER
                     )
                 """,
             )
@@ -51,19 +52,20 @@ class ListDB:
         # TODO: Track mutations and only upsert those
 
         sql = """
-            INSERT INTO list (uuid, description, project_name, project_type, completed)
-                VALUES (?, ?, ?, ?, ?)
+            INSERT INTO list (uuid, description, project_name, project_type, completed, archived)
+                VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
                 DO UPDATE SET
                     description = excluded.description,
                     project_name = excluded.project_name,
                     project_type = excluded.project_type,
-                    completed = excluded.completed
+                    completed = excluded.completed,
+                    archived = excluded.archived
             """
 
         self._conn.executemany(
             sql,
-            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.project.name, item.project.project_type, item.completed) for item in reg.items),
+            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.project.name, item.project.project_type, item.completed, item.archived) for item in reg.all_items),
         )
 
         self._conn.commit()
@@ -76,7 +78,8 @@ class ListDB:
                 description,
                 completed,
                 project_name,
-                project_type
+                project_type,
+                archived
             FROM list
             """)
         reg = ListRegistry()
@@ -85,6 +88,7 @@ class ListDB:
                 uuid=row[0],
                 description=row[1],
                 completed=row[2],
+                archived=row[5],
                 project=ListItemProject(row[3], row[4]),
             )
             reg.add(li)

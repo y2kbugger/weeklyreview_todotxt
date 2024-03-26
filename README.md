@@ -66,6 +66,7 @@ Tedium
     - https://github.com/omnilib/aiosqlite
     - turn on this lint when available https://github.com/astral-sh/ruff/pull/9966
   - ensure we are using uvloop in production (especially now that we gotta gunicorn)
+  - add effieciency to db queries, actually make it so that load doesn't get archived items (by default at least)
 
 # Backlog
 ## System

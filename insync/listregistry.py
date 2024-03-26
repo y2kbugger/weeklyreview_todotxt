@@ -91,6 +91,7 @@ class ListItem:
 
     uuid: UUID = field(default_factory=uuid7)
     completed: bool = False
+    archived: bool = False
     priority: ListItemPriority | None = None
     completion_date: dt.date | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
@@ -118,8 +119,14 @@ class ListRegistry:
         return '\n'.join(str(item) for item in self._list.values()) + '\n'
 
     @property
-    def items(self) -> Iterable[ListItem]:
+    def all_items(self) -> Iterable[ListItem]:
+        """Return all items, including archived ones."""
         return sorted(self._list.values(), key=lambda item: (item.completed, item.description.lower()))
+
+    @property
+    def items(self) -> Iterable[ListItem]:
+        _items = filter(lambda item: not item.archived, self.all_items)
+        return _items
 
     def get_item(self, uuid: UUID) -> ListItem:
         return self._list[uuid]
@@ -198,5 +205,25 @@ class CompletionCommand(Command):
 
     def undo(self, reg: ListRegistry) -> None:
         item = reg.get_item(self.uuid)
-        assert self.completed_orig is not None, "Undoing a command that has not been done"
+        assert self.completed_orig is not None, "Undoing a CompletionCommand that has not been done"
         item.completed = self.completed_orig
+
+@dataclass
+class ArchiveCommand(Command):
+    uuid: UUID
+    archived_new: bool
+    archived_orig: bool | None = None
+
+    def __init__(self, uuid: UUID, archived: bool):
+        self.uuid = uuid
+        self.archived_new = archived
+
+    def do(self, reg: ListRegistry) -> None:
+        item = reg.get_item(self.uuid)
+        self.archived_orig = item.archived
+        item.archived = self.archived_new
+
+    def undo(self, reg: ListRegistry) -> None:
+        item = reg.get_item(self.uuid)
+        assert self.archived_orig is not None, "Undoing a ArchiveCommand that has not been done"
+        item.archived = self.archived_orig

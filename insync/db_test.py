@@ -27,27 +27,22 @@ def test_can_retrieve_empty_list(db: ListDB) -> None:
     assert len(list(reg.items)) == 0
 
 
-def test_can_retrieve_persisted_item(db: ListDB) -> None:
+@pytest.mark.parametrize(
+    'item',
+    [
+        ListItem('test'),
+        ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist)),
+        ListItem('test', completed=True),
+        ListItem('test', archived=True),
+    ],
+)
+def test_can_retrieve_persisted_item_with_project(db: ListDB, item: ListItem) -> None:
     reg = ListRegistry()
-    item = ListItem('test')
     reg.add(item)
     db.patch(reg)
 
     reg2 = db.load()
-    item2 = next(iter(reg2.items))
+    items2 = list(reg2.all_items)
 
-    assert len(list(reg2.items)) == 1
-    assert item == item2
-
-
-def test_can_retrieve_persisted_item_with_project(db: ListDB) -> None:
-    reg = ListRegistry()
-    item = ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist))
-    reg.add(item)
-    db.patch(reg)
-
-    reg2 = db.load()
-    item2 = next(iter(reg2.items))
-
-    assert len(list(reg2.items)) == 1
-    assert item == item2
+    assert len(list(reg2.all_items)) == 1
+    assert item == items2[0]

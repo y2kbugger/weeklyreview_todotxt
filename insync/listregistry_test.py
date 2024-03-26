@@ -1,4 +1,4 @@
-from insync.listregistry import CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ArchiveCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 def test_instantiate_listitem() -> None:
@@ -65,11 +65,19 @@ def test_can_archive_item() -> None:
     reg = ListRegistry()
     item = ListItem('test')
     reg.add(item)
-    assert not item.completed
+    assert not item.archived
 
     reg.do(ArchiveCommand(item.uuid, True))
 
     assert item.archived
+
+def test_archived_item_is_not_in_items() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.add(item)
+    reg.do(ArchiveCommand(item.uuid, True))
+
+    assert item not in reg.items
 
 
 def test_can_undo_archival() -> None:
