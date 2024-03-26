@@ -15,4 +15,9 @@ repos:
         args: ['--no-update']
     -   id: poetry-check
     -   id: poetry-export
-        args: ["--without-hashes", "-f", "requirements.txt", "-o", "requirements.txt"]
+        args: [
+            --with, prod,
+            -f, requirements.txt,
+            --without-hashes,
+            -o, requirements.txt,
+            ]
