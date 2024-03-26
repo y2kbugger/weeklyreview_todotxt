@@ -18,6 +18,14 @@ Run the webapp (FastAPI) UI
 
     $ uvicorn insync.app:app --reload --reload-dir insync --reload-include='*.css' --reload-include='*.html
 
+# Deployment
+Production startup command should use gunicon with uvicorn, as it is a production ready ASGI server, whearas uvicorn is just a development server.
+
+  $ gunicorn -w 1 -k uvicorn.workers.UvicornWorker insync.app:app
+
+To see what is running in the deployed file environment, start up a python file server up there:
+
+  $ python -m http.server 8000
 
 # Architecture
 
