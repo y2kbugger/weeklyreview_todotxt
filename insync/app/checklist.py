@@ -17,8 +17,9 @@ def checklist(project_name: str, request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "checklist.html", {"project": project})
 
 
-def render_checklist_items(listitems: Iterable[ListItem]) -> str:
-    return templates.get_template("checklist_items.html").render(listitems=listitems)
+def render_checklist_items(project: ListItemProject, listitems: Iterable[ListItem]) -> str:
+    return templates.get_template("checklist_items.html").render(project=project, listitems=listitems)
+
 
 @app.post("/checklist/{project_name}/new")
 async def post_checklist(
@@ -54,3 +55,4 @@ async def patch_checklist_completed(
 
     await ws_list_updater.broadcast_update(item.project)
     return Response(status_code=204)
+

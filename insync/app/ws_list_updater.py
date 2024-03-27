@@ -6,7 +6,7 @@ from fastapi.websockets import WebSocketState
 
 from insync.listregistry import ListItem, ListItemProject, ListRegistry
 
-Renderer: TypeAlias = Callable[[list[ListItem]], str]
+Renderer: TypeAlias = Callable[[ListItemProject, list[ListItem]], str]
 
 
 class ProjectChannel:
@@ -44,7 +44,7 @@ class WebSocketListUpdater:
 
     def render_channel(self, channel: ProjectChannel) -> str:
         items = [item for item in self.registry.items if channel.item_filter(item)]
-        return channel.renderer(items)
+        return channel.renderer(channel.project, items)
 
     async def subscribe(self, websocket: WebSocket, project: ListItemProject, renderer: Renderer) -> ProjectChannel:
         await websocket.accept()
@@ -85,4 +85,3 @@ class WebSocketListUpdater:
             await ws.send_text(message)
         except RuntimeError:
             print("Failed to send message, this should not happen regularly as connections are garbage collected before broadcasts.")
-

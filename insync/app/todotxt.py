@@ -23,5 +23,5 @@ def todotxt(
     return templates.TemplateResponse(request, "todotxt.html", {'project': project})
 
 
-def render_todotxt_items(listitems: Iterable[ListItem]) -> str:
-    return templates.get_template("todotxt_items.html").render(listitems=listitems)
+def render_todotxt_items(project: ListItemProject, listitems: Iterable[ListItem]) -> str:
+    return templates.get_template("todotxt_items.html").render(projectj=project, listitems=listitems)

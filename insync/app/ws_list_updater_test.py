@@ -22,9 +22,9 @@ class MockRenderer:
     def __init__(self):
         self.calls = []
 
-    def __call__(self, items: list[ListItem]):
+    def __call__(self, project: ListItemProject, items: list[ListItem]):
         self.calls.append(items)
-        return ','.join([item.description for item in items])
+        return str(project) + ':' + ','.join([item.description for item in items])
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ class TestRendering:
         result = updater.render_channel(channel)
 
         assert len(renderer.calls) == 1
-        assert result == 'test1A'
+        assert result == ':test1A'
 
     def test_when_rendered_only_matched_item_included(
         self,
@@ -63,7 +63,7 @@ class TestRendering:
         result = updater.render_channel(channel)
 
         assert len(renderer.calls) == 1
-        assert result == 'testG'
+        assert result == '+^grocery:testG'
 
     def test_can_project_channel_gets_all_with_matching_root_project(
         self,
@@ -84,7 +84,7 @@ class TestRendering:
 
         # 2c is excluded because it's a different checklist
         # 4b is excluded because it's not a checklist
-        assert result == 'test2A,test3A'
+        assert result == '+^grocery:test2A,test3A'
 
     def test_projects_can_be_a_subset(
         self,
@@ -109,8 +109,9 @@ class TestRendering:
         result_gro = updater.render_channel(channel_gro)
 
         # Assert
-        assert result_grocery == 't1,t2'
-        assert result_gro == 't3'
+        assert result_grocery == '+^grocery:t1,t2'
+        assert result_gro == '+^gro:t3'
+
 
 class TestBroadcasting:
     class MockWebSocket(Mock):
@@ -156,7 +157,7 @@ class TestBroadcasting:
         result = ws.spy_sent_text()
 
         assert len(renderer.calls) == 1
-        assert result == 'test1A'
+        assert result == ':test1A'
 
     async def test_broadcast_to_channel_updates_only_same_channel(
         self,
@@ -175,7 +176,7 @@ class TestBroadcasting:
         result = ws.spy_sent_text()
 
         assert len(renderer.calls) == 1
-        assert result == 'testG'
+        assert result == '+^grocery:testG'
 
     async def test_broadcast_to_channel_updates_parent_subscription(
         self,
@@ -192,7 +193,7 @@ class TestBroadcasting:
         result = ws.spy_sent_text()
 
         assert len(renderer.calls) == 1
-        assert result == 'testG,testGP'
+        assert result == '+^grocery:testG,testGP'
 
     async def test_broadcast_to_parent_channel_spares_child_subscription(
         self,
@@ -226,7 +227,7 @@ class TestBroadcasting:
         result = ws.spy_sent_text()
 
         assert len(renderer.calls) == 1
-        assert result == 'testGP'
+        assert result == '+^grocery.produce:testGP'
 
     async def test_renderer_is_called_only_once_per_broadcast_with_two_identical_subscribers(
         self,
@@ -246,7 +247,7 @@ class TestBroadcasting:
         result2 = ws.spy_sent_text()
 
         assert len(renderer.calls) == 1
-        assert result == result2 == 'testGP'
+        assert result == result2 == '+^grocery.produce:testGP'
 
     async def test_two_subcribers_can_have_different_renderers(
         self,
@@ -260,12 +261,16 @@ class TestBroadcasting:
         reg.add(ListItem('testGP', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
         reg.add(ListItem('testGP2', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
         await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
-        await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), lambda items: ';'.join([item.description for item in items]))
+
+        def other_renderer(project: ListItemProject, items: list[ListItem]):
+            return str(project) + ':' + ';'.join([item.description for item in items])
+
+        await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), other_renderer)
 
         await updater.broadcast_update(ListItemProject('grocery.produce', ListItemProjectType.checklist))
         result = ws.spy_sent_text()
         result2 = ws2.spy_sent_text()
 
         assert result != result2
-        assert result == 'testGP,testGP2'
-        assert result2 == 'testGP;testGP2'
+        assert result == '+^grocery.produce:testGP,testGP2'
+        assert result2 == '+^grocery.produce:testGP;testGP2'
