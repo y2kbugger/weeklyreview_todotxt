@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
-from insync.listregistry import CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 from . import app, get_db, get_registry, get_ws_list_updater, templates
 
@@ -39,6 +39,22 @@ async def post_checklist(
     await ws_list_updater.broadcast_update(item.project)
     return Response(status_code=204)
 
+@app.post("/checklist/{project_name}/reset")
+async def post_checklist_reset(
+    project_name: str,
+    registry: Annotated[ListRegistry, Depends(get_registry)],
+    db: Annotated[ListDB, Depends(get_db)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
+) -> Response:
+    project = ListItemProject(project_name, ListItemProjectType.checklist)
+
+    cmd = ChecklistResetCommand(project)
+    registry.do(cmd)
+    db.patch(registry)
+
+    await ws_list_updater.broadcast_update(project)
+    return Response(status_code=204)
+
 
 @app.patch("/checklist/{uuid}/completed")
 async def patch_checklist_completed(
@@ -55,4 +71,3 @@ async def patch_checklist_completed(
 
     await ws_list_updater.broadcast_update(item.project)
     return Response(status_code=204)
-

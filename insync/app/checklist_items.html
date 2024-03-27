@@ -10,8 +10,10 @@
       </li>
       {% endfor %}
   </section>
-
-  <h2>Completed</h2>
+  <hgroup>
+    <h2>Completed</h2>
+    <a hx-post="/checklist/{{ project.name }}/reset">Reset Checklist</a>
+  </hgroup>
   <section>
     <ul class="completed">
       {% for item in listitems if item.completed %}
