@@ -28,15 +28,16 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-
-# Backlog
-## IT Tedium
 - archived -> archived datetime
+- completed -> property
 - creation-date -> creation datetime
 - completion-date -> completion datetime
 - completion date persist to db
 - creation date persist to db
 - priority persist to db
+
+# Backlog
+## IT Tedium
 - make db patch async
 - url encoding for project names (see todo.txt template)
   - e.g. fix: `{ project.project_type.value if project.project_type.value != 'null' else '*'}`
