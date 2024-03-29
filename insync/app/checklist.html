@@ -27,13 +27,11 @@
 </style>
 {% endblock style %}
 
-{% block title %}Checklist{% endblock %}
+{% block title %}{{ project.name }} - Checklist{% endblock %}
+{% block header %}{{ project.name }}{% endblock %}
+{% block subheader %}Checklist{% endblock %}
 
 {% block content %}
-<hgroup>
-  <h1>{{ project.name }}</h1>
-  <p>Checklist</p>
-</hgroup>
 <form id="form" hx-post="/checklist/{{ project.name }}/new"
   hx-on::after-request="if(event.detail.successful) this.reset()">
   <input name="description" value="" placeholder="e.g. refried beans">

@@ -24,7 +24,9 @@
 </style>
 {% endblock style %}
 
-{% block title %}todo.txt{% endblock %}
+{% block title %}{{ project.name }} - todo.txt{% endblock %}
+{% block header %}{{ project.name }}{% endblock %}
+{% block subheader %}todo.txt{% endblock %}
 
 {% block content %}
 <div hx-ext="ws" ws-connect="/ws/{{ project.project_type.value if project.project_type.value != 'null' else '*'}}/{{ project.name if project.name != '' else '*' }}?renderer_name=todotxt" ws-reconnect="true">
