@@ -5,7 +5,7 @@ Use poetry to install the dependencies:
 
 Install pre-commit hooks:
 
-    $ poetry run pre-commit install
+    $ poetry run pre-commit install --hook-type pre-commit --hook-type pre-push
 
 then activate and run the tests via vscode or the cli:
 
