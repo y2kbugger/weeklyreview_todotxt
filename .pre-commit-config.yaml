@@ -20,3 +20,13 @@ repos:
     rev: "0.7.1"
     hooks:
       - id: nbstripout
+  - repo: local
+    hooks:
+    -   id: pytest-check
+        stages: [push]
+        types: [python]
+        name: pytest-check
+        entry: pytest
+        language: system
+        pass_filenames: false
+        always_run: true
