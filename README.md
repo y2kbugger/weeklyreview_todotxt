@@ -27,81 +27,57 @@ To see what is running in the deployed file environment, start up a python file 
 
   $ python -m http.server 8000
 
-# Architecture
-
- - FastAPI/Jinja backend
- - Leverage FastAPI websockets for real-time collaboration of lists
- - HTMX for dynamic parts of the UI
- - SQLite for persistence
-  - use a service that will backup/persist the sqlite db
-  - also have a service that will create a todo.txt replica of the db either on google docs or github
-
-
 # WIP
-- completion date persist to db
-- creation date persist to db
-- Clarify completed items
-- Add ability to add a new section
-- Separate sections of a checklist
-  - sections can be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
-- Add ability to reset a checklist
-- add ability to mark only some items as recurring
-- order completed items by completion datetime
-- ability to update an item
-Tedium
-  - undo history debug endpoint
-  - Add precommit hook for cleaning notebook output and running tests
-  - think about whether archived is separate from completed or just a manifestation of same thing.
-    - I think non-recurring items should just stay archived.
-    - states completed | recurring, this is order they will show on page
-      - False | False = active-onetime
-      - False | True = active-recurable
-      - True | True = ready-to-reset
-      - True | False = completed
-  - batch patches to db for performance, don't wait for each one to complete before returning
-    - did a benchmark with like 4000+ items saving to DB and it's not really necessary
-  - make db patch async
-  - todo.txt constructors
-  - ensure that all endpoints sync vs async are correct
-    - https://github.com/omnilib/aiosqlite
-    - turn on this lint when available https://github.com/astral-sh/ruff/pull/9966
-  - ensure we are using uvloop in production (especially now that we gotta gunicorn)
-  - add effieciency to db queries, actually make it so that load doesn't get archived items (by default at least)
 
 # Backlog
-## System
-- I want the ability to smartly merge edits of mulitple users so that we can work on the same list at the same time
-- I want to view a global list of timestamped actions so that I can undo or redo actions
-- I want completed items to automatically be archived (at least eventuall) so that I can focus on what's left
-- I want to view list of archived lists so that I can reference historical lists
-- I want an routine backups of the list in todo.txt format so that I can recover from a disaster
-- I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
-- I want an admin page that display meta system info like:
-  - connected websockets
-  - database size
-  - last backup
-  - export to todo.txt
-  - undo/redo history
-  - snapshots in time of db
-- configure htmx not to send headers
+## IT Tedium
+- archived -> archived datetime
+- creation-date -> creation datetime
+- completion-date -> completion datetime
+- completion date persist to db
+- creation date persist to db
 - priority persist to db
-- I want a gui in the todo.txt endpoint so that I can easily navigate to different list types, and names e.g. `*`, `project`, `checklist`, `todo` and `*`, `travel`, `gro`, `grocery`, etc
+- make db patch async
+- url encoding for project names (see todo.txt template)
+  - e.g. fix: `{ project.project_type.value if project.project_type.value != 'null' else '*'}`
+  - This needs to be used for all user facing project names e.g. in the header for null to show *
+- ensure that all endpoints sync vs async are correct
+  - https://github.com/omnilib/aiosqlite
+  - turn on this lint when available https://github.com/astral-sh/ruff/pull/9966
+- ensure we are using uvloop in production (especially now that we gotta gunicorn)
+- add effieciency to db queries, actually make it so that load doesn't get archived items (by default at least)
+- configure htmx not to send headers
+- batch patches to db for performance, don't wait for each one to complete before returning
+  - did a benchmark with like 4000+ items saving to DB and it's not urgent, also might be harder to debug/notice if something goes wrong with persisting
 
-## Capture
-- I want capture to be easy as possible so that I can quickly add items to the list. I want to delay organization until later.
-- I want to capture photos via share images so that I can quickly capture reminders and references for later.
-- I want to quickly capture notes via ok Google so that I can effortlessly capture todos.
+## Todo.txt Page
+- I want a gui in the todo.txt endpoint so that I can easily navigate to different list types, and names e.g. `*`, `project`, `checklist`, `todo` and `*`, `travel`, `gro`, `grocery`, etc
+- I want to be able to view archived items so that I can reference them
 
 ## Checklists
-- I want a way to have an eternal checklists that can be checked off but also reset
-- As a user I want to safety check before resetting a list so that it doesn't accidentally get reset
-- I want to be able to have a heiracry of checklists that can be checked of all at once e.g. `travel.international `
-- I want a way to capture new items to the eternal checklist
-- I want a way to add "one time" items that don't need be added to the eternal checklist
-  - one time can be default with a star or other method to make it permanent
-- I want a way to archive an item from the eternal list
-  - move from checklist to checklist.archived ?
-  - or maybe make not reccuring and then complete it.
+- I want to be able to mark items as "recurring" so that I can maintain reusable checklists.
+- I want the sort order of uncompleted items to be the creation date
+- I want the sort order of completed items to be the completion date
+- I want to segregate the completed items which will recur from the non-recurring items so that I can easily see what is ready to recur.
+- I want to be able to have a heirarchy of checklists that can be checked of all at once e.g. `travel.international `
+  - sections could be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
+- I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
+- I want the ability to view recently archived items so that I can reference/restore them
+- I want the ability to update an item description so that I can evolve it over time
+
+## Admin/Debug Page
+- connected websockets
+- undo/redo history
+- database size
+  - bytes of file
+  - number of items
+  - number of archived items
+  - number of project for each type
+- benchmark/profile testsuite on current data
+- export/import todo.txt
+- snapshots lists to view/restore
+  - sqlite
+  - todo.txt
 
 ## Todos
 - I want lists that are backlogs of projects so that I can plan what to work on during planning.
@@ -118,24 +94,62 @@ Tedium
 ## Reference
 - I want a list type that doesn't have the concept of required completion, but as a reference. e.g. places to eat. vacation spot. These don't end up in up in reviews, but can be referenced specifically.
 
-# Brainstorm
-- working memory
-  - each task has a guid
-  - pure python objects
-  - pandas dataframes
-  - sqlite db
-- persistence
-  - backup of sqlitedb
-  - git history in todo.txt
-- client app
-  - only viewing one "file" of todo.txt at a time
-    - or is it one `#project` tag at a time
-- do I enforce one `#project` tag per line?
-  - pros: simpifies parsing, indexing, and display and UI complexity
-  - cons: can't slice in to dimensions, might not really be important
+## System
+- todo.txt constructors so that I can write writetests more concisely, and restore from todo.txt format
+- I want to view list of archived lists so that I can reference historical lists
+  - an archived list is a list has only archived items
+- I want an routine backups of the list in sqlite format so that I can recover from a disaster
+- I want an routine backups of the list in todo.txt format so that I can recover from a disaster
+- I want to be able to at _least_ read while offline so that I can look at lists while internet unavailble
+- As a user I don't want a description edit to be interupted by a websocket update from another user so that I don't get frustrated.
+- I want to be able to click/preview a link in a description so that I can easily navigate to the reference
 - animating reordering using oob for each list element (guid based tasks?)
   - https://gist.github.com/Thomasparsley/b818e59a6733c40116816cf78f406e96
   - can still research other methods
+
+## Capture
+- I want capture to be easily as possible so that I can quickly add items to the system and delay organization.
+- I want to capture photos via share images so that I can quickly capture reminders and references for later.
+- I want to quickly capture notes via ok Google so that I can effortlessly capture todos.
+
+
+# Architecture
+ - FastAPI/Jinja backend
+ - Leverage FastAPI websockets for real-time collaboration of lists
+ - HTMX for dynamic parts of the UI
+ - Persistence
+  - Working memory only for current list and undo stack (implemented)
+  - SQLite for persistance backup after, restored on startup (implemented)
+  - Periodic historical snapshots
+    - SQLite (not implemented)
+    - todo.txt format (not implemented)
+### Todo.txt
+- map our concepts to todo.txt
+  - completed `x`
+  - priorty `(A) `
+  - completion-date `2020-01-01`
+  - creation-date `2020-01-01`
+  - context `@home` `@car`
+  - project: `+house`
+  - simpletask extensions
+    - due-date `due:2020-01-01`
+    - threshold `t:2024-12-31`
+    - hidden `h:1`
+  - our extensions
+    - completion-datetime `2020-01-01T21:39:27-05:00`
+    - creation-datetime `2020-01-01T21:39:27-05:00`
+    - archived-datetime `archived:2020-01-01T21:39:27-05:00`
+    - project-tree `+house.garage`
+      - and we only allow one per item
+      - type prefixs
+        - `+` - todo
+        - `+^` - checklist
+        - `+#` - reference
+    - cost `$:100`
+    - effort `hours:2.5`
+    - recurable `rec:true`
+      - could have recurrance rules, true is manual which is the only one we support for now
+
 
 # Existing List Pardigms
 - GTD - https://todoist.com/productivity-methods/getting-things-done
@@ -148,19 +162,6 @@ Tedium
   - Critical Now - Absolutely must be done today, review once per hour
   - Opportunity Now - Could be done in next 10 days, review once per day
   - Over the Horizon - Will do more than 10 days from now, review once per week
-- map our concepts to todo.txt
-  - priorty `(A) `
-  - context `@home` `@car`
-  - project: `+house`
-  - simpletask extensions
-    - due-date `due:2020-01-01`
-    - threshold `t:2024-12-31`
-    - hidden `h:1`
-  - our extensions
-    - project-tree `+house.garage`
-    - cost `$:100`
-    - effort `hours:2.5`
-    - type `type:[checklist|todo|ref|checklist.onetime]`
 
 
 # Integrity checks
