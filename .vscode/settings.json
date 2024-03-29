@@ -2,6 +2,7 @@
   "files.associations": {
     "*.html": "jinja-html"
   },
+  "files.insertFinalNewline": true,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
   "editor.formatOnSaveMode": "modificationsIfAvailable",
