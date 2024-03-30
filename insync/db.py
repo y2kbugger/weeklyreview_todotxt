@@ -56,7 +56,8 @@ class ListDB:
                     project_name TEXT,
                     project_type LISTITEMPROJECTTYPE,
                     completion_datetime TIMESTAMP,
-                    archival_datetime TIMESTAMP
+                    archival_datetime TIMESTAMP,
+                    priority TEXT
                     )
                 """,
             )
@@ -76,9 +77,10 @@ class ListDB:
                 project_name,
                 project_type,
                 completion_datetime,
-                archival_datetime
+                archival_datetime,
+                priority
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
                 DO UPDATE SET
                     creation_datetime = excluded.creation_datetime,
@@ -86,7 +88,8 @@ class ListDB:
                     project_name = excluded.project_name,
                     project_type = excluded.project_type,
                     completion_datetime = excluded.completion_datetime,
-                    archival_datetime = excluded.archival_datetime
+                    archival_datetime = excluded.archival_datetime,
+                    priority = excluded.priority
             """
 
         self._conn.executemany(
@@ -100,6 +103,7 @@ class ListDB:
                     item.project.project_type,
                     item.completion_datetime,
                     item.archival_datetime,
+                    item.priority,
                 )
                 for item in reg.all_items
             ),
@@ -117,7 +121,8 @@ class ListDB:
                 project_name,
                 project_type,
                 archival_datetime,
-                creation_datetime
+                creation_datetime,
+                priority
             FROM list
             """)
         reg = ListRegistry()
@@ -129,6 +134,7 @@ class ListDB:
                 completion_datetime=row[2],
                 archival_datetime=row[5],
                 project=ListItemProject(row[3], row[4]),
+                priority=row[7],
             )
             reg.add(li)
 

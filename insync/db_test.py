@@ -4,7 +4,7 @@ from collections.abc import Iterable
 import pytest
 
 from insync.db import ListDB
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ListItem, ListItemPriority, ListItemProject, ListItemProjectType, ListRegistry
 
 
 @pytest.fixture()
@@ -32,6 +32,7 @@ def test_can_retrieve_empty_list(db: ListDB) -> None:
     'item',
     [
         ListItem('test'),
+        ListItem('test', priority=ListItemPriority("K")),
         ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist)),
         ListItem('test', completion_datetime=dt.datetime.now(tz=dt.timezone.utc)),
         ListItem('test', archival_datetime=dt.datetime.now(tz=dt.timezone.utc)),
