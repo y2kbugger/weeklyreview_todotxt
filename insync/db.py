@@ -55,7 +55,7 @@ class ListDB:
                     project_name TEXT,
                     project_type LISTITEMPROJECTTYPE,
                     completion_datetime TIMESTAMP,
-                    archived INTEGER
+                    archival_datetime TIMESTAMP
                     )
                 """,
             )
@@ -68,7 +68,7 @@ class ListDB:
         # TODO: Track mutations and only upsert those
 
         sql = """
-            INSERT INTO list (uuid, description, project_name, project_type, completion_datetime, archived)
+            INSERT INTO list (uuid, description, project_name, project_type, completion_datetime, archival_datetime)
                 VALUES (?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
                 DO UPDATE SET
@@ -76,12 +76,12 @@ class ListDB:
                     project_name = excluded.project_name,
                     project_type = excluded.project_type,
                     completion_datetime = excluded.completion_datetime,
-                    archived = excluded.archived
+                    archival_datetime = excluded.archival_datetime
             """
 
         self._conn.executemany(
             sql,
-            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.project.name, item.project.project_type, item.completion_datetime, item.archived) for item in reg.all_items),
+            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.project.name, item.project.project_type, item.completion_datetime, item.archival_datetime) for item in reg.all_items),
         )
 
         self._conn.commit()
@@ -95,7 +95,7 @@ class ListDB:
                 completion_datetime,
                 project_name,
                 project_type,
-                archived
+                archival_datetime
             FROM list
             """)
         reg = ListRegistry()
@@ -104,7 +104,7 @@ class ListDB:
                 uuid=row[0],
                 description=row[1],
                 completion_datetime=row[2],
-                archived=row[5],
+                archival_datetime=row[5],
                 project=ListItemProject(row[3], row[4]),
             )
             reg.add(li)

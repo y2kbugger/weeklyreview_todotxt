@@ -86,9 +86,24 @@ def test_can_archive_item() -> None:
     reg.add(item)
     assert not item.archived
 
-    reg.do(ArchiveCommand(item.uuid, True))
+    reg.do(ac := ArchiveCommand(item.uuid, True))
 
     assert item.archived
+    assert item.archival_datetime == ac.archival_datetime_new
+
+
+def test_can_undo_archival() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.add(item)
+    reg.do(ArchiveCommand(item.uuid, True))
+    assert item.archived
+
+    reg.undo()
+
+    assert not item.archived
+    assert item.archival_datetime is None
+
 
 def test_can_reset_checklist() -> None:
     reg = ListRegistry()
@@ -114,16 +129,6 @@ def test_archived_item_is_not_in_items() -> None:
 
     assert item not in reg.items
 
-
-def test_can_undo_archival() -> None:
-    reg = ListRegistry()
-    item = ListItem('test')
-    reg.add(item)
-    reg.do(ArchiveCommand(item.uuid, True))
-
-    reg.undo()
-
-    assert not item.archived
 
 
 @pytest.fixture

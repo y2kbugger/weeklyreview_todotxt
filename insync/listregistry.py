@@ -20,9 +20,9 @@ from uuid6 import UUID, uuid7
     - threshold `t:2024-12-31`
     - hidden `h:1`
   - our extensions
-    - completion-datetime `2020-01-01T21:39:27-05:00`
-    - creation-datetime `2020-01-01T21:39:27-05:00`
-    - archived-datetime `archived:2020-01-01T21:39:27-05:00`
+    - completion_datetime `2020-01-01T21:39:27-05:00`
+    - creation_datetime `2020-01-01T21:39:27-05:00`
+    - archival_datetime `archived:2020-01-01T21:39:27-05:00`
     - project-tree `+house.garage`
       - and we only allow one per item
       - type prefixs
@@ -102,16 +102,19 @@ class NullListItemProject(ListItemProject):
 class ListItem:
     description: str
 
-    uuid: UUID = field(default_factory=uuid7)
-
     @property
     def completed(self) -> bool:
         return self.completion_datetime is not None
 
-    archived: bool = False
+    @property
+    def archived(self) -> bool:
+        return self.archival_datetime is not None
+
+    uuid: UUID = field(default_factory=uuid7)
     priority: ListItemPriority | None = None
     completion_datetime: dt.datetime | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
+    archival_datetime: dt.datetime | None = None
     project: ListItemProject = field(default_factory=NullListItemProject)
 
     def __str__(self) -> str:
@@ -239,26 +242,25 @@ class CompletionCommand(Command):
 @dataclass
 class ArchiveCommand(Command):
     uuid: UUID
-    archived_new: bool
-    archived_orig: bool | None = None
+    archival_datetime_new: dt.datetime | None
+    archival_datetime_orig: dt.datetime | None = None
 
     def __init__(self, uuid: UUID, archived: bool):
         self.done = False
         self.uuid = uuid
-        self.archived_new = archived
+        self.archival_datetime_new = dt.datetime.now(tz=dt.timezone.utc) if archived else None
 
     def do(self, reg: ListRegistry) -> None:
         assert not self.done, "Attempting to do a ArchiveCommand that has already been done"
         item = reg.get_item(self.uuid)
-        self.archived_orig = item.archived
-        item.archived = self.archived_new
+        self.archival_datetime_orig = item.archival_datetime
+        item.archival_datetime = self.archival_datetime_new
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
         assert self.done, "Attempting to undo a ArchiveCommand that has not been done"
-        assert self.archived_orig is not None, "Attempting to undo a ArchiveCommand that has no original value"
         item = reg.get_item(self.uuid)
-        item.archived = self.archived_orig
+        item.archival_datetime = self.archival_datetime_orig
         self.done = False
 
 
@@ -270,6 +272,7 @@ class ChecklistResetCommand(Command):
     def __init__(self, project: ListItemProject):
         self.done = False
         assert project.project_type == ListItemProjectType.checklist, "ResetChecklistCommand only works with checklists"
+        self.archival_datetime = dt.datetime.now(tz=dt.timezone.utc)
         self.archived = []
         self.project = project
 
@@ -278,7 +281,7 @@ class ChecklistResetCommand(Command):
         for item in reg.items:
             if item.completed and item.project == self.project:
                 # archive completed items
-                item.archived = True
+                item.archival_datetime = self.archival_datetime
                 self.archived.append(item.uuid)
                 # TODO: make recurring items recur
         self.done = True
@@ -286,5 +289,5 @@ class ChecklistResetCommand(Command):
     def undo(self, reg: ListRegistry) -> None:
         assert self.done, "Attempting to undo a ChecklistResetCommand that has not been done"
         for uuid in self.archived:
-            reg.get_item(uuid).archived = False
+            reg.get_item(uuid).archival_datetime = None
         self.done = False

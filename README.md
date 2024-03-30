@@ -28,7 +28,6 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- archived -> archived datetime
 - creation-date -> creation datetime
 - completion date persist to db
 - creation date persist to db
@@ -136,9 +135,9 @@ To see what is running in the deployed file environment, start up a python file 
     - threshold `t:2024-12-31`
     - hidden `h:1`
   - our extensions
-    - completion-datetime `2020-01-01T21:39:27-05:00`
-    - creation-datetime `2020-01-01T21:39:27-05:00`
-    - archived-datetime `archived:2020-01-01T21:39:27-05:00`
+    - completion_datetime `2020-01-01T21:39:27-05:00`
+    - creation_datetime `2020-01-01T21:39:27-05:00`
+    - archival_datetime `archived:2020-01-01T21:39:27-05:00`
     - project-tree `+house.garage`
       - and we only allow one per item
       - type prefixs
