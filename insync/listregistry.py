@@ -113,7 +113,7 @@ class ListItem:
     uuid: UUID = field(default_factory=uuid7)
     priority: ListItemPriority | None = None
     completion_datetime: dt.datetime | None = None
-    creation_date: dt.date = field(default_factory=dt.date.today)
+    creation_datetime: dt.datetime = field(default_factory=lambda: dt.datetime.now(tz=dt.timezone.utc))
     archival_datetime: dt.datetime | None = None
     project: ListItemProject = field(default_factory=NullListItemProject)
 
@@ -124,7 +124,7 @@ class ListItem:
             "x" if self.completed else "",
             f"({self.priority.value})" if self.priority else "",
             str(self.completion_datetime) if self.completion_datetime else "",
-            str(self.creation_date),
+            str(self.creation_datetime),
             self.description,
             str(self.project) if self.project else "",
         ]

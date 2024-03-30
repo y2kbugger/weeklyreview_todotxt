@@ -35,6 +35,7 @@ def test_can_retrieve_empty_list(db: ListDB) -> None:
         ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist)),
         ListItem('test', completion_datetime=dt.datetime.now(tz=dt.timezone.utc)),
         ListItem('test', archival_datetime=dt.datetime.now(tz=dt.timezone.utc)),
+        ListItem('test', creation_datetime=dt.datetime.now(tz=dt.timezone.utc) - dt.timedelta(days=1)),
     ],
 )
 def test_can_retrieve_persisted_item_with_project(db: ListDB, item: ListItem) -> None:

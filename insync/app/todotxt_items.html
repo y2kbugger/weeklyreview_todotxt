@@ -8,7 +8,7 @@
       {% if item.completed %}x{% endif %}
       <u>{{ item.priority.value }}</u>
       <i>{{ item.completion_datetime.astimezone().replace(tzinfo=None).isoformat(timespec='seconds') if  item.completion_datetime else ''}}</i>
-      <i>{{ item.creation_date }}</i>
+      <i>{{ item.creation_datetime.astimezone().replace(tzinfo=None).isoformat(timespec='seconds') if  item.creation_datetime else ''}}</i>
       {{ item.description }}
       <b>{{ item.project }}</b>
     {% if item.completed %}

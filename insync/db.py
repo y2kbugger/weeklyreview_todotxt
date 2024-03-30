@@ -51,6 +51,7 @@ class ListDB:
                 """
                 CREATE TABLE IF NOT EXISTS list (
                     uuid UUIDLE PRIMARY KEY,
+                    creation_datetime TIMESTAMP,
                     description TEXT,
                     project_name TEXT,
                     project_type LISTITEMPROJECTTYPE,
@@ -68,10 +69,19 @@ class ListDB:
         # TODO: Track mutations and only upsert those
 
         sql = """
-            INSERT INTO list (uuid, description, project_name, project_type, completion_datetime, archival_datetime)
-                VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO list (
+                uuid,
+                creation_datetime,
+                description,
+                project_name,
+                project_type,
+                completion_datetime,
+                archival_datetime
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
                 DO UPDATE SET
+                    creation_datetime = excluded.creation_datetime,
                     description = excluded.description,
                     project_name = excluded.project_name,
                     project_type = excluded.project_type,
@@ -81,7 +91,18 @@ class ListDB:
 
         self._conn.executemany(
             sql,
-            ((UUID(bytes_le=item.uuid.bytes_le), item.description, item.project.name, item.project.project_type, item.completion_datetime, item.archival_datetime) for item in reg.all_items),
+            (
+                (
+                    item.uuid.bytes_le,
+                    item.creation_datetime,
+                    item.description,
+                    item.project.name,
+                    item.project.project_type,
+                    item.completion_datetime,
+                    item.archival_datetime,
+                )
+                for item in reg.all_items
+            ),
         )
 
         self._conn.commit()
@@ -95,13 +116,15 @@ class ListDB:
                 completion_datetime,
                 project_name,
                 project_type,
-                archival_datetime
+                archival_datetime,
+                creation_datetime
             FROM list
             """)
         reg = ListRegistry()
         for row in cursor:
             li = ListItem(
                 uuid=row[0],
+                creation_datetime=row[6],
                 description=row[1],
                 completion_datetime=row[2],
                 archival_datetime=row[5],
