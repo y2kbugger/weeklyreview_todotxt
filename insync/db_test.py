@@ -33,7 +33,7 @@ def test_can_retrieve_empty_list(db: ListDB) -> None:
     [
         ListItem('test'),
         ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist)),
-        ListItem('test', completion_datetime=dt.datetime.now()),
+        ListItem('test', completion_datetime=dt.datetime.now(tz=dt.timezone.utc)),
         ListItem('test', archived=True),
     ],
 )
@@ -47,3 +47,10 @@ def test_can_retrieve_persisted_item_with_project(db: ListDB, item: ListItem) ->
 
     assert len(list(reg2.all_items)) == 1
     assert item == items2[0]
+
+def test_trying_to_save_naive_datetime_raises(db: ListDB) -> None:
+    reg = ListRegistry()
+    item = ListItem('test', completion_datetime=dt.datetime.now())
+    reg.add(item)
+    with pytest.raises(AssertionError):
+        db.patch(reg)

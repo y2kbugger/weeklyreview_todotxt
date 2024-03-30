@@ -1,3 +1,4 @@
+import datetime as dt
 import os
 import sqlite3
 import sys
@@ -6,6 +7,21 @@ from enum import Enum
 from uuid6 import UUID
 
 from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+
+
+def adapt_datetime(dtval: dt.datetime) -> str:
+    assert dtval.tzinfo is not None, "Datetime must have timezone info"
+    return dtval.isoformat("T")
+
+
+def convert_timestamp(ts: bytes) -> dt.datetime:
+    dtval = dt.datetime.fromisoformat(ts.decode())
+    assert dtval.tzinfo is not None, "Datetime must have timezone info"
+    return dtval
+
+
+sqlite3.register_adapter(dt.datetime, adapt_datetime)
+sqlite3.register_converter("TIMESTAMP", convert_timestamp)
 
 sqlite3.register_adapter(UUID, lambda u: u.bytes_le)
 sqlite3.register_converter('UUIDLE', lambda b: UUID(bytes_le=b))

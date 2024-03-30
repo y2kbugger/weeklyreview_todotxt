@@ -207,7 +207,7 @@ class CompletionCommand(Command):
     def __init__(self, uuid: UUID, completed: bool):
         self.done = False
         self.uuid = uuid
-        self.completion_datetime_new = dt.datetime.now() if completed else None
+        self.completion_datetime_new = dt.datetime.now(tz=dt.timezone.utc) if completed else None
 
     def do(self, reg: ListRegistry) -> None:
         assert not self.done, "Attempting to do a CompletionCommand that has already been done"

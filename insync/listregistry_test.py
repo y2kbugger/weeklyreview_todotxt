@@ -51,7 +51,7 @@ def test_can_undo_completion() -> None:
 
 def test_can_uncomplete_item() -> None:
     reg = ListRegistry()
-    item = ListItem('test', completion_datetime=dt.datetime.now())
+    item = ListItem('test', completion_datetime=dt.datetime.now(tz=dt.timezone.utc))
     reg.add(item)
     assert item.completed
 
