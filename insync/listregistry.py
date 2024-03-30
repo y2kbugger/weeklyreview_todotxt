@@ -9,17 +9,30 @@ from uuid6 import UUID, uuid7
 
 """
 - map our concepts to todo.txt
+  - completed `x`
   - priorty `(A) `
+  - completion-date `2020-01-01`
+  - creation-date `2020-01-01`
   - context `@home` `@car`
   - project: `+house`
   - simpletask extensions
     - due-date `due:2020-01-01`
     - threshold `t:2024-12-31`
+    - hidden `h:1`
   - our extensions
+    - completion-datetime `2020-01-01T21:39:27-05:00`
+    - creation-datetime `2020-01-01T21:39:27-05:00`
+    - archived-datetime `archived:2020-01-01T21:39:27-05:00`
     - project-tree `+house.garage`
+      - and we only allow one per item
+      - type prefixs
+        - `+` - todo
+        - `+^` - checklist
+        - `+#` - reference
     - cost `$:100`
     - effort `hours:2.5`
-    - type `type:[checklist|todo|ref|checklist.onetime]`
+    - recurable `rec:true`
+      - could have recurrance rules, true is manual which is the only one we support for now
 """
 
 ListItemPriority = Enum(
