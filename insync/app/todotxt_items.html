@@ -2,14 +2,18 @@
   {% for item in listitems %}
   <p>
     {# x (A) 2016-05-20 2016-04-30 measure space for +chapelShelving @chapel due:2016-05-30 #}
-    {% if item.completed %}<strike>{% endif %}
+    {% if item.completed %}
+    <strike>
+    {% endif %}
       {% if item.completed %}x{% endif %}
       <u>{{ item.priority.value }}</u>
-      <i>{{ item.completion_date if item.completion_date else '' }}</i>
-      <i>{{ item.creation_date if item.completion_date else '' }}</i>
+      <i>{{ item.completion_datetime }}</i>
+      <i>{{ item.creation_date }}</i>
       {{ item.description }}
       <b>{{ item.project }}</b>
-      {% if item.completed %}</strike>{% endif %}
+    {% if item.completed %}
+    </strike>
+    {% endif %}
   </p>
   {% endfor %}
 </pre>
