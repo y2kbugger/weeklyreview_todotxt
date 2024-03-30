@@ -28,12 +28,15 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- refactor commands to use ABC with do/undo wrappers instead of requiring manual done asserting...
+- I want the sort order of uncompleted items to be the creation date
+- I want the sort order of completed items to be the completion date
+- I want to be able to mark items as "recurring" so that I can maintain reusable checklists.
+- I want to segregate the completed items which will recur from the non-recurring items so that I can easily see what is ready to recur.
 
 # Backlog
 ## IT Tedium
 - make db patch async
-- url encoding for project names (see todo.txt template)
+- url encoding for `Project.name`s (see todo.txt template)
   - e.g. fix: `{ project.project_type.value if project.project_type.value != 'null' else '*'}`
   - This needs to be used for all user facing project names e.g. in the header for null to show *
 - ensure that all endpoints sync vs async are correct
@@ -44,16 +47,13 @@ To see what is running in the deployed file environment, start up a python file 
 - configure htmx not to send headers
 - batch patches to db for performance, don't wait for each one to complete before returning
   - did a benchmark with like 4000+ items saving to DB and it's not urgent, also might be harder to debug/notice if something goes wrong with persisting
+- refactor `Command`s to use ABC with do/undo wrappers instead of requiring manual done asserting...
 
 ## Todo.txt Page
 - I want a gui in the todo.txt endpoint so that I can easily navigate to different list types, and names e.g. `*`, `project`, `checklist`, `todo` and `*`, `travel`, `gro`, `grocery`, etc
 - I want to be able to view archived items so that I can reference them
 
 ## Checklists
-- I want to be able to mark items as "recurring" so that I can maintain reusable checklists.
-- I want the sort order of uncompleted items to be the creation date
-- I want the sort order of completed items to be the completion date
-- I want to segregate the completed items which will recur from the non-recurring items so that I can easily see what is ready to recur.
 - I want to be able to have a heirarchy of checklists that can be checked of all at once e.g. `travel.international `
   - sections could be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
 - I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
