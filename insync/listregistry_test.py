@@ -1,3 +1,5 @@
+import datetime as dt
+
 from insync.listregistry import ArchiveCommand, ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
@@ -26,9 +28,10 @@ def test_can_complete_item() -> None:
     reg.add(item)
     assert not item.completed
 
-    reg.do(CompletionCommand(item.uuid, True))
+    reg.do(cc := CompletionCommand(item.uuid, True))
 
     assert item.completed
+    assert item.completion_datetime == cc.completion_datetime_new
 
 
 def test_can_undo_completion() -> None:
@@ -36,10 +39,24 @@ def test_can_undo_completion() -> None:
     item = ListItem('test')
     reg.add(item)
     reg.do(CompletionCommand(item.uuid, True))
+    assert item.completed
 
     reg.undo()
 
     assert not item.completed
+    assert item.completion_datetime is None
+
+
+def test_can_uncomplete_item() -> None:
+    reg = ListRegistry()
+    item = ListItem('test', completion_datetime=dt.datetime.now())
+    reg.add(item)
+    assert item.completed
+
+    reg.do(CompletionCommand(item.uuid, False))
+
+    assert not item.completed
+
 
 def test_can_create_item_using_command() -> None:
     reg = ListRegistry()

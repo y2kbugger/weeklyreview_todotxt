@@ -29,9 +29,7 @@ To see what is running in the deployed file environment, start up a python file 
 
 # WIP
 - archived -> archived datetime
-- completed -> property
 - creation-date -> creation datetime
-- completion-date -> completion datetime
 - completion date persist to db
 - creation date persist to db
 - priority persist to db

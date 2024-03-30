@@ -1,3 +1,4 @@
+import datetime as dt
 from collections.abc import Iterable
 
 import pytest
@@ -32,7 +33,7 @@ def test_can_retrieve_empty_list(db: ListDB) -> None:
     [
         ListItem('test'),
         ListItem('test', project=ListItemProject('grocery', ListItemProjectType.checklist)),
-        ListItem('test', completed=True),
+        ListItem('test', completion_datetime=dt.datetime.now()),
         ListItem('test', archived=True),
     ],
 )

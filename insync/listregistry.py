@@ -90,10 +90,14 @@ class ListItem:
     description: str
 
     uuid: UUID = field(default_factory=uuid7)
-    completed: bool = False
+
+    @property
+    def completed(self) -> bool:
+        return self.completion_datetime is not None
+
     archived: bool = False
     priority: ListItemPriority | None = None
-    completion_date: dt.date | None = None
+    completion_datetime: dt.datetime | None = None
     creation_date: dt.date = field(default_factory=dt.date.today)
     project: ListItemProject = field(default_factory=NullListItemProject)
 
@@ -103,7 +107,7 @@ class ListItem:
         pieces = [
             "x" if self.completed else "",
             f"({self.priority.value})" if self.priority else "",
-            str(self.completion_date) if self.completion_date else "",
+            str(self.completion_datetime) if self.completion_datetime else "",
             str(self.creation_date),
             self.description,
             str(self.project) if self.project else "",
@@ -164,6 +168,8 @@ class Command:
     - It is not legal to undo a command that has not been done.
     """
 
+    done: bool
+
     def do(self, reg: ListRegistry) -> None:
         raise NotImplementedError
 
@@ -177,35 +183,43 @@ class CreateCommand(Command):
     item: ListItem
 
     def __init__(self, uuid: UUID, item: ListItem):
+        self.done = False
         self.uuid = uuid
         self.item = item
 
     def do(self, reg: ListRegistry) -> None:
         reg.add(self.item)
+        self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
+        assert self.done, "Undoing a CreateCommand that has not been done"
         reg.remove(self.uuid)
+        self.done = False
 
 
 @dataclass
 class CompletionCommand(Command):
     uuid: UUID
-    completed_new: bool
-    completed_orig: bool | None = None
+    completion_datetime_new: dt.datetime | None
+    completion_datetime_orig: dt.datetime | None
 
     def __init__(self, uuid: UUID, completed: bool):
+        self.done = False
         self.uuid = uuid
-        self.completed_new = completed
+        self.completion_datetime_new = dt.datetime.now() if completed else None
 
     def do(self, reg: ListRegistry) -> None:
         item = reg.get_item(self.uuid)
-        self.completed_orig = item.completed
-        item.completed = self.completed_new
+        self.completion_datetime_orig = item.completion_datetime
+        item.completion_datetime = self.completion_datetime_new
+        self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
+        assert self.done, "Undoing a CompletionCommand that has not been done"
         item = reg.get_item(self.uuid)
-        assert self.completed_orig is not None, "Undoing a CompletionCommand that has not been done"
-        item.completed = self.completed_orig
+        item.completion_datetime = self.completion_datetime_orig
+        self.done = False
+
 
 @dataclass
 class ArchiveCommand(Command):
@@ -214,6 +228,7 @@ class ArchiveCommand(Command):
     archived_orig: bool | None = None
 
     def __init__(self, uuid: UUID, archived: bool):
+        self.done = False
         self.uuid = uuid
         self.archived_new = archived
 
@@ -221,11 +236,14 @@ class ArchiveCommand(Command):
         item = reg.get_item(self.uuid)
         self.archived_orig = item.archived
         item.archived = self.archived_new
+        self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
-        item = reg.get_item(self.uuid)
         assert self.archived_orig is not None, "Undoing a ArchiveCommand that has not been done"
+        item = reg.get_item(self.uuid)
         item.archived = self.archived_orig
+        self.done = False
+
 
 @dataclass
 class ChecklistResetCommand(Command):
@@ -233,6 +251,7 @@ class ChecklistResetCommand(Command):
     project: ListItemProject
 
     def __init__(self, project: ListItemProject):
+        self.done = False
         assert project.project_type == ListItemProjectType.checklist, "ResetChecklistCommand only works with checklists"
         self.archived = []
         self.project = project
@@ -244,7 +263,9 @@ class ChecklistResetCommand(Command):
                 item.archived = True
                 self.archived.append(item.uuid)
                 # TODO: make recurring items recur
+        self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
         for uuid in self.archived:
             reg.get_item(uuid).archived = False
+        self.done = False
