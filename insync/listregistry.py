@@ -188,11 +188,12 @@ class CreateCommand(Command):
         self.item = item
 
     def do(self, reg: ListRegistry) -> None:
+        assert not self.done, "Attempting to do a CreateCommand that has already been done"
         reg.add(self.item)
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
-        assert self.done, "Undoing a CreateCommand that has not been done"
+        assert self.done, "Attempting to undo do a CreateCommand that has not been done"
         reg.remove(self.uuid)
         self.done = False
 
@@ -209,13 +210,14 @@ class CompletionCommand(Command):
         self.completion_datetime_new = dt.datetime.now() if completed else None
 
     def do(self, reg: ListRegistry) -> None:
+        assert not self.done, "Attempting to do a CompletionCommand that has already been done"
         item = reg.get_item(self.uuid)
         self.completion_datetime_orig = item.completion_datetime
         item.completion_datetime = self.completion_datetime_new
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
-        assert self.done, "Undoing a CompletionCommand that has not been done"
+        assert self.done, "Attempting to undo a CompletionCommand that has not been done"
         item = reg.get_item(self.uuid)
         item.completion_datetime = self.completion_datetime_orig
         self.done = False
@@ -233,13 +235,15 @@ class ArchiveCommand(Command):
         self.archived_new = archived
 
     def do(self, reg: ListRegistry) -> None:
+        assert not self.done, "Attempting to do a ArchiveCommand that has already been done"
         item = reg.get_item(self.uuid)
         self.archived_orig = item.archived
         item.archived = self.archived_new
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
-        assert self.archived_orig is not None, "Undoing a ArchiveCommand that has not been done"
+        assert self.done, "Attempting to undo a ArchiveCommand that has not been done"
+        assert self.archived_orig is not None, "Attempting to undo a ArchiveCommand that has no original value"
         item = reg.get_item(self.uuid)
         item.archived = self.archived_orig
         self.done = False
@@ -257,6 +261,7 @@ class ChecklistResetCommand(Command):
         self.project = project
 
     def do(self, reg: ListRegistry) -> None:
+        assert not self.done, "Attempting to do a ChecklistResetCommand that has already been done"
         for item in reg.items:
             if item.completed and item.project == self.project:
                 # archive completed items
@@ -266,6 +271,7 @@ class ChecklistResetCommand(Command):
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
+        assert self.done, "Attempting to undo a ChecklistResetCommand that has not been done"
         for uuid in self.archived:
             reg.get_item(uuid).archived = False
         self.done = False

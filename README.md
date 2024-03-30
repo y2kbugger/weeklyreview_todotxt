@@ -28,18 +28,12 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- test each Command:
-  - do
-  - undo (do, undo)
-  - undo before do (undo) AssertionError
-  - redo (do, undo, do)
-  - double do (do, do) AssertionError
-  - double undo (do, undo, undo) AssertionError
 - archived -> archived datetime
 - creation-date -> creation datetime
 - completion date persist to db
 - creation date persist to db
 - priority persist to db
+- refactor commands to use ABC with do/undo wrappers instead of requiring manual done asserting...
 
 # Backlog
 ## IT Tedium

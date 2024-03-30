@@ -1,6 +1,8 @@
 import datetime as dt
 
-from insync.listregistry import ArchiveCommand, ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+import pytest
+
+from insync.listregistry import ArchiveCommand, ChecklistResetCommand, Command, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
 
 
 def test_instantiate_listitem() -> None:
@@ -122,6 +124,85 @@ def test_can_undo_archival() -> None:
     reg.undo()
 
     assert not item.archived
+
+
+@pytest.fixture
+def item() -> ListItem:
+    return ListItem('test')
+
+
+@pytest.fixture
+def reg(item: ListItem) -> ListRegistry:
+    _reg = ListRegistry()
+    _reg.add(item)
+    return _reg
+
+
+command_makers = [
+    (lambda item: CompletionCommand(item.uuid, True), 'CompletionCommand'),
+    (lambda item: ArchiveCommand(item.uuid, True), 'ArchiveCommand'),
+    (lambda item: CreateCommand(item.uuid, item), 'CreateCommand'),
+    (lambda item: ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)), 'ChecklistResetCommand'),
+]
+
+
+@pytest.fixture(params=[cm[0] for cm in command_makers], ids=[cm[1] for cm in command_makers])
+def cmd(request: pytest.FixtureRequest, item: ListItem) -> Command:
+    return request.param(item)
+
+
+class TestCommandSemantics:
+    """Test the basic do/undo semantics of the base Command, other tests will test the specific behavior of each Command"""
+
+    """
+    - test each Command:
+    - do
+    - undo (do, undo)
+    - undo before do (undo) AssertionError
+    - redo (do, undo, do)
+    - double do (do, do) AssertionError
+    - double undo (do, undo, undo) AssertionError
+    """
+
+    def test_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        assert cmd.done
+
+    def test_undo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        cmd.undo(reg)
+        assert not cmd.done
+
+    def test_undo_before_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        with pytest.raises(AssertionError):
+            cmd.undo(reg)
+
+    def test_redo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        cmd.undo(reg)
+        cmd.do(reg)
+        assert cmd.done
+
+    def test_double_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        with pytest.raises(AssertionError):
+            cmd.do(reg)
+        assert cmd.done
+        with pytest.raises(AssertionError):
+            # make sure repeated attempts continue to fail
+            cmd.do(reg)
+        assert cmd.done
+
+    def test_double_undo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        cmd.undo(reg)
+        with pytest.raises(AssertionError):
+            cmd.undo(reg)
+        assert not cmd.done
+        with pytest.raises(AssertionError):
+            # make sure repeated attempts continue to fail
+            cmd.undo(reg)
+        assert not cmd.done
 
 
 class TestProjectCanContainProject:
