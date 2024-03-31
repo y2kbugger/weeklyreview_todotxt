@@ -28,7 +28,7 @@
   <section>
     <hgroup role="group">
       <h2>Completed</h2>
-      <a hx-post="/checklist/{{ project.name }}/reset"><small>Reset Checklist</small></a>
+      <a class="reset-checklist" hx-post="/checklist/{{ project.name }}/reset"><small>Reset Checklist</small></a>
     </hgroup>
     <ul class="incomplete">
       {% for item in listitems if item.completed %}
