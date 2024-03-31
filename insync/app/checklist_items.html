@@ -1,11 +1,13 @@
 {% macro checkitem(item) %}
 <li role="group">
   <span>
-    <input name="completed"
-      type="checkbox"
-      hx-patch="/checklist/{{ item.uuid }}/completed"
-      {% if item.completed %}checked{% endif %}>
-    <label for="completed">{{ item.description }}</label>
+    <label for="completed">
+      <input name="completed"
+        type="checkbox"
+        hx-patch="/checklist/{{ item.uuid }}/completed"
+        {% if item.completed %}checked{% endif %} />
+      {{ item.description }}
+    </label>
   </span>
   <span class="recurring {% if item.recurring %}active{% endif %}"
     hx-patch="/checklist/{{ item.uuid }}/recurring"
