@@ -30,8 +30,8 @@ To see what is running in the deployed file environment, start up a python file 
 # WIP
 - I want the sort order of uncompleted items to be the creation date
 - I want the sort order of completed items to be the completion date
-- I want to be able to mark items as "recurring" so that I can maintain reusable checklists.
 - I want to segregate the completed items which will recur from the non-recurring items so that I can easily see what is ready to recur.
+- Update checklist reset command to take recurring into account
 
 # Backlog
 ## IT Tedium

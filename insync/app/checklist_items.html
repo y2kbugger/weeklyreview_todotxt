@@ -7,6 +7,11 @@
           type="checkbox"
           hx-patch="/checklist/{{ item.uuid }}/completed">
         <label for="completed">{{ item.description }}</label>
+        <span class="recurring {% if item.recurring %}active{% endif %}"
+          hx-patch="/checklist/{{ item.uuid }}/recurring"
+          hx-vals='{"recurring": {{ "false" if item.recurring else "true" }} }'>
+          ⟳
+        </span>
       </li>
       {% endfor %}
   </section>

@@ -78,8 +78,9 @@ async def patch_checklist_recurring(
     registry: Annotated[ListRegistry, Depends(get_registry)],
     db: Annotated[ListDB, Depends(get_db)],
     ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
-    recurring: Annotated[bool, Form()] = False,
+    recurring: Annotated[bool, Form()],
 ) -> Response:
+    print(f"uuid: {uuid}, recurring: {recurring}")
     item = next(i for i in registry.items if str(i.uuid) == uuid)
     cmd = RecurringCommand(item.uuid, recurring)
     registry.do(cmd)
