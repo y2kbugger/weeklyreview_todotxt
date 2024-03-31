@@ -116,6 +116,7 @@ class ListItem:
     creation_datetime: dt.datetime = field(default_factory=lambda: dt.datetime.now(tz=dt.timezone.utc))
     archival_datetime: dt.datetime | None = None
     project: ListItemProject = field(default_factory=NullListItemProject)
+    recurring: bool = False
 
     def __str__(self) -> str:
         # x (A) 2016-05-20 2016-04-30 measure space for +chapelShelving @chapel due:2016-05-30
@@ -127,6 +128,8 @@ class ListItem:
             str(self.creation_datetime),
             self.description,
             str(self.project) if self.project else "",
+            f"archived:{self.archival_datetime}" if self.archival_datetime else "",
+            "rec:true" if self.recurring else "",
         ]
         return ' '.join(p for p in pieces if p != '')
 
@@ -261,6 +264,30 @@ class ArchiveCommand(Command):
         assert self.done, "Attempting to undo a ArchiveCommand that has not been done"
         item = reg.get_item(self.uuid)
         item.archival_datetime = self.archival_datetime_orig
+        self.done = False
+
+@dataclass
+class MarkRecurringCommand(Command):
+    uuid: UUID
+    recurring_new: bool
+    recurring_orig: bool
+
+    def __init__(self, uuid: UUID, recurring: bool):
+        self.done = False
+        self.uuid = uuid
+        self.recurring_new = recurring
+
+    def do(self, reg: ListRegistry) -> None:
+        assert not self.done, "Attempting to do a MarkRecurringCommand that has already been done"
+        item = reg.get_item(self.uuid)
+        self.recurring_orig = item.recurring
+        item.recurring = self.recurring_new
+        self.done = True
+
+    def undo(self, reg: ListRegistry) -> None:
+        assert self.done, "Attempting to undo a MarkRecurringCommand that has not been done"
+        item = reg.get_item(self.uuid)
+        item.recurring = self.recurring_orig
         self.done = False
 
 

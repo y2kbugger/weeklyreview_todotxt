@@ -57,7 +57,8 @@ class ListDB:
                     project_type LISTITEMPROJECTTYPE,
                     completion_datetime TIMESTAMP,
                     archival_datetime TIMESTAMP,
-                    priority TEXT
+                    priority TEXT,
+                    recurring BOOLEAN
                     )
                 """,
             )
@@ -78,9 +79,10 @@ class ListDB:
                 project_type,
                 completion_datetime,
                 archival_datetime,
-                priority
+                priority,
+                recurring
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT (uuid)
                 DO UPDATE SET
                     creation_datetime = excluded.creation_datetime,
@@ -89,7 +91,8 @@ class ListDB:
                     project_type = excluded.project_type,
                     completion_datetime = excluded.completion_datetime,
                     archival_datetime = excluded.archival_datetime,
-                    priority = excluded.priority
+                    priority = excluded.priority,
+                    recurring = excluded.recurring
             """
 
         self._conn.executemany(
@@ -104,6 +107,7 @@ class ListDB:
                     item.completion_datetime,
                     item.archival_datetime,
                     item.priority,
+                    item.recurring,
                 )
                 for item in reg.all_items
             ),
@@ -122,7 +126,8 @@ class ListDB:
                 project_type,
                 archival_datetime,
                 creation_datetime,
-                priority
+                priority,
+                recurring
             FROM list
             """)
         reg = ListRegistry()
@@ -135,6 +140,7 @@ class ListDB:
                 archival_datetime=row[5],
                 project=ListItemProject(row[3], row[4]),
                 priority=row[7],
+                recurring=row[8],
             )
             reg.add(li)
 

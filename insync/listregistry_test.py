@@ -2,7 +2,18 @@ import datetime as dt
 
 import pytest
 
-from insync.listregistry import ArchiveCommand, ChecklistResetCommand, Command, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import (
+    ArchiveCommand,
+    ChecklistResetCommand,
+    Command,
+    CompletionCommand,
+    CreateCommand,
+    ListItem,
+    ListItemProject,
+    ListItemProjectType,
+    ListRegistry,
+    MarkRecurringCommand,
+)
 
 
 def test_instantiate_listitem() -> None:
@@ -139,6 +150,38 @@ def test_archived_item_is_not_in_items() -> None:
 
     assert item not in reg.items
 
+def test_can_mark_item_as_recurring() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.add(item)
+    assert not item.recurring
+
+    reg.do(MarkRecurringCommand(item.uuid, True))
+
+    assert item.recurring
+
+
+def test_can_unmark_item_as_recurring() -> None:
+    reg = ListRegistry()
+    item = ListItem('test', recurring=True)
+    reg.add(item)
+    assert item.recurring
+
+    reg.do(MarkRecurringCommand(item.uuid, False))
+
+    assert not item.recurring
+
+
+def test_can_undo_mark_as_recurring() -> None:
+    reg = ListRegistry()
+    item = ListItem('test')
+    reg.add(item)
+    reg.do(MarkRecurringCommand(item.uuid, True))
+    assert item.recurring
+
+    reg.undo()
+
+    assert not item.recurring
 
 
 @pytest.fixture
