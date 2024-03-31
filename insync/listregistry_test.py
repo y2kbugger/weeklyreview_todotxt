@@ -126,7 +126,7 @@ def test_can_undo_archival() -> None:
     assert item.archival_datetime is None
 
 
-def test_can_reset_checklist() -> None:
+def test_reset_checklist_archives_completed() -> None:
     reg = ListRegistry()
     item1 = ListItem('test1', project=ListItemProject('grocery', ListItemProjectType.checklist))
     item2 = ListItem('test2', project=ListItemProject('grocery', ListItemProjectType.checklist))
@@ -137,9 +137,69 @@ def test_can_reset_checklist() -> None:
     reg.do(ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)))
 
     assert item1.archived
-    assert item1.completed
     assert not item2.archived
+
+
+def test_reset_checklist_does_not_affect_other_projects() -> None:
+    reg = ListRegistry()
+    item1 = ListItem('test1', project=ListItemProject('grocery', ListItemProjectType.checklist))
+    item2 = ListItem('test2', project=ListItemProject('grocery', ListItemProjectType.todo))
+    reg.add(item1)
+    reg.add(item2)
+    reg.do(CompletionCommand(item1.uuid, True))
+    reg.do(CompletionCommand(item2.uuid, True))
+
+    reg.do(ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)))
+
+    assert item1.archived
+    assert not item2.archived
+
+
+def test_reset_checkout_resets_subprojects() -> None:
+    reg = ListRegistry()
+    item1 = ListItem('test1', project=ListItemProject('grocery.produce', ListItemProjectType.checklist))
+    reg.add(item1)
+    reg.do(CompletionCommand(item1.uuid, True))
+
+    reg.do(ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)))
+
+    assert item1.archived
+
+
+def test_reset_checkilist_uncompletes_recurring_items() -> None:
+    reg = ListRegistry()
+    item1 = ListItem('test1', project=ListItemProject('grocery', ListItemProjectType.checklist), recurring=True)
+    reg.add(item1)
+    reg.do(CompletionCommand(item1.uuid, True))
+
+    reg.do(ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)))
+
+    assert not item1.completed
+
+
+def test_can_undo_reset_checklist() -> None:
+    reg = ListRegistry()
+    item1 = ListItem('test1', project=ListItemProject('grocery', ListItemProjectType.checklist))
+    item2 = ListItem('test2', project=ListItemProject('grocery', ListItemProjectType.checklist), recurring=True)
+    reg.add(item1)
+    reg.add(item2)
+    reg.do(CompletionCommand(item1.uuid, True))
+    reg.do(CompletionCommand(item2.uuid, True))
+
+    reg.do(ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)))
+    assert item1.completed
+    assert item1.archived
+
     assert not item2.completed
+    assert not item2.archived
+
+    reg.undo()
+
+    assert item1.completed
+    assert not item1.archived
+
+    assert not item2.archived
+    assert item2.completed
 
 
 def test_archived_item_is_not_in_items() -> None:

@@ -292,6 +292,12 @@ class RecurringCommand(Command):
 
 
 @dataclass
+class _PreRecurState:
+    uuid: UUID
+    completion_datetime: dt.datetime
+
+
+@dataclass
 class ChecklistResetCommand(Command):
     archived: list[UUID]
     project: ListItemProject
@@ -299,22 +305,38 @@ class ChecklistResetCommand(Command):
     def __init__(self, project: ListItemProject):
         self.done = False
         assert project.project_type == ListItemProjectType.checklist, "ResetChecklistCommand only works with checklists"
-        self.archival_datetime = dt.datetime.now(tz=dt.timezone.utc)
+        self.checklist_reset_datetime = dt.datetime.now(tz=dt.timezone.utc)
         self.archived = []
+
+        self.recurred = []
         self.project = project
 
     def do(self, reg: ListRegistry) -> None:
         assert not self.done, "Attempting to do a ChecklistResetCommand that has already been done"
         for item in reg.items:
-            if item.completed and item.project == self.project:
-                # archive completed items
-                item.archival_datetime = self.archival_datetime
+            if item.project not in self.project:
+                continue
+
+            if item.completion_datetime is None:
+                # not completed, so skip
+                continue
+
+            if item.recurring:
+                # recur the item
+                prs = _PreRecurState(item.uuid, item.completion_datetime)
+                item.completion_datetime = None
+                self.recurred.append(prs)
+            else:
+                # archive the item
+                item.archival_datetime = self.checklist_reset_datetime
                 self.archived.append(item.uuid)
-                # TODO: make recurring items recur
+
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
         assert self.done, "Attempting to undo a ChecklistResetCommand that has not been done"
         for uuid in self.archived:
             reg.get_item(uuid).archival_datetime = None
+        for prs in self.recurred:
+            reg.get_item(prs.uuid).completion_datetime = prs.completion_datetime
         self.done = False
