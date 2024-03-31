@@ -28,7 +28,6 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- I want to segregate the completed items which will recur from the non-recurring items so that I can easily see what is ready to recur.
 - I want to show the whole project path as sub headers
 - I want the sort order of uncompleted items to be the creation date
 - I want the sort order of completed items to be the completion date

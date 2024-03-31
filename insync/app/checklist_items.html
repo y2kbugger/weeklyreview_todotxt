@@ -32,6 +32,14 @@
       <a class="reset-checklist" hx-post="/checklist/{{ project.name }}/reset"><small>Reset Checklist</small></a>
     </hgroup>
     <ul class="complete">
+      <h3>Recurring</h3>
+      {% for item in listitems if item.completed  and item.recurring %}
+      {{ checkitem(item) }}
+      {% endfor %}
+    </ul>
+    <ul class="complete">
+      <h3>Complete</h3>
+      {% for item in listitems if item.completed  and not item.recurring %}
       {{ checkitem(item) }}
       {% endfor %}
     </ul>
