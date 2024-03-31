@@ -25,13 +25,13 @@
       {% endfor %}
     </ul>
   </section>
+
   <section>
     <hgroup role="group">
       <h2>Completed</h2>
       <a class="reset-checklist" hx-post="/checklist/{{ project.name }}/reset"><small>Reset Checklist</small></a>
     </hgroup>
-    <ul class="incomplete">
-      {% for item in listitems if item.completed %}
+    <ul class="complete">
       {{ checkitem(item) }}
       {% endfor %}
     </ul>
