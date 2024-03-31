@@ -267,7 +267,7 @@ class ArchiveCommand(Command):
         self.done = False
 
 @dataclass
-class MarkRecurringCommand(Command):
+class RecurringCommand(Command):
     uuid: UUID
     recurring_new: bool
     recurring_orig: bool
@@ -278,14 +278,14 @@ class MarkRecurringCommand(Command):
         self.recurring_new = recurring
 
     def do(self, reg: ListRegistry) -> None:
-        assert not self.done, "Attempting to do a MarkRecurringCommand that has already been done"
+        assert not self.done, "Attempting to do a RecurringCommand that has already been done"
         item = reg.get_item(self.uuid)
         self.recurring_orig = item.recurring
         item.recurring = self.recurring_new
         self.done = True
 
     def undo(self, reg: ListRegistry) -> None:
-        assert self.done, "Attempting to undo a MarkRecurringCommand that has not been done"
+        assert self.done, "Attempting to undo a RecurringCommand that has not been done"
         item = reg.get_item(self.uuid)
         item.recurring = self.recurring_orig
         self.done = False

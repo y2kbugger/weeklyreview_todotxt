@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
-from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry, RecurringCommand
 
 from . import app, get_db, get_registry, get_ws_list_updater, templates
 
@@ -66,6 +66,22 @@ async def patch_checklist_completed(
 ) -> Response:
     item = next(i for i in registry.items if str(i.uuid) == uuid)
     cmd = CompletionCommand(item.uuid, completed)
+    registry.do(cmd)
+    db.patch(registry)
+
+    await ws_list_updater.broadcast_update(item.project)
+    return Response(status_code=204)
+
+@app.patch("/checklist/{uuid}/recurring")
+async def patch_checklist_recurring(
+    uuid: str,
+    registry: Annotated[ListRegistry, Depends(get_registry)],
+    db: Annotated[ListDB, Depends(get_db)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
+    recurring: Annotated[bool, Form()] = False,
+) -> Response:
+    item = next(i for i in registry.items if str(i.uuid) == uuid)
+    cmd = RecurringCommand(item.uuid, recurring)
     registry.do(cmd)
     db.patch(registry)
 

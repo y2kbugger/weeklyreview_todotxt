@@ -12,7 +12,7 @@ from insync.listregistry import (
     ListItemProject,
     ListItemProjectType,
     ListRegistry,
-    MarkRecurringCommand,
+    RecurringCommand,
 )
 
 
@@ -156,7 +156,7 @@ def test_can_mark_item_as_recurring() -> None:
     reg.add(item)
     assert not item.recurring
 
-    reg.do(MarkRecurringCommand(item.uuid, True))
+    reg.do(RecurringCommand(item.uuid, True))
 
     assert item.recurring
 
@@ -167,7 +167,7 @@ def test_can_unmark_item_as_recurring() -> None:
     reg.add(item)
     assert item.recurring
 
-    reg.do(MarkRecurringCommand(item.uuid, False))
+    reg.do(RecurringCommand(item.uuid, False))
 
     assert not item.recurring
 
@@ -176,7 +176,7 @@ def test_can_undo_mark_as_recurring() -> None:
     reg = ListRegistry()
     item = ListItem('test')
     reg.add(item)
-    reg.do(MarkRecurringCommand(item.uuid, True))
+    reg.do(RecurringCommand(item.uuid, True))
     assert item.recurring
 
     reg.undo()
