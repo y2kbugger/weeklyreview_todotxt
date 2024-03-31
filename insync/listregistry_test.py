@@ -91,6 +91,16 @@ def test_can_archive_item() -> None:
     assert item.archived
     assert item.archival_datetime == ac.archival_datetime_new
 
+def test_can_unarchive_item() -> None:
+    reg = ListRegistry()
+    item = ListItem('test', archival_datetime=dt.datetime.now(tz=dt.timezone.utc))
+    reg.add(item)
+    assert item.archived
+
+    reg.do(ArchiveCommand(item.uuid, False))
+
+    assert not item.archived
+
 
 def test_can_undo_archival() -> None:
     reg = ListRegistry()
