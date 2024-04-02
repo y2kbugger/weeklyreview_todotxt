@@ -23,7 +23,24 @@
       margin: 0;
     }
 
-    ul.completed li {
+    .new-item {}
+
+    .child-new-item {
+      /* margin-left: 2em; */
+      height: 1.4em;
+    }
+
+    .incomplete {
+      h2 {
+        margin-top: 1.3em;
+      }
+    }
+
+    .completed-toolbar {
+      margin-top: 2em;
+    }
+
+    .completed li {
       opacity: var(--pico-form-element-disabled-opacity);
 
       &:hover {
@@ -53,7 +70,14 @@
       }
     }
 
-  }
+    .add-subproject-item {
+      &:hover {
+        cursor: pointer;
+        box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
+      }
+
+
+    }
 </style>
 {% endblock style %}
 
@@ -62,10 +86,9 @@
 {% block subheader %}Checklist{% endblock %}
 
 {% block content %}
-<form id="form" hx-post="/checklist/{{ project.name }}/new"
-  hx-on::after-request="if(event.detail.successful) this.reset()">
-  <input name="description" value="" placeholder="e.g. refried beans">
-</form>
+<input class="new-item" name="description" value="" placeholder="e.g. refried beans"
+  hx-post="/checklist/{{ project.name }}/new"
+  hx-on::after-request="this.value=''" />
 <div hx-ext="ws" ws-connect="/ws/checklist/{{ project.name }}?renderer_name=checklist" ws-reconnect="true">
   <div id="checklist-items">Loading...</div>
 </div>

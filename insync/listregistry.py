@@ -145,7 +145,7 @@ class ListRegistry:
     @property
     def all_items(self) -> Iterable[ListItem]:
         """Return all items, including archived ones."""
-        return sorted(self._list.values(), key=lambda item: (item.completed, item.description.lower()))
+        return sorted(self._list.values(), key=lambda item: (item.completed, item.project.name.lower()))
 
     @property
     def items(self) -> Iterable[ListItem]:

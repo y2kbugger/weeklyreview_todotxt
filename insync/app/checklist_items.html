@@ -21,13 +21,24 @@
   <section>
     <ul class="incomplete">
       {% for item in listitems if not item.completed %}
+      {% if loop.changed(item.project.name) and item.project.name != project.name %}
+      {# Skip the initial project since it's at the top of the page #}
+      <h2>{{ item.project.name[project.name|length:][1:]}} </h2>
+      <span role="group">
+        <span type="checkbox" class="add-subproject-item">+</span>
+        <input class="new-item child-new-item" name="description" value="" placeholder="..."
+          hx-post="/checklist/{{ item.project.name }}/new"
+          hx-on::after-request="this.value=''" />
+      </span>
+      {% endif %}
+
       {{ checkitem(item) }}
       {% endfor %}
     </ul>
   </section>
 
   <section>
-    <hgroup role="group">
+    <hgroup class="completed-toolbar" role="group">
       <h2>Completed</h2>
       <a class="reset-checklist" hx-post="/checklist/{{ project.name }}/reset"><small>Reset Checklist</small></a>
     </hgroup>

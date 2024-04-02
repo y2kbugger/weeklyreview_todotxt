@@ -31,6 +31,9 @@ To see what is running in the deployed file environment, start up a python file 
 - I want to show the whole project path as sub headers
 - I want the sort order of uncompleted items to be the creation date
 - I want the sort order of completed items to be the completion date
+- allow hotpatching in of a .dairy style subproject in initial entry box
+- add link for navigating to subproject
+- add checkmark for completing entire subproject at once
 
 # Backlog
 ## IT Tedium
@@ -47,6 +50,7 @@ To see what is running in the deployed file environment, start up a python file 
 - batch patches to db for performance, don't wait for each one to complete before returning
   - did a benchmark with like 4000+ items saving to DB and it's not urgent, also might be harder to debug/notice if something goes wrong with persisting
 - refactor `Command`s to use ABC with do/undo wrappers instead of requiring manual done asserting...
+- first clas method for removing common prefixes from project names
 
 ## Todo.txt Page
 - I want a gui in the todo.txt endpoint so that I can easily navigate to different list types, and names e.g. `*`, `project`, `checklist`, `todo` and `*`, `travel`, `gro`, `grocery`, etc
