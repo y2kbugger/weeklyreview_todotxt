@@ -23,9 +23,10 @@
       margin: 0;
     }
 
-    .add-subproject-item {
+    li.add-subproject-item {
       margin-top: 0.5em;
       line-height: 1.6em;
+      box-shadow: none;
 
       span {
         margin-right: 0.5em;
@@ -90,7 +91,7 @@
 <input class="new-item" name="description" value="" placeholder="e.g. refried beans"
   hx-post="/checklist/{{ project.name }}/new"
   hx-on::after-request="this.value=''" />
-<div hx-ext="ws" ws-connect="/ws/checklist/{{ project.name }}?renderer_name=checklist" ws-reconnect="true">
+<div hx-ext="ws" ws-connect="/ws/checklist/{{ project.name }}?renderer_name=checklist" ws-reconnect="true" hx-swap="morph">
   <div id="checklist-items">Loading...</div>
 </div>
 {% endblock content %}
