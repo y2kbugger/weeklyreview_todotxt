@@ -1,3 +1,4 @@
+from collections import defaultdict
 from collections.abc import Iterable
 from typing import Annotated
 
@@ -18,7 +19,10 @@ def checklist(project_name: str, request: Request) -> HTMLResponse:
 
 
 def render_checklist_items(project: ListItemProject, listitems: Iterable[ListItem]) -> str:
-    return templates.get_template("checklist_items.html").render(project=project, listitems=listitems)
+    listitems_by_subproject = defaultdict(list)
+    for item in listitems:
+        listitems_by_subproject[item.project].append(item)
+    return templates.get_template("checklist_items.html").render(project=project, listitems=listitems, listitems_by_subproject=listitems_by_subproject)
 
 
 @app.post("/checklist/{project_name}/new")

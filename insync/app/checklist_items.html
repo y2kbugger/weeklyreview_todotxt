@@ -1,14 +1,12 @@
 {% macro checkitem(item) %}
 <li role="group">
-  <span>
-    <label for="completed">
-      <input name="completed"
-        type="checkbox"
-        hx-patch="/checklist/{{ item.uuid }}/completed"
-        {% if item.completed %}checked{% endif %} />
-      {{ item.description }}
-    </label>
-  </span>
+  <label for="completed">
+    <input name="completed"
+      type="checkbox"
+      hx-patch="/checklist/{{ item.uuid }}/completed"
+      {% if item.completed %}checked{% endif %} />
+    {{ item.description }}
+  </label>
   <span class="recurring {% if item.recurring %}active{% endif %}"
     hx-patch="/checklist/{{ item.uuid }}/recurring"
     hx-vals='{"recurring": {{ "false" if item.recurring else "true" }} }'>
@@ -16,25 +14,38 @@
   </span>
 </li>
 {% endmacro %}
+{% macro add_subproject_item(subproject) %}
+<li class="add-subproject-item" role="group">
+  <span>+</span>
+  <input id="add-subproject-item-input-{{subproject.name}}"
+    type="text"
+    name="description"
+    hx-post="/checklist/{{ subproject.name }}/new"
+    hx-on::after-request="this.value=''"
+    value=""
+    placeholder="add item" />
+</li>
+{% endmacro %}
 
 <div id="checklist-items" hx-swap-oob="true">
   <section>
+    {% for subproject, listitems in listitems_by_subproject.items() %}
+
+    {% if subproject.name != project.name %}
+    <h2>{{ subproject.name[project.name|length:][1:]}} </h2>
+    {% endif %}
+
     <ul class="incomplete">
       {% for item in listitems if not item.completed %}
-      {% if loop.changed(item.project.name) and item.project.name != project.name %}
-      {# Skip the initial project since it's at the top of the page #}
-      <h2>{{ item.project.name[project.name|length:][1:]}} </h2>
-      <span role="group">
-        <span type="checkbox" class="add-subproject-item">+</span>
-        <input class="new-item child-new-item" name="description" value="" placeholder="..."
-          hx-post="/checklist/{{ item.project.name }}/new"
-          hx-on::after-request="this.value=''" />
-      </span>
-      {% endif %}
-
       {{ checkitem(item) }}
       {% endfor %}
+
+      {% if subproject.name != project.name %}
+      {{ add_subproject_item(subproject) }}
+      {% endif %}
     </ul>
+    {% endfor %}
+
   </section>
 
   <section>

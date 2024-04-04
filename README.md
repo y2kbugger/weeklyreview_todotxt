@@ -28,6 +28,8 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
+- sort subprojects parts that are integers numerically
+- I want to be able to append multiple items to a lists without refocusing the input
 - I want to show the whole project path as sub headers
 - I want the sort order of uncompleted items to be the creation date
 - I want the sort order of completed items to be the completion date
@@ -37,6 +39,7 @@ To see what is running in the deployed file environment, start up a python file 
 
 # Backlog
 ## IT Tedium
+- Add first class ListItemsFilter to handing filtering (completed, recurring, etc), grouping, sorting, of items
 - make db patch async
 - url encoding for `Project.name`s (see todo.txt template)
   - e.g. fix: `{ project.project_type.value if project.project_type.value != 'null' else '*'}`

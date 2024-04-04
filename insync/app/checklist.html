@@ -23,11 +23,20 @@
       margin: 0;
     }
 
-    .new-item {}
+    .add-subproject-item {
+      margin-top: 0.5em;
+      line-height: 1.6em;
 
-    .child-new-item {
-      /* margin-left: 2em; */
-      height: 1.4em;
+      span {
+        margin-right: 0.5em;
+        font-size: 1.6em;
+      }
+
+      input[type="text"] {
+        height: 1.8em;
+        padding: 0.3em;
+        border-radius: 3px;
+      }
     }
 
     .incomplete {
@@ -69,15 +78,7 @@
         opacity: 1;
       }
     }
-
-    .add-subproject-item {
-      &:hover {
-        cursor: pointer;
-        box-shadow: 0 0 1px 1px rgba(0, 0, 0, 0.1);
-      }
-
-
-    }
+  }
 </style>
 {% endblock style %}
 
