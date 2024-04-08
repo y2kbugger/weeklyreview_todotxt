@@ -28,14 +28,15 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- sort subprojects parts that are integers numerically
-- I want to be able to append multiple items to a lists without refocusing the input
-- I want to show the whole project path as sub headers
+- Add first class ListItemsFilter to handing filtering (completed, recurring, etc), grouping, sorting, of items
+  - make registry.search to get a view
+  - implement contains for the view
+  - implement contains for the registry
+  - implement len for the view and registry
+  - implement sorts for the view
+  - separate ListRegistry, Commands, and ListView
 - I want the sort order of uncompleted items to be the creation date
 - I want the sort order of completed items to be the completion date
-- allow hotpatching in of a .dairy style subproject in initial entry box
-- add link for navigating to subproject
-- add checkmark for completing entire subproject at once
 
 # Backlog
 ## IT Tedium
@@ -60,9 +61,18 @@ To see what is running in the deployed file environment, start up a python file 
 - I want to be able to view archived items so that I can reference them
 
 ## Checklists
+- I want to be able to click into a subproject, e.g. produce so that I can focus
+- I want an overall hyperlinked cookie crumb trail so that I can easily navigate up and down the project hierarchy
+- I want to be able to rename a subproject so that I can curate my lists
+- I want integer project parts to be sorted numerically so that they are in the correct order
+- I want to be able to drag and drop a subproject so that I can easily reorder them
+- I want the integer part of a project to be hidden in the UI so that it doesn't clutter the view
 - I want to be able to have a heirarchy of checklists that can be checked of all at once e.g. `travel.international `
   - sections could be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
 - I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
+- I want to be able to create a subproject via an initial '.' in the entry box so that I can quickly create a subproject
+- I want visual feedback while designating a subproject so that I can see that it is being created.
+  - Also add hint in the entry box placeholder
 - I want the ability to view recently archived items so that I can reference/restore them
 - I want the ability to update an item description so that I can evolve it over time
 
