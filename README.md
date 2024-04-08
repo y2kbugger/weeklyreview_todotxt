@@ -29,10 +29,6 @@ To see what is running in the deployed file environment, start up a python file 
 
 # WIP
 - Add first class ListItemsFilter to handing filtering (completed, recurring, etc), grouping, sorting, of items
-  - make registry.search to get a view
-  - implement contains for the view
-  - implement contains for the registry
-  - implement len for the view and registry
   - implement sorts for the view
   - separate ListRegistry, Commands, and ListView
 - I want the sort order of uncompleted items to be the creation date
@@ -40,7 +36,7 @@ To see what is running in the deployed file environment, start up a python file 
 
 # Backlog
 ## IT Tedium
-- Add first class ListItemsFilter to handing filtering (completed, recurring, etc), grouping, sorting, of items
+- add favicon
 - make db patch async
 - url encoding for `Project.name`s (see todo.txt template)
   - e.g. fix: `{ project.project_type.value if project.project_type.value != 'null' else '*'}`

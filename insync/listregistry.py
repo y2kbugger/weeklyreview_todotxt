@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -136,30 +136,33 @@ class ListItem:
 
 @dataclass
 class ListRegistry:
-    _list: dict[UUID, ListItem] = field(default_factory=dict)
+    _items: dict[UUID, ListItem] = field(default_factory=dict)
     _history: list[Command] = field(default_factory=list)
 
     def __str__(self) -> str:
-        return '\n'.join(str(item) for item in self._list.values()) + '\n'
+        return '\n'.join(str(item) for item in self._items.values()) + '\n'
 
-    @property
-    def all_items(self) -> Iterable[ListItem]:
-        """Return all items, including archived ones."""
-        return sorted(self._list.values(), key=lambda item: (item.completed, item.project.name.lower()))
+    def __contains__(self, item: ListItem) -> bool:
+        return item.uuid in self._items
 
-    @property
-    def items(self) -> Iterable[ListItem]:
-        _items = filter(lambda item: not item.archived, self.all_items)
-        return _items
+    def __len__(self) -> int:
+        return len(self._items)
+
+    def __iter__(self) -> Iterator[ListItem]:
+        return iter(self._items.values())
+
+    def search(self, project: ListItemProject) -> ListView:
+        items = filter(lambda item: item.project in project, self._items.values())
+        return ListView(items)
 
     def get_item(self, uuid: UUID) -> ListItem:
-        return self._list[uuid]
+        return self._items[uuid]
 
     def add(self, item: ListItem) -> None:
-        self._list[item.uuid] = item
+        self._items[item.uuid] = item
 
     def remove(self, uuid: UUID) -> None:
-        self._list.pop(uuid)
+        self._items.pop(uuid)
 
     def do(self, command: Command) -> None:
         command.do(self)
@@ -176,6 +179,27 @@ class ListRegistry:
     def undo(self, command: Command | None = None) -> None:
         """Undo specific command or else the most recent command in the history."""
         self._undo(command or self._history[-1])
+
+class ListView:
+    def __init__(self, items: Iterable[ListItem]):
+        self._items = list(items)
+
+    def __iter__(self) -> Iterator[ListItem]:
+        return iter(self._items)
+
+    def __len__(self) -> int:
+        return len(self._items)
+
+    def __contains__(self, item: ListItem) -> bool:
+        return item in self._items
+
+    @property
+    def active_items(self) -> Iterable[ListItem]:
+        return filter(lambda item: not item.archived, self)
+
+    @property
+    def archived_items(self) -> Iterable[ListItem]:
+        return filter(lambda item: item.archived, self)
 
 
 @dataclass
@@ -313,7 +337,7 @@ class ChecklistResetCommand(Command):
 
     def do(self, reg: ListRegistry) -> None:
         assert not self.done, "Attempting to do a ChecklistResetCommand that has already been done"
-        for item in reg.items:
+        for item in reg:
             if item.project not in self.project:
                 continue
 

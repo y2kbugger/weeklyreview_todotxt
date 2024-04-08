@@ -109,7 +109,7 @@ class ListDB:
                     item.priority,
                     item.recurring,
                 )
-                for item in reg.all_items
+                for item in reg
             ),
         )
 

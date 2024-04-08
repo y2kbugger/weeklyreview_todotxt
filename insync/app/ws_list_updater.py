@@ -43,7 +43,7 @@ class WebSocketListUpdater:
         return channel
 
     def render_channel(self, channel: ProjectChannel) -> str:
-        items = [item for item in self.registry.items if channel.item_filter(item)]
+        items = [item for item in self.registry if channel.item_filter(item)]
         return channel.renderer(channel.project, items)
 
     async def subscribe(self, websocket: WebSocket, project: ListItemProject, renderer: Renderer) -> ProjectChannel:

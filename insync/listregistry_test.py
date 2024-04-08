@@ -12,6 +12,8 @@ from insync.listregistry import (
     ListItemProject,
     ListItemProjectType,
     ListRegistry,
+    ListView,
+    NullListItemProject,
     RecurringCommand,
 )
 
@@ -31,8 +33,8 @@ def test_add_item() -> None:
     reg = ListRegistry()
     item = ListItem('test')
     reg.add(item)
-    assert len(list(reg.items)) == 1
-    assert item in reg.items
+    assert len(reg) == 1
+    assert item in reg
 
 
 def test_can_complete_item() -> None:
@@ -77,8 +79,8 @@ def test_can_create_item_using_command() -> None:
 
     reg.do(CreateCommand(item.uuid, item))
 
-    assert len(list(reg.items)) == 1
-    assert item in reg.items
+    assert len(reg) == 1
+    assert item in reg
 
 
 def test_can_undo_create_item() -> None:
@@ -88,8 +90,9 @@ def test_can_undo_create_item() -> None:
 
     reg.undo()
 
-    assert len(list(reg.items)) == 0
-    assert item not in reg.items
+    assert len(reg) == 0
+    assert item not in reg
+
 
 def test_can_archive_item() -> None:
     reg = ListRegistry()
@@ -208,7 +211,9 @@ def test_archived_item_is_not_in_items() -> None:
     reg.add(item)
     reg.do(ArchiveCommand(item.uuid, True))
 
-    assert item not in reg.items
+    assert item not in reg.search(project=item.project).active_items
+    assert item in reg.search(project=item.project).archived_items
+
 
 def test_can_mark_item_as_recurring() -> None:
     reg = ListRegistry()
@@ -369,3 +374,20 @@ class TestProjectCanContainProject:
     def test_project_name_part_can_be_substring_of_completely_different_project(self) -> None:
         assert ListItemProject('gro', ListItemProjectType.checklist) not in ListItemProject('grocery', ListItemProjectType.checklist)
         assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('gro', ListItemProjectType.checklist)
+
+
+def test_can_create_view() -> None:
+    view = ListView([])
+
+
+def test_can_add_item_to_view() -> None:
+    item = ListItem('test')
+    items = [item]
+    view = ListView(items)
+    assert item in view
+
+
+def test_registry_can_return_view() -> None:
+    reg = ListRegistry()
+    view = reg.search(project=NullListItemProject())
+    assert isinstance(view, ListView)
