@@ -34,10 +34,17 @@ To see what is running in the deployed file environment, start up a python file 
 - I want the sort order of uncompleted items to be the creation date
 - I want the sort order of completed items to be the completion date
 
+# Bugs
+- archived items are not hidden from UI
+- archived items are not greyed out
+
 # Backlog
 ## IT Tedium
+- css to separate files
 - add favicon
 - make db patch async
+- ruff lint pre-commit hook
+- ruff format pre-commit hook
 - url encoding for `Project.name`s (see todo.txt template)
   - e.g. fix: `{ project.project_type.value if project.project_type.value != 'null' else '*'}`
   - This needs to be used for all user facing project names e.g. in the header for null to show *
