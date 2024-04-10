@@ -1,19 +1,12 @@
+import datetime as dt
+
+import pytest
+
 from insync.listitem import (
     ListItem,
     ListItemProject,
     ListItemProjectType,
 )
-
-
-def test_instantiate_listitem() -> None:
-    item = ListItem('test')
-    assert item.description == 'test'
-
-
-def test_instantiate_listitem_with_project() -> None:
-    itemproject = ListItemProject('grocery', ListItemProjectType.checklist)
-    item = ListItem('test', project=itemproject)
-    assert item.project.name == 'grocery'
 
 
 class TestProjectCanContainProject:
@@ -62,3 +55,40 @@ class TestProjectCanContainProject:
     def test_project_name_part_can_be_substring_of_completely_different_project(self) -> None:
         assert ListItemProject('gro', ListItemProjectType.checklist) not in ListItemProject('grocery', ListItemProjectType.checklist)
         assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('gro', ListItemProjectType.checklist)
+
+
+@pytest.fixture
+def item() -> ListItem:
+    return ListItem('test')
+
+
+def test_imcomplete_is_the_default(item: ListItem) -> None:
+    assert not item.completed
+
+
+def test_items_are_not_archived_by_default(item: ListItem) -> None:
+    assert not item.archived
+
+
+def test_items_are_created_with_a_creation_datetime(item: ListItem) -> None:
+    assert isinstance(item.creation_datetime, dt.datetime)
+
+
+def test_completion_datetime_drives_completed(item: ListItem) -> None:
+    item.completion_datetime = dt.datetime.now(tz=dt.timezone.utc)
+    assert item.completed
+
+
+def test_completion_datetime_of_none_is_not_completed(item: ListItem) -> None:
+    item.completion_datetime = None
+    assert not item.completed
+
+
+def test_archival_datetime_drives_archived(item: ListItem) -> None:
+    item.archival_datetime = dt.datetime.now(tz=dt.timezone.utc)
+    assert item.archived
+
+
+def test_archival_datetime_of_none_is_not_archived(item: ListItem) -> None:
+    item.archival_datetime = None
+    assert not item.archived
