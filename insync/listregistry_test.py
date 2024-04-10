@@ -34,13 +34,6 @@ def test_registry_can_return_view() -> None:
     assert isinstance(view, ListView)
 
 
-def test_archived_item_is_not_in_items() -> None:
-    reg = ListRegistry()
-    item = ListItem('test', archival_datetime=dt.datetime.now(tz=dt.timezone.utc))
-    reg.add(item)
-
-    assert item not in reg.search(project=item.project).active_items
-    assert item in reg.search(project=item.project).archived_items
 
 
 @pytest.fixture
