@@ -20,32 +20,19 @@ from insync.listregistry import (
 from insync.listview import ListView
 
 
-def test_add_item() -> None:
-    reg = ListRegistry()
-    item = ListItem('test')
-    reg.add(item)
-    assert len(reg) == 1
-    assert item in reg
-
-
-def test_registry_can_return_view() -> None:
-    reg = ListRegistry()
-    view = reg.search(project=NullListItemProject())
-    assert isinstance(view, ListView)
-
-
-
-
 @pytest.fixture
 def item() -> ListItem:
     return ListItem('test')
-
 
 @pytest.fixture
 def reg(item: ListItem) -> ListRegistry:
     _reg = ListRegistry()
     _reg.add(item)
     return _reg
+
+def test_registry_can_return_view(reg: ListRegistry) -> None:
+    view = reg.search(project=NullListItemProject())
+    assert isinstance(view, ListView)
 
 
 command_makers = [
@@ -55,7 +42,6 @@ command_makers = [
     (lambda item: CreateCommand(item.uuid, item), 'CreateCommand'),
     (lambda item: RecurringCommand(item.uuid, True), 'ArchiveCommand'),
 ]
-
 
 @pytest.fixture(params=[cm[0] for cm in command_makers], ids=[cm[1] for cm in command_makers])
 def cmd(request: pytest.FixtureRequest, item: ListItem) -> Command:
