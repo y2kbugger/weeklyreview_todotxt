@@ -40,6 +40,8 @@ To see what is running in the deployed file environment, start up a python file 
 
 # Backlog
 ## IT Tedium
+- better tests for listitem.py across everything in it
+- use fixtures better in list registry tests
 - css to separate files
 - add favicon
 - make db patch async
