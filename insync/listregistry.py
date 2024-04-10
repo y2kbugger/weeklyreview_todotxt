@@ -172,15 +172,14 @@ class RecurringCommand(Command):
 
 
 @dataclass
-class _PreRecurState:
-    uuid: UUID
-    completion_datetime: dt.datetime
-
-
-@dataclass
 class ChecklistResetCommand(Command):
     archived: list[UUID]
     project: ListItemProject
+
+    @dataclass
+    class _PreRecurState:
+        uuid: UUID
+        completion_datetime: dt.datetime
 
     def __init__(self, project: ListItemProject):
         self.done = False
@@ -203,7 +202,7 @@ class ChecklistResetCommand(Command):
 
             if item.recurring:
                 # recur the item
-                prs = _PreRecurState(item.uuid, item.completion_datetime)
+                prs = self._PreRecurState(item.uuid, item.completion_datetime)
                 item.completion_datetime = None
                 self.recurred.append(prs)
             else:
