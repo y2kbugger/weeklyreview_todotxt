@@ -41,7 +41,6 @@ To see what is running in the deployed file environment, start up a python file 
 # Backlog
 ## IT Tedium
 - css to separate files
-- add favicon
 - make db patch async
 - ruff lint pre-commit hook
 - ruff format pre-commit hook
