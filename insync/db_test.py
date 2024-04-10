@@ -4,7 +4,8 @@ from collections.abc import Iterable
 import pytest
 
 from insync.db import ListDB
-from insync.listregistry import ListItem, ListItemPriority, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listitem import ListItem, ListItemPriority, ListItemProject, ListItemProjectType
+from insync.listregistry import ListRegistry
 
 
 @pytest.fixture()
@@ -50,6 +51,7 @@ def test_can_retrieve_persisted_item_with_project(db: ListDB, item: ListItem) ->
 
     assert len(list(reg2)) == 1
     assert item == items2[0]
+
 
 def test_trying_to_save_naive_datetime_raises(db: ListDB) -> None:
     reg = ListRegistry()

@@ -6,7 +6,8 @@ from enum import Enum
 
 from uuid6 import UUID
 
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry
+from insync.listitem import ListItem, ListItemProject, ListItemProjectType
+from insync.listregistry import ListRegistry
 
 
 def adapt_datetime(dtval: dt.datetime) -> str:
@@ -41,7 +42,6 @@ sqlite3.register_converter('LISTITEMPROJECTTYPE', lambda b: ListItemProjectType(
 
 
 class ListDB:
-
     def __init__(self, db_path: str | os.PathLike):
         self._conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
 

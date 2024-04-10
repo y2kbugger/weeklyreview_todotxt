@@ -7,7 +7,8 @@ from fastapi.responses import HTMLResponse
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
-from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListItem, ListItemProject, ListItemProjectType, ListRegistry, RecurringCommand
+from insync.listitem import ListItem, ListItemProject, ListItemProjectType
+from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListRegistry, RecurringCommand
 
 from . import app, get_db, get_registry, get_ws_list_updater, templates
 
@@ -68,7 +69,7 @@ async def patch_checklist_completed(
     ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
     completed: Annotated[bool, Form()] = False,
 ) -> Response:
-    item = next(i for i in registry.items if str(i.uuid) == uuid)
+    item = next(i for i in registry if str(i.uuid) == uuid)
     cmd = CompletionCommand(item.uuid, completed)
     registry.do(cmd)
     db.patch(registry)
@@ -85,7 +86,7 @@ async def patch_checklist_recurring(
     recurring: Annotated[bool, Form()],
 ) -> Response:
     print(f"uuid: {uuid}, recurring: {recurring}")
-    item = next(i for i in registry.items if str(i.uuid) == uuid)
+    item = next(i for i in registry if str(i.uuid) == uuid)
     cmd = RecurringCommand(item.uuid, recurring)
     registry.do(cmd)
     db.patch(registry)

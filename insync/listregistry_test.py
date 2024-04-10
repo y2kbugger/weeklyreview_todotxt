@@ -2,31 +2,22 @@ import datetime as dt
 
 import pytest
 
+from insync.listitem import (
+    ListItem,
+    ListItemProject,
+    ListItemProjectType,
+    NullListItemProject,
+)
 from insync.listregistry import (
     ArchiveCommand,
     ChecklistResetCommand,
     Command,
     CompletionCommand,
     CreateCommand,
-    ListItem,
-    ListItemProject,
-    ListItemProjectType,
     ListRegistry,
-    ListView,
-    NullListItemProject,
     RecurringCommand,
 )
-
-
-def test_instantiate_listitem() -> None:
-    item = ListItem('test')
-    assert item.description == 'test'
-
-
-def test_instantiate_listitem_with_project() -> None:
-    itemproject = ListItemProject('grocery', ListItemProjectType.checklist)
-    item = ListItem('test', project=itemproject)
-    assert item.project.name == 'grocery'
+from insync.listview import ListView
 
 
 def test_add_item() -> None:
@@ -35,6 +26,101 @@ def test_add_item() -> None:
     reg.add(item)
     assert len(reg) == 1
     assert item in reg
+
+
+def test_registry_can_return_view() -> None:
+    reg = ListRegistry()
+    view = reg.search(project=NullListItemProject())
+    assert isinstance(view, ListView)
+
+
+def test_archived_item_is_not_in_items() -> None:
+    reg = ListRegistry()
+    item = ListItem('test', archival_datetime=dt.datetime.now(tz=dt.timezone.utc))
+    reg.add(item)
+
+    assert item not in reg.search(project=item.project).active_items
+    assert item in reg.search(project=item.project).archived_items
+
+
+@pytest.fixture
+def item() -> ListItem:
+    return ListItem('test')
+
+
+@pytest.fixture
+def reg(item: ListItem) -> ListRegistry:
+    _reg = ListRegistry()
+    _reg.add(item)
+    return _reg
+
+
+command_makers = [
+    (lambda item: ArchiveCommand(item.uuid, True), 'ArchiveCommand'),
+    (lambda item: ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)), 'ChecklistResetCommand'),
+    (lambda item: CompletionCommand(item.uuid, True), 'CompletionCommand'),
+    (lambda item: CreateCommand(item.uuid, item), 'CreateCommand'),
+    (lambda item: RecurringCommand(item.uuid, True), 'ArchiveCommand'),
+]
+
+
+@pytest.fixture(params=[cm[0] for cm in command_makers], ids=[cm[1] for cm in command_makers])
+def cmd(request: pytest.FixtureRequest, item: ListItem) -> Command:
+    return request.param(item)
+
+
+class TestCommandSemantics:
+    """Test the basic do/undo semantics of the base Command, other tests will test the specific behavior of each Command"""
+
+    """
+    - test each Command:
+    - do
+    - undo (do, undo)
+    - undo before do (undo) AssertionError
+    - redo (do, undo, do)
+    - double do (do, do) AssertionError
+    - double undo (do, undo, undo) AssertionError
+    """
+
+    def test_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        assert cmd.done
+
+    def test_undo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        cmd.undo(reg)
+        assert not cmd.done
+
+    def test_undo_before_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        with pytest.raises(AssertionError):
+            cmd.undo(reg)
+
+    def test_redo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        cmd.undo(reg)
+        cmd.do(reg)
+        assert cmd.done
+
+    def test_double_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        with pytest.raises(AssertionError):
+            cmd.do(reg)
+        assert cmd.done
+        with pytest.raises(AssertionError):
+            # make sure repeated attempts continue to fail
+            cmd.do(reg)
+        assert cmd.done
+
+    def test_double_undo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
+        cmd.do(reg)
+        cmd.undo(reg)
+        with pytest.raises(AssertionError):
+            cmd.undo(reg)
+        assert not cmd.done
+        with pytest.raises(AssertionError):
+            # make sure repeated attempts continue to fail
+            cmd.undo(reg)
+        assert not cmd.done
 
 
 def test_can_complete_item() -> None:
@@ -104,6 +190,7 @@ def test_can_archive_item() -> None:
 
     assert item.archived
     assert item.archival_datetime == ac.archival_datetime_new
+
 
 def test_can_unarchive_item() -> None:
     reg = ListRegistry()
@@ -205,16 +292,6 @@ def test_can_undo_reset_checklist() -> None:
     assert item2.completed
 
 
-def test_archived_item_is_not_in_items() -> None:
-    reg = ListRegistry()
-    item = ListItem('test')
-    reg.add(item)
-    reg.do(ArchiveCommand(item.uuid, True))
-
-    assert item not in reg.search(project=item.project).active_items
-    assert item in reg.search(project=item.project).archived_items
-
-
 def test_can_mark_item_as_recurring() -> None:
     reg = ListRegistry()
     item = ListItem('test')
@@ -247,147 +324,3 @@ def test_can_undo_mark_as_recurring() -> None:
     reg.undo()
 
     assert not item.recurring
-
-
-@pytest.fixture
-def item() -> ListItem:
-    return ListItem('test')
-
-
-@pytest.fixture
-def reg(item: ListItem) -> ListRegistry:
-    _reg = ListRegistry()
-    _reg.add(item)
-    return _reg
-
-
-command_makers = [
-    (lambda item: CompletionCommand(item.uuid, True), 'CompletionCommand'),
-    (lambda item: ArchiveCommand(item.uuid, True), 'ArchiveCommand'),
-    (lambda item: CreateCommand(item.uuid, item), 'CreateCommand'),
-    (lambda item: ChecklistResetCommand(ListItemProject('grocery', ListItemProjectType.checklist)), 'ChecklistResetCommand'),
-]
-
-
-@pytest.fixture(params=[cm[0] for cm in command_makers], ids=[cm[1] for cm in command_makers])
-def cmd(request: pytest.FixtureRequest, item: ListItem) -> Command:
-    return request.param(item)
-
-
-class TestCommandSemantics:
-    """Test the basic do/undo semantics of the base Command, other tests will test the specific behavior of each Command"""
-
-    """
-    - test each Command:
-    - do
-    - undo (do, undo)
-    - undo before do (undo) AssertionError
-    - redo (do, undo, do)
-    - double do (do, do) AssertionError
-    - double undo (do, undo, undo) AssertionError
-    """
-
-    def test_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
-        cmd.do(reg)
-        assert cmd.done
-
-    def test_undo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
-        cmd.do(reg)
-        cmd.undo(reg)
-        assert not cmd.done
-
-    def test_undo_before_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
-        with pytest.raises(AssertionError):
-            cmd.undo(reg)
-
-    def test_redo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
-        cmd.do(reg)
-        cmd.undo(reg)
-        cmd.do(reg)
-        assert cmd.done
-
-    def test_double_do(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
-        cmd.do(reg)
-        with pytest.raises(AssertionError):
-            cmd.do(reg)
-        assert cmd.done
-        with pytest.raises(AssertionError):
-            # make sure repeated attempts continue to fail
-            cmd.do(reg)
-        assert cmd.done
-
-    def test_double_undo(self, item: ListItem, reg: ListRegistry, cmd: Command) -> None:
-        cmd.do(reg)
-        cmd.undo(reg)
-        with pytest.raises(AssertionError):
-            cmd.undo(reg)
-        assert not cmd.done
-        with pytest.raises(AssertionError):
-            # make sure repeated attempts continue to fail
-            cmd.undo(reg)
-        assert not cmd.done
-
-
-class TestProjectCanContainProject:
-    def test_different_types_never_are_never_contained(self) -> None:
-        assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('grocery', ListItemProjectType.todo)
-
-    def test_project_is_contained_in_itself(self) -> None:
-        assert ListItemProject('grocery', ListItemProjectType.checklist) in ListItemProject('grocery', ListItemProjectType.checklist)
-
-    def test_project_is_contained_in_its_parent(self) -> None:
-        assert ListItemProject('grocery.produce', ListItemProjectType.checklist) in ListItemProject('grocery', ListItemProjectType.checklist)
-
-    def test_project_is_not_contained_in_its_child(self) -> None:
-        assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('grocery.produce', ListItemProjectType.checklist)
-
-    def test_project_is_not_contained_in_different_project(self) -> None:
-        assert ListItemProject('apples', ListItemProjectType.todo) not in ListItemProject('bananas', ListItemProjectType.todo)
-
-    def test_project_is_contained_in_root_if_type_is_same(self) -> None:
-        assert ListItemProject('grocery', ListItemProjectType.checklist) in ListItemProject('', ListItemProjectType.checklist)
-
-    def test_project_is_not_contained_in_root_if_type_is_different(self) -> None:
-        assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('', ListItemProjectType.todo)
-
-    def test_any_project_is_contained_in_root_if_type_is_null(self) -> None:
-        assert ListItemProject('grocery', ListItemProjectType.checklist) in ListItemProject('', ListItemProjectType.null)
-        assert ListItemProject('apples', ListItemProjectType.todo) in ListItemProject('', ListItemProjectType.null)
-        assert ListItemProject('', ListItemProjectType.todo) in ListItemProject('', ListItemProjectType.null)
-        assert ListItemProject('', ListItemProjectType.null) in ListItemProject('', ListItemProjectType.null)
-
-    def test_null_project_is_not_contained_in_any_other_project(self) -> None:
-        assert ListItemProject('', ListItemProjectType.null) not in ListItemProject('grocery', ListItemProjectType.checklist)
-        assert ListItemProject('', ListItemProjectType.null) not in ListItemProject('grocery.produce', ListItemProjectType.checklist)
-        assert ListItemProject('', ListItemProjectType.null) not in ListItemProject('apples', ListItemProjectType.todo)
-        assert ListItemProject('', ListItemProjectType.null) not in ListItemProject('', ListItemProjectType.todo)
-        assert ListItemProject('', ListItemProjectType.null) not in ListItemProject('', ListItemProjectType.checklist)
-
-    def test_project_name_parts(self) -> None:
-        project = ListItemProject('grocery.produce', ListItemProjectType.checklist)
-        assert project.name_parts == ['grocery', 'produce']
-
-    def test_project_name_parts_of_root(self) -> None:
-        project = ListItemProject('', ListItemProjectType.checklist)
-        assert project.name_parts == []
-
-    def test_project_name_part_can_be_substring_of_completely_different_project(self) -> None:
-        assert ListItemProject('gro', ListItemProjectType.checklist) not in ListItemProject('grocery', ListItemProjectType.checklist)
-        assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('gro', ListItemProjectType.checklist)
-
-
-def test_can_create_view() -> None:
-    view = ListView([])
-
-
-def test_can_add_item_to_view() -> None:
-    item = ListItem('test')
-    items = [item]
-    view = ListView(items)
-    assert item in view
-
-
-def test_registry_can_return_view() -> None:
-    reg = ListRegistry()
-    view = reg.search(project=NullListItemProject())
-    assert isinstance(view, ListView)

@@ -4,7 +4,7 @@ from typing import Literal
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType
+from insync.listitem import ListItem, ListItemProject, ListItemProjectType
 
 from . import app, templates
 

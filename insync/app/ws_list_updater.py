@@ -4,7 +4,8 @@ from typing import Callable, TypeAlias
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
-from insync.listregistry import ListItem, ListItemProject, ListRegistry
+from insync.listitem import ListItem, ListItemProject
+from insync.listregistry import ListRegistry
 
 Renderer: TypeAlias = Callable[[ListItemProject, list[ListItem]], str]
 

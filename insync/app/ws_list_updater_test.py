@@ -5,7 +5,8 @@ import pytest
 from fastapi.websockets import WebSocketState
 
 from insync.app.ws_list_updater import WebSocketListUpdater
-from insync.listregistry import ListItem, ListItemProject, ListItemProjectType, ListRegistry, NullListItemProject
+from insync.listitem import ListItem, ListItemProject, ListItemProjectType, NullListItemProject
+from insync.listregistry import ListRegistry
 
 
 @pytest.fixture
