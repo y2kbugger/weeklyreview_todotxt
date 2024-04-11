@@ -6,16 +6,14 @@
   "files.insertFinalNewline": true,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
-  "editor.formatOnSaveMode": "modificationsIfAvailable",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit",
     "source.fixAll": "always"
   },
-
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "[jinja-html][html][jinja]": {
+  "[jinja-html][html][jinja][css]": {
     "editor.formatOnSaveMode": "file"
   },
   "python.terminal.activateEnvInCurrentTerminal": true,
