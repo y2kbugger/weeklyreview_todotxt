@@ -36,7 +36,6 @@ To see what is running in the deployed file environment, start up a python file 
 
 # Bugs
 - archived items are not hidden from UI
-- completed items are not greyed out
 
 # Backlog
 ## IT Tedium

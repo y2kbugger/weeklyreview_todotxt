@@ -32,7 +32,7 @@
     {% for subproject, listitems in listitems_by_subproject.items() %}
 
     {% if subproject.name != project.name %}
-    <h2>{{ subproject.name[project.name|length:][1:]}} </h2>
+    <h2 class="subproject">{{ subproject.name[project.name|length:][1:]}} </h2>
     {% endif %}
 
     <ul class="incomplete">
