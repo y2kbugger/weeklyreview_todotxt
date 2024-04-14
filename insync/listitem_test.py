@@ -57,6 +57,59 @@ class TestProjectCanContainProject:
         assert ListItemProject('grocery', ListItemProjectType.checklist) not in ListItemProject('gro', ListItemProjectType.checklist)
 
 
+class TestCanFindCommonProjectRoot:
+    def test_root_of_no_projects_is_null(self) -> None:
+        assert ListItemProject.common_root([]) == ListItemProject('', ListItemProjectType.null)
+
+    def test_root_of_one_project_is_itself(self) -> None:
+        project = ListItemProject('grocery.produce', ListItemProjectType.checklist)
+        assert ListItemProject.common_root([project]) == ListItemProject('grocery.produce', ListItemProjectType.checklist)
+
+    def test_common_root_can_be_empty(self) -> None:
+        project1 = ListItemProject('grocery.produce', ListItemProjectType.checklist)
+        project2 = ListItemProject('dairy', ListItemProjectType.checklist)
+        assert ListItemProject.common_root([project1, project2]) == ListItemProject('', ListItemProjectType.checklist)
+
+    def test_root_of_projects_with_different_types_is_null(self) -> None:
+        project1 = ListItemProject('grocery.produce', ListItemProjectType.checklist)
+        project2 = ListItemProject('grocery.produce', ListItemProjectType.todo)
+        assert ListItemProject.common_root([project1, project2]) == ListItemProject('', ListItemProjectType.null)
+
+    def test_root_of_projects_with_same_type_is_common_prefix(self) -> None:
+        project1 = ListItemProject('grocery.produce', ListItemProjectType.checklist)
+        project2 = ListItemProject('grocery.dairy', ListItemProjectType.checklist)
+        assert ListItemProject.common_root([project1, project2]) == ListItemProject('grocery', ListItemProjectType.checklist)
+
+    def test_common_root_can_be_deeper_than_one_level(self) -> None:
+        project1 = ListItemProject('grocery.produce.fruit', ListItemProjectType.checklist)
+        project2 = ListItemProject('grocery.produce.vegetable', ListItemProjectType.checklist)
+        assert ListItemProject.common_root([project1, project2]) == ListItemProject('grocery.produce', ListItemProjectType.checklist)
+
+    def test_commmon_root_early_return_ok(self) -> None:
+        p1 = ListItemProject('a.grocery.produce.fruit', ListItemProjectType.checklist)
+        p2 = ListItemProject('a.grocery.produce.fruit.dsf', ListItemProjectType.checklist)
+        p3 = ListItemProject('a.grocery.produce.vegetable', ListItemProjectType.checklist)
+        p4 = ListItemProject('a.porridge.lol.sdaflasdf.asdf', ListItemProjectType.checklist)
+        print(ListItemProject.common_root([p1, p2, p3, p4]))
+        assert ListItemProject.common_root([p1, p2, p3, p4]) == ListItemProject('a', ListItemProjectType.checklist)
+
+
+def test_truncate_project() -> None:
+    project = ListItemProject('grocery.produce.fruit', ListItemProjectType.checklist)
+    assert project.truncate(0) == ListItemProject('', ListItemProjectType.checklist)
+    assert project.truncate(1) == ListItemProject('grocery', ListItemProjectType.checklist)
+    assert project.truncate(2) == ListItemProject('grocery.produce', ListItemProjectType.checklist)
+    assert project.truncate(3) == ListItemProject('grocery.produce.fruit', ListItemProjectType.checklist)
+    assert project.truncate(4) == ListItemProject('grocery.produce.fruit', ListItemProjectType.checklist)
+
+
+def test_project_len() -> None:
+    assert len(ListItemProject('grocery.produce.fruit', ListItemProjectType.checklist)) == 3
+    assert len(ListItemProject('grocery.produce', ListItemProjectType.checklist)) == 2
+    assert len(ListItemProject('grocery', ListItemProjectType.checklist)) == 1
+    assert len(ListItemProject('', ListItemProjectType.checklist)) == 0
+
+
 @pytest.fixture
 def item() -> ListItem:
     return ListItem('test')

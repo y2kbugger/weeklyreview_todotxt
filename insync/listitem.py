@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
+from collections.abc import Iterable
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -74,6 +75,9 @@ class ListItemProject:
         else:
             return self.name.split('.')
 
+    def __len__(self) -> int:
+        return len(self.name_parts)
+
     def __contains__(self, other: ListItemProject) -> bool:
         # null acts as a wildcard
         if self.project_type != ListItemProjectType.null and self.project_type != other.project_type:
@@ -90,6 +94,36 @@ class ListItemProject:
         if not isinstance(other, ListItemProject):
             return False
         return self.name == other.name and self.project_type == other.project_type
+
+    def truncate(self, num_parts: int) -> ListItemProject:
+        return ListItemProject('.'.join(self.name_parts[:num_parts]), self.project_type)
+
+    @classmethod
+    def common_root(cls, projects: Iterable[ListItemProject]) -> ListItemProject:
+        ps = list(projects)
+        if not len(ps):
+            return NullListItemProject()
+
+        if len({p.project_type for p in ps}) > 1:
+            # multiple project types, return the null project
+            return NullListItemProject()
+        else:
+            project_type = ps[0].project_type
+
+        project_partss = [p.name_parts for p in ps]
+
+        # Initialize the shortest tuple to compare to others (optimization step)
+        shortest = min(project_partss, key=len)
+
+        # Iterate over each index and element in the shortest tuple
+        for i, value in enumerate(shortest):
+            for t in project_partss:
+                # If mismatch is found, return the current longest prefix
+                if t[i] != value:
+                    return ListItemProject('.'.join(shortest[:i]), project_type)
+
+        # If no mismatch, return the entire shortest tuple
+        return ListItemProject('.'.join(shortest), project_type)
 
 
 class NullListItemProject(ListItemProject):

@@ -29,7 +29,7 @@ class ListRegistry:
 
     def search(self, project: ListItemProject) -> ListView:
         items = filter(lambda item: item.project in project, self._items.values())
-        return ListView(items)
+        return ListView(items, project)
 
     def get_item(self, uuid: UUID) -> ListItem:
         return self._items[uuid]
