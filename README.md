@@ -55,6 +55,8 @@ To see what is running in the deployed file environment, start up a python file 
   - did a benchmark with like 4000+ items saving to DB and it's not urgent, also might be harder to debug/notice if something goes wrong with persisting
 - refactor `Command`s to use ABC with do/undo wrappers instead of requiring manual done asserting...
 - first clas method for removing common prefixes from project names
+- reevaluate a method of keeping a flyweight of projects so that mutation of the name happens only in one spot. This could also help with referential integrity of when renaming or changing sort weights of projects. a draft of flyweight meta class is in the `scratch.ipynb` notebook, but I think that another approach would be to let the registry handle the flyweighting of the projects, swapping them out as they are added to the registry. the only sticking point is that projects are currently frozen, so you can't mutate them even if you wanted to. so you would have to loop over and replace all the projects anyway. maybe they are frozen only so I could add them to sets or something. update: its so that i could base a project channel hash on a project.
+  - also consider normalizing the persistance of projects to the db so that they are only stored once, and then referenced by the items.
 
 ## Todo.txt Page
 - I want a gui in the todo.txt endpoint so that I can easily navigate to different list types, and names e.g. `*`, `project`, `checklist`, `todo` and `*`, `travel`, `gro`, `grocery`, etc
