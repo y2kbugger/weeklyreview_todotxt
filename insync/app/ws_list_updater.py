@@ -4,10 +4,11 @@ from typing import Callable, TypeAlias
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
-from insync.listitem import ListItem, ListItemProject
+from insync.listitem import ListItemProject
 from insync.listregistry import ListRegistry
+from insync.listview import ListView
 
-Renderer: TypeAlias = Callable[[ListItemProject, list[ListItem]], str]
+Renderer: TypeAlias = Callable[[ListView], str]
 
 
 class ProjectChannel:
@@ -22,9 +23,6 @@ class ProjectChannel:
         if not isinstance(other, ProjectChannel):
             return False
         return self.project == other.project and self.renderer == other.renderer
-
-    def item_filter(self, item: ListItem) -> bool:
-        return item.project in self.project
 
     def broadcast_filter(self, broadcast: ListItemProject) -> bool:
         return broadcast in self.project
@@ -44,8 +42,7 @@ class WebSocketListUpdater:
         return channel
 
     def render_channel(self, channel: ProjectChannel) -> str:
-        items = [item for item in self.registry if channel.item_filter(item)]
-        return channel.renderer(channel.project, items)
+        return channel.renderer(self.registry.search(channel.project))
 
     async def subscribe(self, websocket: WebSocket, project: ListItemProject, renderer: Renderer) -> ProjectChannel:
         await websocket.accept()

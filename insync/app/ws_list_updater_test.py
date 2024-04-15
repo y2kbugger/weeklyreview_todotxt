@@ -7,6 +7,7 @@ from fastapi.websockets import WebSocketState
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.listitem import ListItem, ListItemProject, ListItemProjectType, NullListItemProject
 from insync.listregistry import ListRegistry
+from insync.listview import ListView
 
 
 @pytest.fixture
@@ -23,9 +24,9 @@ class MockRenderer:
     def __init__(self):
         self.calls = []
 
-    def __call__(self, project: ListItemProject, items: list[ListItem]):
-        self.calls.append(items)
-        return str(project) + ':' + ','.join([item.description for item in items])
+    def __call__(self, view: ListView):
+        self.calls.append(list(view))
+        return str(view.project) + ':' + ','.join([item.description for item in view])
 
 
 @pytest.fixture
@@ -263,8 +264,8 @@ class TestBroadcasting:
         reg.add(ListItem('testGP2', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
         await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
 
-        def other_renderer(project: ListItemProject, items: list[ListItem]):
-            return str(project) + ':' + ';'.join([item.description for item in items])
+        def other_renderer(view: ListView):
+            return str(view.project) + ':' + ';'.join([item.description for item in view])
 
         await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), other_renderer)
 

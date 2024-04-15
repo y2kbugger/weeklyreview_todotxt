@@ -14,6 +14,13 @@
   </span>
 </li>
 {% endmacro %}
+
+{% macro checkitems(view) %}
+{% for item in view %}
+{{ checkitem(item) }}
+{% endfor %}
+{% endmacro %}
+
 {% macro add_subproject_item(subproject) %}
 <li class="add-subproject-item" role="group">
   <span>+</span>
@@ -29,20 +36,15 @@
 
 <div id="checklist-items" hx-swap-oob="morph">
   <section>
-    {% for subproject, listitems in listitems_by_subproject.items() %}
-
-    {% if subproject.name != project.name %}
-    <h2 class="subproject">{{ subproject.name[project.name|length:][1:]}} </h2>
-    {% endif %}
-
     <ul class="incomplete">
-      {% for item in listitems if not item.completed %}
-      {{ checkitem(item) }}
-      {% endfor %}
+      {{ checkitems(listview.currentproject.incomplete) }}
+    </ul>
 
-      {% if subproject.name != project.name %}
-      {{ add_subproject_item(subproject) }}
-      {% endif %}
+    {% for subproject_listview in listview.subproject_views() %}
+    <h2 class="subproject">{{ subproject_listview.project.name[listview.project.name|length:][1:]}} </h2>
+    <ul class="incomplete">
+      {{ checkitems(subproject_listview.incomplete) }}
+      {{ add_subproject_item(subproject_listview.project) }}
     </ul>
     {% endfor %}
 
@@ -51,19 +53,15 @@
   <section>
     <hgroup class="completed-toolbar" role="group">
       <h2>Completed</h2>
-      <a class="reset-checklist" hx-post="/checklist/{{ project.name }}/reset"><small>Reset Checklist</small></a>
+      <a class="reset-checklist" hx-post="/checklist/{{ listview.project.name }}/reset"><small>Reset Checklist</small></a>
     </hgroup>
     <ul class="complete">
       <h3>Recurring</h3>
-      {% for item in listitems if item.completed  and item.recurring %}
-      {{ checkitem(item) }}
-      {% endfor %}
+      {{ checkitems(listview.complete.recurring) }}
     </ul>
     <ul class="complete">
-      <h3>Complete</h3>
-      {% for item in listitems if item.completed  and not item.recurring %}
-      {{ checkitem(item) }}
-      {% endfor %}
+      <h3>Ready to archive</h3>
+      {{ checkitems(listview.complete.onetime) }}
     </ul>
   </section>
 </div>

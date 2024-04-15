@@ -39,6 +39,7 @@ To see what is running in the deployed file environment, start up a python file 
 
 # Backlog
 ## IT Tedium
+- make ListView filters progress state into the view for inspection (like the project filter does) e.g user of view can know if they are seeing the archived items or not.??? maybe?
 - make db patch async
 - ruff lint pre-commit hook
 - ruff format pre-commit hook

@@ -20,61 +20,87 @@ def test_active_and_archived_are_split() -> None:
     active_item = ListItem('test')
     archived_item = ListItem('test', archival_datetime=dt.datetime.now(tz=dt.timezone.utc))
     items = [archived_item, active_item]
+
     view = ListView(items, active_item.project)
 
-    assert archived_item not in view.active_items
-    assert archived_item in view.archived_items
+    assert archived_item not in view.active
+    assert archived_item in view.archived
 
-    assert active_item in view.active_items
-    assert active_item not in view.archived_items
+    assert active_item in view.active
+    assert active_item not in view.archived
 
 
-def test_bysubproject_returns_view_of_grouped_items() -> None:
+def test_incomplete_and_complete_are_split() -> None:
+    incomplete_item = ListItem('test')
+    complete_item = ListItem('test', completion_datetime=dt.datetime.now(tz=dt.timezone.utc))
+    items = [incomplete_item, complete_item]
+
+    view = ListView(items, incomplete_item.project)
+
+    assert incomplete_item in view.incomplete
+    assert incomplete_item not in view.complete
+
+    assert complete_item not in view.incomplete
+    assert complete_item in view.complete
+
+
+def test_onetime_and_recurring_are_split() -> None:
+    onetime_item = ListItem('test')
+    recurring_item = ListItem('test', recurring=True)
+    items = [onetime_item, recurring_item]
+
+    view = ListView(items, onetime_item.project)
+
+    assert onetime_item in view.onetime
+    assert onetime_item not in view.recurring
+
+    assert recurring_item not in view.onetime
+    assert recurring_item in view.recurring
+
+
+def test_subproject_views_returns_view_of_grouped_items() -> None:
     item2 = ListItem('test2', project=ListItemProject('projectA.produce', ListItemProjectType.checklist))
     item3 = ListItem('test3', project=ListItemProject('projectA.produce', ListItemProjectType.checklist))
 
     items = [item2, item3]
     view = ListView(items, ListItemProject('projectA', ListItemProjectType.checklist))
-    subprojectviews = list(view.group_by_subproject())
+    subprojectviews = list(view.subproject_views())
     assert len(subprojectviews) == 1
     assert isinstance(subprojectviews[0], ListView)
     assert subprojectviews[0].project == ListItemProject('projectA.produce', ListItemProjectType.checklist)
 
 
-def test_bysubproject_groups_only_next_layer() -> None:
+def test_subproject_views_groups_only_next_layer() -> None:
     item2 = ListItem('test2', project=ListItemProject('projectA.produce', ListItemProjectType.checklist))
     item3 = ListItem('test3', project=ListItemProject('projectA.produce.fruits', ListItemProjectType.checklist))
 
     items = [item2, item3]
     view = ListView(items, ListItemProject('projectA', ListItemProjectType.checklist))
-    subprojectviews = list(view.group_by_subproject())
+    subprojectviews = list(view.subproject_views())
     assert len(subprojectviews) == 1
     assert subprojectviews[0].project == ListItemProject('projectA.produce', ListItemProjectType.checklist)
 
 
-def test_bysubproject_include_group_of_items_of_merely_self() -> None:
+def test_subproject_views_doesnt_include_group_of_items_of_merely_self() -> None:
     item1 = ListItem('test1', project=ListItemProject('projectA', ListItemProjectType.checklist))
     item2 = ListItem('test2', project=ListItemProject('projectA.produce', ListItemProjectType.checklist))
 
     items = [item1, item2]
     view = ListView(items, ListItemProject('projectA', ListItemProjectType.checklist))
-    subprojectviews = list(view.group_by_subproject())
+    subprojectviews = list(view.subproject_views())
     subprojects = [view.project for view in subprojectviews]
-    assert len(subprojectviews) == 2
-    assert ListItemProject('projectA', ListItemProjectType.checklist) in subprojects
-    assert ListItemProject('projectA.produce', ListItemProjectType.checklist) in subprojects
+    assert ListItemProject('projectA', ListItemProjectType.checklist) not in subprojects
 
 
-def test_bysubproject_include_group_of_items_of_merely_self_as_first_group() -> None:
-    items1 = [ListItem('t', project=ListItemProject(f'projectA.a{n}', ListItemProjectType.checklist)) for n in range(20)]
+def test_currentproject_view_contains_only_current_project_without_subproject() -> None:
     item1 = ListItem('test1', project=ListItemProject('projectA', ListItemProjectType.checklist))
-    items2 = [ListItem('t', project=ListItemProject(f'projectA.b{n}', ListItemProjectType.checklist)) for n in range(20)]
-    items = [*items1, item1, *items2]
-    view = ListView(items, ListItemProject('projectA', ListItemProjectType.checklist))
-    subprojectviews = list(view.group_by_subproject())
-    subprojects = [view.project for view in subprojectviews]
+    item2 = ListItem('test2', project=ListItemProject('projectA.produce', ListItemProjectType.checklist))
 
-    assert subprojects[0] == ListItemProject('projectA', ListItemProjectType.checklist)
+    items = [item1, item2]
+    view = ListView(items, ListItemProject('projectA', ListItemProjectType.checklist))
+    assert view.currentproject.project == ListItemProject('projectA', ListItemProjectType.checklist)
+    assert item1 in view.currentproject
+    assert item2 not in view.currentproject
 
 
 # handle when project of original listview is '' and null

@@ -1,5 +1,3 @@
-from collections import defaultdict
-from collections.abc import Iterable
 from typing import Annotated
 
 from fastapi import Depends, Form, Request, Response
@@ -9,6 +7,7 @@ from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
 from insync.listitem import ListItem, ListItemProject, ListItemProjectType
 from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListRegistry, RecurringCommand
+from insync.listview import ListView
 
 from . import app, get_db, get_registry, get_ws_list_updater, templates
 
@@ -19,11 +18,8 @@ def checklist(project_name: str, request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "checklist.html", {"project": project})
 
 
-def render_checklist_items(project: ListItemProject, listitems: Iterable[ListItem]) -> str:
-    listitems_by_subproject = defaultdict(list)
-    for item in listitems:
-        listitems_by_subproject[item.project].append(item)
-    return templates.get_template("checklist_items.html").render(project=project, listitems=listitems, listitems_by_subproject=listitems_by_subproject)
+def render_checklist_items(listview: ListView) -> str:
+    return templates.get_template("checklist_items.html").render(listview=listview.active)
 
 
 @app.post("/checklist/{project_name}/new")
@@ -43,6 +39,7 @@ async def post_checklist(
 
     await ws_list_updater.broadcast_update(item.project)
     return Response(status_code=204)
+
 
 @app.post("/checklist/{project_name}/reset")
 async def post_checklist_reset(
@@ -76,6 +73,7 @@ async def patch_checklist_completed(
 
     await ws_list_updater.broadcast_update(item.project)
     return Response(status_code=204)
+
 
 @app.patch("/checklist/{uuid}/recurring")
 async def patch_checklist_recurring(
