@@ -43,7 +43,11 @@ sqlite3.register_converter('LISTITEMPROJECTTYPE', lambda b: ListItemProjectType(
 
 class ListDB:
     def __init__(self, db_path: str | os.PathLike):
-        self._conn = sqlite3.connect(db_path, detect_types=sqlite3.PARSE_DECLTYPES)
+        self._conn = sqlite3.connect(
+            db_path,
+            detect_types=sqlite3.PARSE_DECLTYPES,
+            check_same_thread=False,  # let fastapi handle safety
+        )
 
     def ensure_tables_created(self) -> None:
         try:

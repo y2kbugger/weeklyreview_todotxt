@@ -27,11 +27,14 @@ async def _lifespan(app: FastAPI):
     app.state.db.patch(app.state.registry)
     app.state.db.close()
 
+
 def get_registry() -> ListRegistry:
     return app.state.registry
 
+
 def get_db() -> ListDB:
     return app.state.db
+
 
 def get_ws_list_updater() -> WebSocketListUpdater:
     return app.state.ws_list_updater
@@ -39,6 +42,7 @@ def get_ws_list_updater() -> WebSocketListUpdater:
 
 app = FastAPI(lifespan=_lifespan, debug=True, title="InSync", version="0.1.0")
 templates = Jinja2Templates(directory="insync/app")
+
 
 class StaticFilesWithWhitelist(StaticFiles):
     def __init__(self, directory: str, included_extensions: list[str]):
@@ -53,4 +57,4 @@ class StaticFilesWithWhitelist(StaticFiles):
 
 app.mount("/static", StaticFilesWithWhitelist("insync/app/", ['css', 'js', 'svg', 'png', 'ico', 'css.map']), name='static')
 
-from . import index, ws, checklist, todotxt  # noqa endpoint imports
+from . import index, sqladmin, ws, checklist, todotxt  # noqa endpoint imports

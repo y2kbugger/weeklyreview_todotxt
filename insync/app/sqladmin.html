@@ -1,0 +1,28 @@
+{% extends "common/layout.html" %}
+
+{% block title %}SQLAdmin{% endblock %}
+{% block header %}Admin{% endblock %}
+{% block subheader %}SQL{% endblock %}
+
+{% block content %}
+<form hx-post="/sqladmin" hx-target="#results">
+  <textarea name="sql" placeholder="Enter SQL here"></textarea>
+  <button type="submit">Run</button>
+</form>
+
+<div id="results">
+</div>
+<pre>
+CREATE TABLE IF NOT EXISTS list (
+    uuid UUIDLE PRIMARY KEY,
+    creation_datetime TIMESTAMP,
+    description TEXT,
+    project_name TEXT,
+    project_type LISTITEMPROJECTTYPE,
+    completion_datetime TIMESTAMP,
+    archival_datetime TIMESTAMP,
+    priority TEXT,
+    recurring BOOLEAN
+    )
+</pre>
+{% endblock content %}
