@@ -71,6 +71,6 @@ class ListView:
         subprojects = {item.project.truncate(len(self.project) + 1) for item in self}
         if self.project in subprojects:
             subprojects.remove(self.project)
-        for subproject in subprojects:
+        for subproject in sorted(subprojects, key=lambda subproject: subproject.name):
             subproject_items = filter(lambda item: item.project in subproject, self)
             yield ListView(subproject_items, subproject)
