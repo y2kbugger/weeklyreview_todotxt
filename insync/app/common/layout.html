@@ -10,7 +10,7 @@
   <link rel="icon" type="image/png" sizes="16x16" href="{{ request.url_for('static', path='/common/favicon-16x16.png') }}">
   <link rel="icon" type="image/png" sizes="32x32" href="{{ request.url_for('static', path='/common/favicon-32x32.png') }}">
 
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+  <link rel="stylesheet" href="{{ request.url_for('static', path='/common/pico.min.css') }}" />
   <link rel="stylesheet" href="{{ request.url_for('static', path='/common/layout.css') }}" />
 
   {% block style %}
