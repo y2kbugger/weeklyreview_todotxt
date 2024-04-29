@@ -55,6 +55,6 @@ class StaticFilesWithWhitelist(StaticFiles):
         return super().lookup_path(path)
 
 
-app.mount("/static", StaticFilesWithWhitelist("insync/app/", ['css', 'js', 'svg', 'png', 'ico', 'css.map']), name='static')
+app.mount("/static", StaticFilesWithWhitelist("insync/app/", ['css', 'js', 'svg', 'png', 'ico', 'css.map', 'webmanifest']), name='static')
 
 from . import index, sqladmin, ws, checklist, todotxt  # noqa endpoint imports
