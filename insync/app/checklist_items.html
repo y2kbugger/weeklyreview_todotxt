@@ -30,7 +30,8 @@
     hx-post="/checklist/{{ subproject.name }}/new"
     hx-on::after-request="if(event.detail.successful) this.value=''"
     value=""
-    placeholder="add item" />
+    placeholder="add item"
+    enterkeyhint="send" />
 </li>
 {% endmacro %}
 
