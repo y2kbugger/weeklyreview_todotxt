@@ -57,12 +57,7 @@
       <a class="reset-checklist" hx-post="/checklist/{{ listview.project.name }}/reset"><small>Reset Checklist</small></a>
     </hgroup>
     <ul class="complete">
-      <h3>Recurring</h3>
-      {{ checkitems(listview.complete.recurring) }}
-    </ul>
-    <ul class="complete">
-      <h3>Ready to archive</h3>
-      {{ checkitems(listview.complete.onetime) }}
+      {{ checkitems(listview.complete|sort(attribute='completion_datetime', reverse=True)) }}
     </ul>
   </section>
 </div>
