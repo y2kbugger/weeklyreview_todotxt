@@ -28,11 +28,12 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- Add first class ListItemsFilter to handing filtering (completed, recurring, etc), grouping, sorting, of items
-  - implement sorts for the view
-  - separate ListRegistry, Commands, and ListView
-- I want the sort order of uncompleted items to be the creation date
-- I want the sort order of completed items to be the completion date
+- I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
+  - Undo must be scoped to only current project
+  - want to explain to user what will be undone
+  - want to explain to user what will be redone
+  - want a visual indicator of whether an undo is available
+
 
 # Bugs
 - archived items are not hidden from UI
@@ -72,7 +73,6 @@ To see what is running in the deployed file environment, start up a python file 
 - I want the integer part of a project to be hidden in the UI so that it doesn't clutter the view
 - I want to be able to have a heirarchy of checklists that can be checked of all at once e.g. `travel.international `
   - sections could be sorted by integer subproject e.g. `+^grocery.1.produce` `+^grocery.2.dairy`
-- I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
 - I want to be able to create a subproject via an initial '.' in the entry box so that I can quickly create a subproject
 - I want visual feedback while designating a subproject so that I can see that it is being created.
   - Also add hint in the entry box placeholder
