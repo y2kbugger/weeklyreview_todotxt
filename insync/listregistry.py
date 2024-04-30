@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 
 from uuid6 import UUID
@@ -13,7 +13,6 @@ from insync.listview import ListView
 @dataclass
 class ListRegistry:
     _items: dict[UUID, ListItem] = field(default_factory=dict)
-    _history: list[Command] = field(default_factory=list)
 
     def __str__(self) -> str:
         return '\n'.join(str(item) for item in self._items.values()) + '\n'
@@ -27,10 +26,6 @@ class ListRegistry:
     def __iter__(self) -> Iterator[ListItem]:
         return iter(self._items.values())
 
-    def search(self, project: ListItemProject) -> ListView:
-        items = filter(lambda item: item.project in project, self._items.values())
-        return ListView(items, project)
-
     def get_item(self, uuid: UUID) -> ListItem:
         return self._items[uuid]
 
@@ -40,21 +35,26 @@ class ListRegistry:
     def remove(self, uuid: UUID) -> None:
         self._items.pop(uuid)
 
+    ### ListView Creation ###
+    def search(self, project: ListItemProject) -> ListView:
+        items = filter(lambda item: item.project in project, self._items.values())
+        return ListView(items, project)
+
+    ### Do/Undo/Redo ###
+    _undostack: list[Command] = field(default_factory=list)
+    _redostack: list[Command] = field(default_factory=list)
+
     def do(self, command: Command) -> None:
         command.do(self)
-        self._history.append(command)
+        self._undostack.append(command)
 
-    @property
-    def undo_stack(self) -> Iterable[Command]:
-        yield from reversed(self._history)
-
-    def _undo(self, command: Command) -> None:
+    def undo(self) -> None:
+        command = self._undostack.pop()
         command.undo(self)
-        self._history.remove(command)
+        self._redostack.append(command)
 
-    def undo(self, command: Command | None = None) -> None:
-        """Undo specific command or else the most recent command in the history."""
-        self._undo(command or self._history[-1])
+    def redo(self) -> None:
+        self.do(self._redostack.pop())
 
 
 @dataclass

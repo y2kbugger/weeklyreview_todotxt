@@ -105,6 +105,56 @@ class TestCommandSemantics:
         assert not cmd.done
 
 
+def test_registry_excepts_when_trying_to_undo_nothing(reg: ListRegistry) -> None:
+    with pytest.raises(IndexError):
+        reg.undo()
+
+
+def test_registry_undoes_last_command(reg: ListRegistry, item: ListItem) -> None:
+    reg.do(ArchiveCommand(item.uuid, True))
+    reg.do(CompletionCommand(item.uuid, True))
+    assert item.completed
+    reg.undo()
+    assert not item.completed
+
+
+def test_registry_pops_undone_command_off_redostack(reg: ListRegistry, item: ListItem) -> None:
+    reg.do(CompletionCommand(item.uuid, True))
+    reg.undo()
+    with pytest.raises(IndexError):
+        reg.undo()
+
+
+def test_registry_excepts_when_trying_to_redo_nothing(reg: ListRegistry) -> None:
+    with pytest.raises(IndexError):
+        reg.redo()
+
+
+def test_registry_redoes_last_undone_command(reg: ListRegistry, item: ListItem) -> None:
+    reg.do(CompletionCommand(item.uuid, True))
+    assert item.completed
+    reg.undo()
+    assert not item.completed
+    reg.redo()
+    assert item.completed
+
+
+def test_registry_redo_puts_command_back_on_undostack(reg: ListRegistry, item: ListItem) -> None:
+    reg.do(CompletionCommand(item.uuid, True))
+    reg.undo()
+    reg.redo()
+    reg.undo()
+    assert not item.completed
+
+
+def test_registry_pops_redone_command_off_redostack(reg: ListRegistry, item: ListItem) -> None:
+    reg.do(CompletionCommand(item.uuid, True))
+    reg.undo()
+    reg.redo()
+    with pytest.raises(IndexError):
+        reg.redo()
+
+
 def test_can_create_item_using_command(reg: ListRegistry) -> None:
     new_item = ListItem('test')
     old_len = len(reg)
