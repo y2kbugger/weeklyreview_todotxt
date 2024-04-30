@@ -1,10 +1,10 @@
-from collections.abc import Iterable
 from typing import Literal
 
 from fastapi import Request
 from fastapi.responses import HTMLResponse
 
-from insync.listitem import ListItem, ListItemProject, ListItemProjectType
+from insync.listitem import ListItemProject, ListItemProjectType
+from insync.listview import ListView
 
 from . import app, templates
 
@@ -23,5 +23,7 @@ def todotxt(
     return templates.TemplateResponse(request, "todotxt.html", {'project': project})
 
 
-def render_todotxt_items(project: ListItemProject, listitems: Iterable[ListItem]) -> str:
+def render_todotxt_items(listview: ListView) -> str:
+    project = listview.project
+    listitems = listview.active
     return templates.get_template("todotxt_items.html").render(projectj=project, listitems=listitems)
