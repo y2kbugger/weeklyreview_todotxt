@@ -11,6 +11,9 @@ from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
 from insync.listregistry import ListRegistry
 
+HOT_RELOAD_ENABLED = os.getenv("HOT_RELOAD_ENABLED", "True").lower() == "true"
+hot_reload = None
+
 
 @asynccontextmanager
 async def _lifespan(app: FastAPI):
@@ -22,7 +25,15 @@ async def _lifespan(app: FastAPI):
 
     app.state.ws_list_updater = WebSocketListUpdater(app.state.registry)
 
+    if HOT_RELOAD_ENABLED:
+        assert hot_reload is not None
+        await hot_reload.startup()
+
     yield
+
+    if HOT_RELOAD_ENABLED:
+        assert hot_reload is not None
+        await hot_reload.shutdown()
 
     app.state.db.patch(app.state.registry)
     app.state.db.close()
@@ -42,6 +53,13 @@ def get_ws_list_updater() -> WebSocketListUpdater:
 
 app = FastAPI(lifespan=_lifespan, debug=True, title="InSync", version="0.1.0")
 templates = Jinja2Templates(directory="insync/app")
+
+if HOT_RELOAD_ENABLED:
+    import arel
+
+    hot_reload = arel.HotReload(paths=[arel.Path("insync")])
+    app.add_websocket_route("/hot-reload", route=hot_reload, name="hot-reload")  # type: ignore
+    templates.env.globals["hot_reload"] = hot_reload
 
 
 class StaticFilesWithWhitelist(StaticFiles):

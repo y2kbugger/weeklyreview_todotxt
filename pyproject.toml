@@ -22,6 +22,7 @@ pytest = "^8.0.1"
 pandas = "^2.2.1"
 ruff = "^0.3.2"
 pre-commit = "^3.7.0"
+arel = { git = "https://github.com/y2kbugger/arel.git", branch = "asset_reload" }
 
 [tool.poetry.group.prod]
 optional = true

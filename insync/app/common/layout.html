@@ -21,6 +21,10 @@
   <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
   <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
   <script src="{{ request.url_for('static', path='/common/_hyperscript.min.js') }}"></script>
+
+  {% if hot_reload is defined %}
+  {{ hot_reload.script(url_for('hot-reload')) | safe }}
+  {% endif %}
 </head>
 
 <body class="container" hx-ext="morph">
