@@ -6,8 +6,9 @@ from fastapi.websockets import WebSocketState
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.listitem import ListItem, ListItemProject, ListItemProjectType, NullListItemProject
-from insync.listregistry import ListRegistry
+from insync.listregistry import ListRegistry, UndoView
 from insync.listview import ListView
+from insync.renderer import Renderer
 
 
 @pytest.fixture
@@ -20,13 +21,14 @@ def updater(reg: ListRegistry) -> WebSocketListUpdater:
     return WebSocketListUpdater(reg)
 
 
-class MockRenderer:
+class MockRenderer(Mock):
     def __init__(self):
+        super().__init__()
         self.calls = []
 
-    def __call__(self, view: ListView):
-        self.calls.append(list(view))
-        return str(view.project) + ':' + ','.join([item.description for item in view])
+    def render(self, listview: ListView, undoview: UndoView) -> str:
+        self.calls.append(list(listview))
+        return str(listview.project) + ':' + ','.join([item.description for item in listview])
 
 
 @pytest.fixture
@@ -264,10 +266,12 @@ class TestBroadcasting:
         reg.add(ListItem('testGP2', project=ListItemProject('grocery.produce', ListItemProjectType.checklist)))
         await updater.subscribe(ws, ListItemProject('grocery.produce', ListItemProjectType.checklist), renderer)
 
-        def other_renderer(view: ListView):
-            return str(view.project) + ':' + ';'.join([item.description for item in view])
+        class OtherRenderer(Renderer):
+            @staticmethod
+            def render(listview: ListView, undoview: UndoView) -> str:
+                return str(listview.project) + ':' + ';'.join([item.description for item in listview])
 
-        await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), other_renderer)
+        await updater.subscribe(ws2, ListItemProject('grocery.produce', ListItemProjectType.checklist), OtherRenderer())
 
         await updater.broadcast_update(ListItemProject('grocery.produce', ListItemProjectType.checklist))
         result = ws.spy_sent_text()

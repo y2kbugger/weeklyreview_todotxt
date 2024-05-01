@@ -3,8 +3,8 @@ from typing import Annotated, Literal
 from fastapi import Depends, WebSocket, WebSocketDisconnect
 from fastapi.params import Query
 
-from insync.app.checklist import render_checklist_items
-from insync.app.todotxt import render_todotxt_items
+from insync.app.checklist import ChecklistRenderer
+from insync.app.todotxt import TodoTxtRenderer
 from insync.listitem import ListItemProject, ListItemProjectType
 
 from . import app, get_ws_list_updater
@@ -20,8 +20,8 @@ async def _ws_keep_alive(ws_list_updater: WebSocketListUpdater, websocket: WebSo
 
 
 renderers = {
-    "checklist": render_checklist_items,
-    "todotxt": render_todotxt_items,
+    "checklist": ChecklistRenderer(),
+    "todotxt": TodoTxtRenderer(),
 }
 
 

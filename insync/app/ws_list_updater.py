@@ -1,14 +1,11 @@
 from collections import defaultdict
-from typing import Callable, TypeAlias
 
 from fastapi import WebSocket
 from fastapi.websockets import WebSocketState
 
 from insync.listitem import ListItemProject
 from insync.listregistry import ListRegistry
-from insync.listview import ListView
-
-Renderer: TypeAlias = Callable[[ListView], str]
+from insync.renderer import Renderer
 
 
 class ProjectChannel:
@@ -42,7 +39,7 @@ class WebSocketListUpdater:
         return channel
 
     def render_channel(self, channel: ProjectChannel) -> str:
-        return channel.renderer(self.registry.search(channel.project))
+        return channel.renderer.render(self.registry.search(channel.project), self.registry.undoview())
 
     async def subscribe(self, websocket: WebSocket, project: ListItemProject, renderer: Renderer) -> ProjectChannel:
         await websocket.accept()

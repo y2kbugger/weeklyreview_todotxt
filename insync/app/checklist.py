@@ -6,8 +6,9 @@ from fastapi.responses import HTMLResponse
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
 from insync.listitem import ListItem, ListItemProject, ListItemProjectType
-from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListRegistry, RecurringCommand
+from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListRegistry, RecurringCommand, UndoView
 from insync.listview import ListView
+from insync.renderer import Renderer
 
 from . import app, get_db, get_registry, get_ws_list_updater, templates
 
@@ -18,8 +19,10 @@ def checklist(project_name: str, request: Request) -> HTMLResponse:
     return templates.TemplateResponse(request, "checklist.html", {"project": project})
 
 
-def render_checklist_items(listview: ListView) -> str:
-    return templates.get_template("checklist_items.html").render(listview=listview.active)
+class ChecklistRenderer(Renderer):
+    @staticmethod
+    def render(listview: ListView, undoview: UndoView) -> str:
+        return templates.get_template("checklist_items.html").render(listview=listview.active, undoview=undoview)
 
 
 @app.post("/checklist/{project_name}/new")
