@@ -16,6 +16,7 @@ from insync.listregistry import (
     CreateCommand,
     ListRegistry,
     RecurringCommand,
+    UndoView,
 )
 from insync.listview import ListView
 
@@ -35,6 +36,16 @@ def reg(item: ListItem) -> ListRegistry:
 def test_registry_can_return_view(reg: ListRegistry) -> None:
     view = reg.search(project=NullListItemProject())
     assert isinstance(view, ListView)
+
+
+def test_registry_can_return_undoview(reg: ListRegistry, item: ListItem) -> None:
+    undoview = reg.undoview()
+    assert isinstance(undoview, UndoView)
+    assert undoview.undocommand is None
+    assert undoview.redocommand is None
+    cmd = ArchiveCommand(item.uuid, True)
+    reg.do(cmd)
+    assert undoview.undocommand is cmd
 
 
 command_makers = [

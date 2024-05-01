@@ -58,6 +58,9 @@ class ListRegistry:
     def redo(self) -> None:
         self.do(self._redostack.pop())
 
+    def undoview(self) -> UndoView:
+        return UndoView(self._undostack, self._redostack)
+
 
 class UndoView:
     def __init__(self, undostack: Sequence[Command], redostack: Sequence[Command]):
