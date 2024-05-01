@@ -34,6 +34,10 @@
     enterkeyhint="send" />
 </li>
 {% endmacro %}
+<div id="toolbaritems" hx-swap-oob="replace">
+  <span class="undo {% if undoview.undocommand %}enabled{% endif %}" hx-post="/checklist/{{ listview.project.name }}/undoredo/undo">⎌</span>
+  <span class="redo {% if undoview.redocommand %}enabled{% endif %}" hx-post="/checklist/{{ listview.project.name }}/undoredo/redo" style="transform: matrix(-1, 0, 0, 1, 0, 0);">⎌</span>
+</div>
 
 <div id="checklist-items" hx-swap-oob="morph">
   <section>

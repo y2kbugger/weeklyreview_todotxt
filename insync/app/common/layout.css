@@ -1,3 +1,27 @@
 body.container {
-    max-width: 550px;
+  max-width: 550px;
+}
+
+#toolbar {
+  display: flex;
+  justify-content: space-between;
+
+  #toolbaritems {
+    font-size: 3em;
+
+    span {
+      /* inline-block enables mirroring icons */
+      display: inline-block;
+    }
+
+    :not(.enabled) {
+      opacity: .35;
+      pointer-events: none;
+    }
+
+    .enabled {
+      cursor: pointer;
+      color: #17d0dd;
+    }
+  }
 }

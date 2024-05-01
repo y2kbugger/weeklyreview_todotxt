@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import Depends, Form, Request, Response
 from fastapi.responses import HTMLResponse
@@ -11,6 +11,30 @@ from insync.listview import ListView
 from insync.renderer import Renderer
 
 from . import app, get_db, get_registry, get_ws_list_updater, templates
+
+
+@app.post("/checklist/{project_name}/undoredo/{undo_or_redo}")
+async def checklist_undo(
+    project_name: str,
+    undo_or_redo: Literal["undo", "redo"],
+    registry: Annotated[ListRegistry, Depends(get_registry)],
+    db: Annotated[ListDB, Depends(get_db)],
+    ws_list_updater: Annotated[WebSocketListUpdater, Depends(get_ws_list_updater)],
+) -> Response:
+    project = ListItemProject(project_name, ListItemProjectType.checklist)
+
+    if undo_or_redo == "undo":
+        assert registry.undoview().undocommand is not None, "No command to undo"
+        registry.undo()
+    elif undo_or_redo == "redo":
+        assert registry.undoview().redocommand is not None, "No command to redo"
+        registry.redo()
+    else:
+        raise ValueError(f"Invalid undo_or_redo value: {undo_or_redo}")
+
+    db.patch(registry)
+    await ws_list_updater.broadcast_update(project)
+    return Response(status_code=204)
 
 
 @app.get("/checklist/{project_name}")

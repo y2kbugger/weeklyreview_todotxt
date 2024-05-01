@@ -29,10 +29,12 @@
 
 <body class="container" hx-ext="morph">
   <header>
-    <hgroup>
-      <h1>{% block header %}{% endblock %}</h1>
-      <p>{% block subheader %}{% endblock %}</p>
-    </hgroup>
+    <div id="toolbar">
+      <hgroup>
+        <h1>{% block header %}{% endblock %}</h1>
+        <p>{% block subheader %}{% endblock %}</p>
+      </hgroup>
+      <div id="toolbaritems"></div>
   </header>
   <main>
     {% block content required %}
