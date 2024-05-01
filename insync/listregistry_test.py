@@ -155,6 +155,16 @@ def test_registry_pops_redone_command_off_redostack(reg: ListRegistry, item: Lis
         reg.redo()
 
 
+def test_doing_command_clears_redostack(reg: ListRegistry, item: ListItem) -> None:
+    reg.do(CompletionCommand(item.uuid, True))
+    reg.undo()
+    reg.do(ArchiveCommand(item.uuid, True))
+    assert not item.completed
+    with pytest.raises(IndexError):
+        reg.redo()
+
+
+#### COMMAND SPECIFIC TESTS ####
 def test_can_create_item_using_command(reg: ListRegistry) -> None:
     new_item = ListItem('test')
     old_len = len(reg)

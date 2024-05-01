@@ -47,6 +47,7 @@ class ListRegistry:
     def do(self, command: Command) -> None:
         command.do(self)
         self._undostack.append(command)
+        self._redostack.clear()
 
     def undo(self) -> None:
         command = self._undostack.pop()
