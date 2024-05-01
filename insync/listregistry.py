@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import datetime as dt
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
+from typing import Any
 
 from uuid6 import UUID
 
@@ -58,6 +59,20 @@ class ListRegistry:
         self.do(self._redostack.pop())
 
 
+class UndoView:
+    def __init__(self, undostack: Sequence[Command], redostack: Sequence[Command]):
+        self._undostack = undostack
+        self._redostack = redostack
+
+    @property
+    def undocommand(self) -> Command | None:
+        return self._undostack[-1] if self._undostack else None
+
+    @property
+    def redocommand(self) -> Command | None:
+        return self._redostack[-1] if self._redostack else None
+
+
 @dataclass
 class Command:
     """Command to do and undo a mutation to the list
@@ -74,6 +89,23 @@ class Command:
 
     def undo(self, reg: ListRegistry) -> None:
         raise NotImplementedError
+
+
+@dataclass
+class NullCommand(Command):
+    uuid: UUID
+
+    def __init__(self, uuid: UUID):
+        self.done = False
+        self.uuid = uuid
+
+    def do(self, reg: Any) -> None:
+        assert not self.done, "Attempting to do a NullCommand that has already been done"
+        self.done = True
+
+    def undo(self, reg: ListRegistry) -> None:
+        assert self.done, "Attempting to undo a NullCommand that has not been done"
+        self.done = False
 
 
 @dataclass
