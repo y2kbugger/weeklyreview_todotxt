@@ -1,0 +1,18 @@
+{% extends "common/layout.html" %}
+{% block style %}
+<link rel="stylesheet" href="{{ request.url_for('static', path='/checklist.css') }}" />
+{% endblock style %}
+
+{% block title %}Checklists{% endblock %}
+{% block header %}Checklists{% endblock %}
+{% block subheader %}All checklists{% endblock %}
+
+{% block content %}
+<ul>
+  {% for project in top_level_projects %}
+  <li>
+    <a href="{{ request.url_for('checklist', project_name=project.name) }}">{{ project.name }}</a>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock content %}
