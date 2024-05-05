@@ -1,10 +1,26 @@
+html {
+  scrollbar-gutter: stable;
+}
+
 body.container {
   max-width: 550px;
 }
 
 #toolbar {
   display: flex;
-  justify-content: space-between;
+
+  #logo {
+    margin-right: .5em;
+
+    img {
+      height: 3em;
+    }
+  }
+
+  hgroup {
+    margin-right: auto;
+    margin-bottom: 0;
+  }
 
   #toolbaritems {
     font-size: 3em;
