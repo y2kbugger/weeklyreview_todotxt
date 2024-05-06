@@ -56,10 +56,10 @@
   </section>
 
   <section>
-    <hgroup class="completed-toolbar" role="group">
+    <div id="completed-toolbar">
       <h2>Completed</h2>
       <a class="reset-checklist" hx-post="/checklist/{{ listview.project.name }}/reset"><small>Reset Checklist</small></a>
-    </hgroup>
+    </div>
     <ul class="complete">
       {{ checkitems(listview.complete|sort(attribute='completion_datetime', reverse=True)) }}
     </ul>

@@ -37,7 +37,7 @@ body.container {
 
     .enabled {
       cursor: pointer;
-      color: #17d0dd;
+      color: var(--pico-primary)
     }
   }
 }

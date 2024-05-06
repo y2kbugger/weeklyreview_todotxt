@@ -3,7 +3,6 @@ h2.subproject {
   margin-top: 1.6em;
   font-weight: 400;
   font-style: italic;
-  opacity: .66;
 }
 
 ul {
@@ -64,16 +63,14 @@ ul {
 }
 
 
-.completed-toolbar {
+div#completed-toolbar {
   margin-top: 2em;
+  display: flex;
   gap: 1em;
   align-items: flex-start;
 
   h2 {
     font-size: 1.3em;
-    opacity: .86;
-    margin: 0;
-    max-width: fit-content;
   }
 
   .reset-checklist {
