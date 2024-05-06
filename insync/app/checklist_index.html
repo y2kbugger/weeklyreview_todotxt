@@ -8,7 +8,7 @@
 {% block subheader %}All checklists{% endblock %}
 
 {% block content %}
-<ul>
+<ul id="index-list">
   {% for project in top_level_projects %}
   <li>
     <a href="{{ request.url_for('checklist', project_name=project.name) }}">{{ project.name }}</a>

@@ -80,3 +80,7 @@ ul {
     max-width: fit-content;
   }
 }
+
+ul#index-list {
+  padding-left: 2em;
+}
