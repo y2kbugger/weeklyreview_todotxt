@@ -47,7 +47,10 @@
     </ul>
 
     {% for subproject_listview in listview.subproject_views() %}
-    <h2 class="subproject">{{ subproject_listview.project.name[listview.project.name|length:][1:] | replace('_', ') ')}} </h2>
+    <h2 class="subproject"
+      _="on click go to url `/checklist/{{subproject_listview.project.name}}`">
+      {{ subproject_listview.project.name[listview.project.name|length:][1:] | replace('_', ') ')}}
+    </h2>
     <ul class="incomplete">
       {{ checkitems(subproject_listview.incomplete) }}
       {{ add_subproject_item(subproject_listview.project) }}
