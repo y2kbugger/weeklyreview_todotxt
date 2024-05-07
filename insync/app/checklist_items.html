@@ -34,7 +34,8 @@
     enterkeyhint="send" />
 </li>
 {% endmacro %}
-<div id="toolbaritems" hx-swap-oob="replace">
+{# TODO: investigate why this has to match the other and say morph instead of outerHTML  #}
+<div id="toolbaritems" hx-swap-oob="morph">
   <span class="undo {% if undoview.undocommand %}enabled{% endif %}" hx-post="/checklist/{{ listview.project.name }}/undoredo/undo">⎌</span>
   <span class="redo {% if undoview.redocommand %}enabled{% endif %}" hx-post="/checklist/{{ listview.project.name }}/undoredo/redo" style="transform: matrix(-1, 0, 0, 1, 0, 0);">⎌</span>
 </div>
@@ -64,4 +65,5 @@
       {{ checkitems(listview.complete|sort(attribute='completion_datetime', reverse=True)) }}
     </ul>
   </section>
+
 </div>
