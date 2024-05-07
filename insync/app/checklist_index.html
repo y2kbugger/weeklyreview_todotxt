@@ -8,6 +8,9 @@
 {% block subheader %}All checklists{% endblock %}
 
 {% block content %}
+<input class="new-item" name="description" value="" placeholder="e.g. camper.winterize, grocery.3_meat, etc."
+  _="on keyup[key is 'Enter'] go to url `/checklist/${me.value}`"
+  enterkeyhint="send" />
 <ul id="index-list">
   {% for project in top_level_projects %}
   <li>
