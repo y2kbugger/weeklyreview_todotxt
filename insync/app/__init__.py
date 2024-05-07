@@ -6,10 +6,10 @@ from logging import getLogger
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
+from starlette.status import HTTP_302_FOUND, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
@@ -57,6 +57,11 @@ def get_ws_list_updater() -> WebSocketListUpdater:
     return app.state.ws_list_updater
 
 
+class NotAuthenticatedException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+
 class ZAuth:
     def __init__(self, valid_principal_names: list[str]):
         self._valid_principal_names = valid_principal_names
@@ -67,11 +72,10 @@ class ZAuth:
             logger.info("No valid_principal_names configured, skipping auth because we are not deployed")
             return
         if x_ms_client_principal_name is None:
-            logger.info("No x-ms-client-principal-name header, not authenticated")
-            raise HTTPException(
-                status_code=HTTP_403_FORBIDDEN,
-                detail="Not authenticated",
-            )
+            msg = "No x-ms-client-principal-name header, not authenticated"
+            logger.info(msg)
+            raise NotAuthenticatedException(msg)
+
         assert len(x_ms_client_principal_name) == 1, "Expected exactly one x-ms-client-principal-name"
         client_principal_name = x_ms_client_principal_name[0]
         if client_principal_name.lower() not in self._valid_principal_names:
@@ -95,6 +99,29 @@ app = FastAPI(
     version="0.1.0",
     dependencies=[Depends(zauth)],
 )
+
+
+@app.exception_handler(NotAuthenticatedException)
+async def authentication_exception_handler(request: Request, exc: NotAuthenticatedException) -> RedirectResponse:
+    # login_hint = "y2kbugger@gmail.com"
+    import pprint
+
+    headers_pretty = pprint.pformat(dict(request.headers))
+    print(f"headers: {headers_pretty}")
+    logger.warning("NotAuthenticatedException: %s", exc.name)
+    logger.warning("Headers: %s", headers_pretty)
+    auth_url = "/.auth/login/google"
+    return JSONResponse(
+        content={"headers": dict(request.headers)},
+        status_code=200,
+    )
+
+    return RedirectResponse(
+        url=auth_url,
+        status_code=HTTP_302_FOUND,
+    )
+
+
 templates = Jinja2Templates(directory="insync/app")
 
 if HOT_RELOAD_ENABLED:
