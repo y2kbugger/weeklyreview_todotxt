@@ -12,7 +12,9 @@
   hx-post="/checklist/{{ project.name }}/new"
   hx-on::after-request="if(event.detail.successful) this.value=''"
   enterkeyhint="send" />
-<div hx-ext="ws" ws-connect="/ws/checklist/{{ project.name }}?renderer_name=checklist" ws-reconnect="true" hx-swap="morph">
+<div hx-ext="ws"
+  ws-connect="/ws/checklist/{{ project.name }}?renderer_name=checklist"
+  ws-reconnect="true">
   <div id="checklist-items">Loading...</div>
 </div>
 {% endblock content %}
