@@ -1,12 +1,11 @@
-# from __future__ import annotations
-
 import os
+from collections.abc import Awaitable, Callable
 from contextlib import asynccontextmanager
 from logging import getLogger
 from typing import Annotated
 
 from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response, WebSocket
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.status import HTTP_302_FOUND, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
@@ -58,8 +57,8 @@ def get_ws_list_updater() -> WebSocketListUpdater:
 
 
 class NotAuthenticatedException(Exception):
-    def __init__(self, lastlogin_client_principal: str | None = None):
-        self.lastlogin_client_principal = lastlogin_client_principal
+    def __init__(self, lastlogin_client_principal_name: str | None = None):
+        self.lastlogin_client_principal_name = lastlogin_client_principal_name
 
 
 class ZAuth:
@@ -68,10 +67,8 @@ class ZAuth:
 
     async def __call__(
         self,
-        request: Request,
-        response: Response,
         x_ms_client_principal_name: Annotated[list[str] | None, Header()] = None,
-        lastlogin_client_principal: Annotated[str | None, Cookie()] = None,
+        lastlogin_client_principal_name: Annotated[str | None, Cookie()] = None,
     ) -> None:
         if len(self._valid_principal_names) == 0:
             assert x_ms_client_principal_name is None, "Ensure we are not deployed, we don't want open access to prod"
@@ -79,7 +76,7 @@ class ZAuth:
             return
         if x_ms_client_principal_name is None:
             logger.info("No x-ms-client-principal-name header, not authenticated")
-            raise NotAuthenticatedException(lastlogin_client_principal)
+            raise NotAuthenticatedException(lastlogin_client_principal_name)
 
         assert len(x_ms_client_principal_name) == 1, "Expected exactly one x-ms-client-principal-name"
         client_principal_name = x_ms_client_principal_name[0]
@@ -91,12 +88,11 @@ class ZAuth:
             )
 
         logger.info("authorized client_principal_name %s", client_principal_name)
-        response.set_cookie("lastlogin_client_principal", client_principal_name, max_age=60 * 60 * 24 * 365 * 10, secure=True, httponly=True, samesite="strict")
 
 
-emails = os.environ.get("INSYNC_VALID_PRINCIPAL_NAMES", "").split(",")
-emails = [email.strip().lower() for email in emails if email.strip() != '']
-zauth = ZAuth(valid_principal_names=emails)
+INSYNC_VALID_PRINCIPAL_NAMES = os.environ.get("INSYNC_VALID_PRINCIPAL_NAMES", "").split(",")
+INSYNC_VALID_PRINCIPAL_NAMES = [name.strip().lower() for name in INSYNC_VALID_PRINCIPAL_NAMES if name.strip() != '']
+zauth = ZAuth(valid_principal_names=INSYNC_VALID_PRINCIPAL_NAMES)
 
 app = FastAPI(
     lifespan=_lifespan,
@@ -105,6 +101,20 @@ app = FastAPI(
     version="0.1.0",
     dependencies=[Depends(zauth)],
 )
+
+
+@app.middleware("http")
+async def add_lastlogin_client_principal_name_cookie(
+    request: Request,
+    call_next: Callable[[Request], Awaitable[Response]],
+) -> Response:
+    client_principal_name = request.headers.get("x-ms-client-principal-name")
+
+    response = await call_next(request)
+
+    if client_principal_name is not None:
+        response.set_cookie("lastlogin_client_principal_name", client_principal_name, max_age=60 * 60 * 24 * 365 * 10, secure=True, httponly=True, samesite="strict")
+    return response
 
 
 @app.exception_handler(NotAuthenticatedException)
