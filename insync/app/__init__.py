@@ -120,6 +120,8 @@ async def add_lastlogin_client_principal_name_cookie(
 @app.exception_handler(NotAuthenticatedException)
 async def authentication_exception_handler(request: Request, exc: NotAuthenticatedException) -> RedirectResponse:
     auth_url = "/.auth/login/google"
+    if exc.lastlogin_client_principal_name is not None:
+        auth_url += f"?login_hint={exc.lastlogin_client_principal_name}"
     return RedirectResponse(
         url=auth_url,
         status_code=HTTP_302_FOUND,
