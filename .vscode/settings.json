@@ -26,4 +26,6 @@
   "html.format.wrapAttributes": "preserve",
   "html.format.preserveNewLines": true,
   "html.format.wrapLineLength": 0,
+  "terminal.integrated.middleClickBehavior": "paste",
+  "python.terminal.activateEnvironment": true,
 }
