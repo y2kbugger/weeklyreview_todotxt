@@ -124,6 +124,7 @@ async def authentication_exception_handler(request: Request, exc: NotAuthenticat
         auth_url += f"?login_hint={exc.lastlogin_client_principal_name}"
     return RedirectResponse(
         url=auth_url,
+        headers={"Referer": "https://insync.kohlereclipse.com/checklist/referererer"},
         status_code=HTTP_302_FOUND,
     )
 
