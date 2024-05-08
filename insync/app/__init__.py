@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 from typing import Annotated
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket
+from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response, WebSocket
 from fastapi.responses import JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -58,23 +58,28 @@ def get_ws_list_updater() -> WebSocketListUpdater:
 
 
 class NotAuthenticatedException(Exception):
-    def __init__(self, name: str):
-        self.name = name
+    def __init__(self, lastlogin_client_principal: str | None = None):
+        self.lastlogin_client_principal = lastlogin_client_principal
 
 
 class ZAuth:
     def __init__(self, valid_principal_names: list[str]):
         self._valid_principal_names = valid_principal_names
 
-    async def __call__(self, x_ms_client_principal_name: Annotated[list[str] | None, Header()] = None) -> None:
+    async def __call__(
+        self,
+        request: Request,
+        response: Response,
+        x_ms_client_principal_name: Annotated[list[str] | None, Header()] = None,
+        lastlogin_client_principal: Annotated[str | None, Cookie()] = None,
+    ) -> None:
         if len(self._valid_principal_names) == 0:
             assert x_ms_client_principal_name is None, "Ensure we are not deployed, we don't want open access to prod"
             logger.info("No valid_principal_names configured, skipping auth because we are not deployed")
             return
         if x_ms_client_principal_name is None:
-            msg = "No x-ms-client-principal-name header, not authenticated"
-            logger.info(msg)
-            raise NotAuthenticatedException(msg)
+            logger.info("No x-ms-client-principal-name header, not authenticated")
+            raise NotAuthenticatedException(lastlogin_client_principal)
 
         assert len(x_ms_client_principal_name) == 1, "Expected exactly one x-ms-client-principal-name"
         client_principal_name = x_ms_client_principal_name[0]
@@ -86,6 +91,7 @@ class ZAuth:
             )
 
         logger.info("authorized client_principal_name %s", client_principal_name)
+        response.set_cookie("lastlogin_client_principal", client_principal_name, max_age=60 * 60 * 24 * 365 * 10, secure=True, httponly=True, samesite="strict")
 
 
 emails = os.environ.get("INSYNC_VALID_PRINCIPAL_NAMES", "").split(",")
@@ -103,19 +109,7 @@ app = FastAPI(
 
 @app.exception_handler(NotAuthenticatedException)
 async def authentication_exception_handler(request: Request, exc: NotAuthenticatedException) -> RedirectResponse:
-    # login_hint = "y2kbugger@gmail.com"
-    import pprint
-
-    headers_pretty = pprint.pformat(dict(request.headers))
-    print(f"headers: {headers_pretty}")
-    logger.warning("NotAuthenticatedException: %s", exc.name)
-    logger.warning("Headers: %s", headers_pretty)
     auth_url = "/.auth/login/google"
-    return JSONResponse(
-        content={"headers": dict(request.headers)},
-        status_code=200,
-    )
-
     return RedirectResponse(
         url=auth_url,
         status_code=HTTP_302_FOUND,
