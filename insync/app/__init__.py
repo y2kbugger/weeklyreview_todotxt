@@ -4,11 +4,12 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 from typing import Annotated
 
-from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response, WebSocket
+import uvicorn.config
+from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from starlette.status import HTTP_302_FOUND, HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
+from starlette.status import HTTP_302_FOUND, HTTP_401_UNAUTHORIZED
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
@@ -18,6 +19,7 @@ logger = getLogger(__name__)
 
 HOT_RELOAD_ENABLED = os.getenv("HOT_RELOAD_ENABLED", "True").lower() == "true"
 hot_reload = None
+INSYNC_DEBUG = os.getenv("INSYNC_DEBUG", "False").lower() == "true"
 
 
 @asynccontextmanager
@@ -95,9 +97,24 @@ INSYNC_VALID_PRINCIPAL_NAMES = os.environ.get("INSYNC_VALID_PRINCIPAL_NAMES", ""
 INSYNC_VALID_PRINCIPAL_NAMES = [name.strip().lower() for name in INSYNC_VALID_PRINCIPAL_NAMES if name.strip() != '']
 zauth = ZAuth(valid_principal_names=INSYNC_VALID_PRINCIPAL_NAMES)
 
+
+logging_config = uvicorn.config.LOGGING_CONFIG
+logging_config["loggers"]["insync"] = {
+    "handlers": ["default"],
+    "level": "DEBUG" if INSYNC_DEBUG else "INFO",
+    "propagate": False,
+}
+
+# if INSYNC_DEBUG:
+#     logging_config["loggers"]["uvicorn"]["level"] = "DEBUG"
+#     logging_config["loggers"]["uvicorn.error"]["level"] = "DEBUG"
+#     logging_config["loggers"]["uvicorn.access"]["level"] = "DEBUG"
+
 app = FastAPI(
     lifespan=_lifespan,
-    debug=True,
+    debug=INSYNC_DEBUG,
+    log_level="DEBUG" if INSYNC_DEBUG else "INFO",
+    log_config=logging_config,
     title="InSync",
     version="0.1.0",
     dependencies=[Depends(zauth)],
