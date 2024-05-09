@@ -70,6 +70,7 @@ class ZAuth:
         x_ms_client_principal_name: Annotated[list[str] | None, Header()] = None,
         lastlogin_client_principal_name: Annotated[str | None, Cookie()] = None,
     ) -> None:
+        print("authing lolololol ZAuth.__call__")
         if len(self._valid_principal_names) == 0:
             assert x_ms_client_principal_name is None, "Ensure we are not deployed, we don't want open access to prod"
             logger.info("No valid_principal_names configured, skipping auth because we are not deployed")
