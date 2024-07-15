@@ -44,33 +44,7 @@ testpaths = ["insync"]
 [tool.ruff]
 
 # Exclude a variety of commonly ignored directories.
-exclude = [
-    ".bzr",
-    ".direnv",
-    ".eggs",
-    ".git",
-    ".git-rewrite",
-    ".hg",
-    ".ipynb_checkpoints",
-    ".mypy_cache",
-    ".nox",
-    ".pants.d",
-    ".pyenv",
-    ".pytest_cache",
-    ".pytype",
-    ".ruff_cache",
-    ".svn",
-    ".tox",
-    ".venv",
-    ".vscode",
-    "__pypackages__",
-    "_build",
-    "buck-out",
-    "build",
-    "dist",
-    "node_modules",
-    "site-packages",
-    "venv",
+extend-exclude = [
 ]
 
 # Same as Black.
@@ -79,7 +53,7 @@ indent-width = 4
 
 [tool.ruff.lint]
 select = ["FIX", "TD", "F", "A", "COM", "B", "C4", "E", "U", "ERA", "W1", "W2", "I", "ANN001", "ANN201", "RUF100", "ICN", "SLF", "SIM","PTH","PD","RUF", "ASYNC"]
-ignore = ["TD001", "TD002", "TD003", "SIM105", "PD901"]
+ignore = ["TD001", "TD002", "TD003", "SIM105", "PD901", "PD010", "FIX002", "COM812"]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
 fixable = ["ALL"]
@@ -101,3 +75,7 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 quote-style = "preserve"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
