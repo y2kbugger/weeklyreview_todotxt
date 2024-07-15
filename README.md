@@ -16,7 +16,22 @@ Interactively code with the python API in the `scratch.ipynb` notebook. This sho
 
 Run the webapp (FastAPI) UI
 
-    $ uvicorn insync.app:app --reload --reload-dir insync --reload-include='*.css' --reload-include='*.html
+    $ uvicorn insync.app:app --reload --reload-dir insync --reload-include='*.css' --reload-include='*.html'
+
+# Updating
+## Precommit
+If you need to update the precommit hooks, run the following:
+
+    pre-commit autoupdate
+
+## Poetry deps
+Ensure you have poetry-plugin-up installed
+
+    poetry self add poetry-plugin-up
+
+Then run the following to update all dependencies
+
+    poetry up --latest
 
 # Deployment
 Production startup command should use gunicon with uvicorn, as it is a production ready ASGI server, whearas uvicorn is just a development server.
