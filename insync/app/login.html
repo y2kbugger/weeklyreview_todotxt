@@ -8,6 +8,11 @@
     <button type="submit">Login</button>
   </form>
 
+  <form id="insyncretry">
+    <button type="submit">Retry</button>
+  </form>
+
+
   <script>
     document.getElementById('insynclogin').addEventListener('submit', function (event) {
       event.preventDefault();
@@ -17,6 +22,11 @@
       // redirect to the app
       window.location.href = '/';
 
+    });
+    document.getElementById('insyncretry').addEventListener('submit', function (event) {
+      event.preventDefault();
+      // redirect to the app
+      window.location.href = '/';
     });
   </script>
 </body>
