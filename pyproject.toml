@@ -23,6 +23,8 @@ pandas = "^2.2.2"
 ruff = "^0.3.2"
 pre-commit = "^3.7.0"
 arel = { git = "https://github.com/y2kbugger/arel.git", branch = "asset_reload" }
+ipywidgets = "^8.1.3"
+line-profiler = "^4.1.3"
 
 [tool.poetry.group.prod]
 optional = true
