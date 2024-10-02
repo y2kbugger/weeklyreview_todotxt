@@ -19,7 +19,7 @@ def checklist_index(
     registry: Annotated[ListRegistry, Depends(get_registry)],
 ) -> HTMLResponse:
     root_listview = registry.search(NullListItemProject())
-    top_level_projects = [lv.project for lv in root_listview.subproject_views() if lv.project.project_type == ListItemProjectType.checklist]
+    top_level_projects = [lv.project for lv in root_listview.active.subproject_views() if lv.project.project_type == ListItemProjectType.checklist]
     return templates.TemplateResponse(request, "checklist_index.html", {'top_level_projects': top_level_projects})
 
 
