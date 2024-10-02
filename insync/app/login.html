@@ -1,5 +1,10 @@
+<!DOCTYPE html>
 <html>
 
+<head>
+  <title>Insync</title>
+  <link rel="icon" href="data:,">
+</head>
 
 <body>
   <form id="insynclogin">
@@ -8,23 +13,18 @@
     <button type="submit">Login</button>
   </form>
 
-  <form id="insyncretry">
-    <button type="submit">Retry</button>
-  </form>
-
-
   <script>
     document.getElementById('insynclogin').addEventListener('submit', function (event) {
       event.preventDefault();
       var password = document.getElementById('password').value;
-      // set the password as a secure cookie 400 days from now https only on this domain, samesites=strict
-      document.cookie = 'insyncauthn=' + password + '; expires=' + new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toUTCString() + '; secure; path=/'
-      // redirect to the app
-      window.location.href = '/';
-
-    });
-    document.getElementById('insyncretry').addEventListener('submit', function (event) {
-      event.preventDefault();
+      cookie_parts = []
+      cookie_parts.push('insyncauthn=' + password)
+      cookie_parts.push('expires=' + new Date(Date.now() + 400 * 24 * 60 * 60 * 1000).toUTCString()) // 400 days
+      cookie_parts.push('path=/') // only send the cookie on the app path
+      cookie_parts.push('samesite=strict') // do not send the cookie on cross-site requests
+      cookie_parts.push('secure') // only send the cookie over https
+      // cookie_parts.push('httponly') // do not allow javascript to access the cookie
+      document.cookie = cookie_parts.join('; ')
       // redirect to the app
       window.location.href = '/';
     });
