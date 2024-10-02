@@ -33,8 +33,9 @@ def reg(item: ListItem) -> ListRegistry:
     return _reg
 
 
-def test_registry_can_return_view(reg: ListRegistry) -> None:
+def test_registry_can_return_view(reg: ListRegistry, item: ListItem) -> None:
     view = reg.search(project=NullListItemProject())
+    assert item in view
     assert isinstance(view, ListView)
 
 
