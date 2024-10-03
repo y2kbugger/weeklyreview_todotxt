@@ -81,5 +81,17 @@ div#completed-toolbar {
 }
 
 ul#index-list {
-  padding-left: 2em;
+  padding-left: 1em;
+  font-size: 1.2em;
+
+  li {
+    &.sub-item {
+      margin: 0;
+      padding: 0;
+      margin-left: 2em;
+      font-size: .7em;
+      opacity: .6;
+      list-style-type: circle;
+    }
+  }
 }

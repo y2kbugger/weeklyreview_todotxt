@@ -12,10 +12,15 @@
   _="on keyup[key is 'Enter'] go to url `/checklist/${me.value}`"
   enterkeyhint="send" />
 <ul id="index-list">
-  {% for project in top_level_projects %}
+  {% for lv in checklist_listview.subproject_views() %}
   <li>
-    <a href="{{ request.url_for('checklist', project_name=project.name) }}">{{ project.name }}</a>
+    <a href="{{ request.url_for('checklist', project_name=lv.project.name) }}">{{ lv.project.name }}</a>
   </li>
+  {% for sub_lv in lv.subproject_views() %}
+  <li class="sub-item">
+    <a href="{{ request.url_for('checklist', project_name=sub_lv.project.name) }}">{{ sub_lv.project.name }}</a>
+  </li>
+  {% endfor %}
   {% endfor %}
 </ul>
 {% endblock content %}

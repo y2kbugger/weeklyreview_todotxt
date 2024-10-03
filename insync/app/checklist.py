@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 
 from insync.app.ws_list_updater import WebSocketListUpdater
 from insync.db import ListDB
-from insync.listitem import ListItem, ListItemProject, ListItemProjectType, NullListItemProject
+from insync.listitem import ListItem, ListItemProject, ListItemProjectType
 from insync.listregistry import ChecklistResetCommand, CompletionCommand, CreateCommand, ListRegistry, RecurringCommand, UndoView
 from insync.listview import ListView
 from insync.renderer import Renderer
@@ -18,9 +18,9 @@ def checklist_index(
     request: Request,
     registry: Annotated[ListRegistry, Depends(get_registry)],
 ) -> HTMLResponse:
-    root_listview = registry.search(NullListItemProject())
-    top_level_projects = [lv.project for lv in root_listview.active.subproject_views() if lv.project.project_type == ListItemProjectType.checklist]
-    return templates.TemplateResponse(request, "checklist_index.html", {'top_level_projects': top_level_projects})
+    checklist_listview = registry.search(ListItemProject("", ListItemProjectType.checklist))
+    checklist_listview = checklist_listview.active
+    return templates.TemplateResponse(request, "checklist_index.html", {'checklist_listview': checklist_listview})
 
 
 @app.post("/checklist/{project_name}/undoredo/{undo_or_redo}")
