@@ -21,7 +21,7 @@ def post_login(token: Annotated[str, Form()]) -> RedirectResponse:
         path="/",
         secure=True,
         httponly=True,
-        samesite="strict",
+        samesite="lax",  # Safe as long as CORS is not enabled
     )
     return response
 
