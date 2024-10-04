@@ -1,3 +1,4 @@
+import hashlib
 from logging import getLogger
 
 from fastapi.responses import RedirectResponse
@@ -6,6 +7,10 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from insync import AUTHS
 
 logger = getLogger(__name__)
+
+
+def hash_token(password: str) -> str:
+    return hashlib.sha256((password).encode()).hexdigest()
 
 
 class AuthMiddleware:
@@ -40,7 +45,7 @@ class AuthMiddleware:
         user = None
         if insyncauthn is not None:
             for u, tok in AUTHS:
-                if insyncauthn == tok:
+                if insyncauthn == hash_token(tok):
                     user = u
                     break
 
