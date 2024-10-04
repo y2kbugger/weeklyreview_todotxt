@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.templating import Jinja2Templates
 from jinja2 import Environment, PackageLoader, StrictUndefined
 from starlette.middleware import Middleware
+from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 from insync import DB_STR, HOT_RELOAD_ENABLED, __githash__
 from insync.app.auth_middleware import AuthMiddleware
@@ -62,6 +63,11 @@ env.globals["githash"] = __githash__
 add_jinja_filters_to_env(env)
 templates = Jinja2Templates(env=env)
 
+middleware = []
+if not HOT_RELOAD_ENABLED:
+    middleware.append(Middleware(HTTPSRedirectMiddleware))
+
+middleware.append(Middleware(AuthMiddleware))
 
 app = FastAPI(
     lifespan=_lifespan,
@@ -69,7 +75,7 @@ app = FastAPI(
     title="InSync",
     version="0.1.0",
     dependencies=[],
-    middleware=[Middleware(AuthMiddleware)],  # type: ignore
+    middleware=middleware,
 )
 
 if HOT_RELOAD_ENABLED:

@@ -1,8 +1,7 @@
 from logging import getLogger
 
-from fastapi import FastAPI
 from fastapi.responses import RedirectResponse
-from starlette.types import Receive, Scope, Send
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from insync import AUTHS
 
@@ -10,7 +9,7 @@ logger = getLogger(__name__)
 
 
 class AuthMiddleware:
-    def __init__(self, app: FastAPI):
+    def __init__(self, app: ASGIApp):
         self.app = app
 
     @staticmethod
