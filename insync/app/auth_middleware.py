@@ -47,22 +47,20 @@ class AuthMiddleware:
 
         logger.warning(f"{path=}, {insyncauthn=}, {user=}")
         match (path, insyncauthn, user):
+            case ("/login", _, None):
+                logger.warning("Hitting login page, and not logged in")
+                # login page is the only page that can be accessed without a token
+                asgi_next = self.app
+            case ("/login", _, user):
+                # hitting login page, but already logged in
+                logger.warning(f"hitting login page but already logged in {user}")
+                asgi_next = RedirectResponse(url='/', status_code=302)
             case (_, None, None):
                 logger.warning("No insyncauthn cookie")
                 asgi_next = RedirectResponse(url="/login", status_code=302)
             case (_, _, None):
                 logger.warning(f"insyncauthn doesn't match an account {insyncauthn}")
                 asgi_next = RedirectResponse(url="/login", status_code=302)
-            case ("/login", _, user):
-                # hitting login page, but already logged in
-                logger.warning(f"hitting login page but already logged in {user}")
-                headers = dict(scope.get("headers", []))
-                referer = headers.get(b"referer", b"/")
-                asgi_next = RedirectResponse(url=referer.decode("utf-8"), status_code=302)
-            case ("/login", _, _):
-                logger.warning("Hitting login page, and not logged in")
-                # login page is the only page that can be accessed without a token
-                asgi_next = self.app
             case (_, _, user):
                 logger.warning(f"user is authenticated {user}")
                 # user is authenticated
