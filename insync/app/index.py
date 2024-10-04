@@ -5,4 +5,4 @@ from . import app
 
 @app.get("/")
 def index() -> RedirectResponse:
-    return RedirectResponse("/checklist")
+    return RedirectResponse("/checklist", status_code=302)
