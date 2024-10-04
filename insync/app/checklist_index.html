@@ -1,6 +1,6 @@
 {% extends "common/layout.html" %}
 {% block style %}
-<link rel="stylesheet" href="{{ request.url_for('static', path='/checklist.css') }}" />
+<link rel="stylesheet" href="{{ request.url_for('static', path='/checklist.css') | githash }}" />
 {% endblock style %}
 
 {% block title %}Checklists{% endblock %}

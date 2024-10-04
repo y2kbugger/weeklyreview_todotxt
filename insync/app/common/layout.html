@@ -7,12 +7,12 @@
 
   <title>{% block title required%}{% endblock %}</title>
 
-  <link rel="icon" type="image/png" sizes="16x16" href="{{ request.url_for('static', path='/common/favicon-16x16.png') }}">
-  <link rel="icon" type="image/png" sizes="32x32" href="{{ request.url_for('static', path='/common/favicon-32x32.png') }}">
-  <link rel="manifest" href="{{ request.url_for('static', path='/common/site.webmanifest') }}" crossorigin="use-credentials">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ request.url_for('static', path='/common/favicon-16x16.png') | githash }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ request.url_for('static', path='/common/favicon-32x32.png') | githash }}">
+  <link rel="manifest" href="{{ request.url_for('static', path='/common/site.webmanifest') | githash }}" crossorigin="use-credentials">
 
-  <link rel="stylesheet" href="{{ request.url_for('static', path='/common/pico.min.css') }}" />
-  <link rel="stylesheet" href="{{ request.url_for('static', path='/common/layout.css') }}" />
+  <link rel="stylesheet" href="{{ request.url_for('static', path='/common/pico.min.css') | githash }}" />
+  <link rel="stylesheet" href="{{ request.url_for('static', path='/common/layout.css') | githash }}" />
 
   {% block style %}
   {% endblock style %}
@@ -20,7 +20,7 @@
   <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
   <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
-  <script src="{{ request.url_for('static', path='/common/_hyperscript.min.js') }}"></script>
+  <script src="{{ request.url_for('static', path='/common/_hyperscript.min.js') | githash }}"></script>
   {% block script %}
   {% endblock script %}
 
@@ -33,7 +33,7 @@
   <header>
     <div id="toolbar">
       <a id="logo" href="{{ url_for('index') }}">
-        <img src="{{ url_for('static', path='/common/android-chrome-192x192.png') }}" />
+        <img src="{{ url_for('static', path='/common/android-chrome-192x192.png') | githash }}" />
       </a>
       <hgroup>
         <h1>{% block header %}{% endblock %}</h1>
