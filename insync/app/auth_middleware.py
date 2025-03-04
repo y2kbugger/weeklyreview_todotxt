@@ -49,7 +49,7 @@ class AuthMiddleware:
                     user = u
                     break
 
-        logger.warning(f"{path=}, {insyncauthn=}, {user=}")
+        logger.debug(f"{path=}, {insyncauthn=}, {user=}")
         match (path, insyncauthn, user):
             case ("/login", _, None):
                 logger.warning("Hitting login page, and not logged in")
@@ -63,10 +63,10 @@ class AuthMiddleware:
                 logger.warning("No insyncauthn cookie")
                 asgi_next = RedirectResponse(url="/login", status_code=302)
             case (_, _, None):
-                logger.warning(f"insyncauthn doesn't match an account {insyncauthn}")
+                logger.warning(f"insyncauthn doesn't match an account {user}")
                 asgi_next = RedirectResponse(url="/login", status_code=302)
             case (_, _, user):
-                logger.warning(f"user is authenticated {user}")
+                logger.debug(f"user is authenticated {user}")
                 # user is authenticated
                 assert user is not None, "User should not be None here, just in case a mistaken code change in the future might break this guarentee."
                 scope["user"] = user
