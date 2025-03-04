@@ -1,7 +1,7 @@
 # Quickstart
 Use poetry to install the dependencies:
 
-    $ poetry install
+    $ poetry install --with dev
 
 Install pre-commit hooks:
 
@@ -19,22 +19,31 @@ Run the webapp (FastAPI) UI
     $ uvicorn insync.app:app --reload --reload-dir insync --reload-include='*.css' --reload-include='*.html'
 
 # Updating
-## Precommit
-If you need to update the precommit hooks, run the following:
+### System Poetry itself
 
-    pre-commit autoupdate
+    poetry self update
 
-## Poetry deps
+### Poetry deps
 Ensure you have poetry-plugin-up installed
 
     poetry self add poetry-plugin-up
 
-Then run the following to update all dependencies
+Then run the following to update all dependencies in the pyproject.toml file
 
-    poetry up --latest
+    poetry up --latest --preserve-wildcard
+
+Then run the following to update the lock file
+
+    poetry update
+
+### Precommit
+If you need to update the precommit hooks, run the following:
+
+    pre-commit autoupdate
 
 # Deployment
 Production startup command should use gunicon with uvicorn, as it is a production ready ASGI server, whearas uvicorn is just a development server.
+NOTE: this is not true anymore, uvicorn is production ready now.
 
   $ gunicorn -w 1 -k uvicorn.workers.UvicornWorker insync.app:app
 
@@ -43,11 +52,16 @@ To see what is running in the deployed file environment, start up a python file 
   $ python -m http.server 8000
 
 # WIP
-- I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
-  - Undo must be scoped to only current project
-  - want to explain to user what will be undone
-  - want to explain to user what will be redone
-  - want a visual indicator of whether an undo is available
+- Drop Todo.txt requirement
+- Normalize project names in the db
+- Make projects archivable, not items
+- items should not be archivable, but rather we just hide all but last 10 completed items or so
+- Eliminate hierarchy of projects, just use a single project name, with one layer of sections
+- No unpersisted undos
+  - either don't to undos, or do them in the db
+  - maybe an easier way would be one row per "undoable" change unit, and compose those into a single undoable action for complex changes like reset/complete section
+- easy way to sync state from production.
+  - maybe set up lightstream just in case and use this to refresh devlocal
 
 
 # Bugs
@@ -126,6 +140,12 @@ To see what is running in the deployed file environment, start up a python file 
 - I want a list type that doesn't have the concept of required completion, but as a reference. e.g. places to eat. vacation spot. These don't end up in up in reviews, but can be referenced specifically.
 
 ## System
+- I want an easy way to undo an accidental action e.g. reset, completion so that I can quickly recover from mistakes.
+  - Undo must be scoped to only current list/project
+  - Undo must be scoped to only the current user
+  - want to explain to user what will be undone
+  - want to explain to user what will be redone
+  - want a visual indicator of whether an undo is available
 - todo.txt constructors so that I can write writetests more concisely, and restore from todo.txt format
 - I want to view list of archived lists so that I can reference historical lists
   - an archived list is a list has only archived items
