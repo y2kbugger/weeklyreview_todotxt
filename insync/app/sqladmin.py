@@ -7,6 +7,17 @@ from insync.db import ListDB
 
 from . import app, get_db, templates
 
+@app.post("/reload", response_class=HTMLResponse)
+def reload(request: Request) -> HTMLResponse:
+    def _inplace_replace_dataclass(old_obj, new_obj):
+        from dataclasses import fields
+        if type(old_obj) is not type(new_obj):
+            raise ValueError("Both objects must be of the same type.")
+        for field in fields(old_obj):
+            setattr(old_obj, field.name, getattr(new_obj, field.name))
+    new_registry = app.state.db.load()
+    _inplace_replace_dataclass(request.app.state.registry, new_registry)
+    return HTMLResponse(content="Reloaded")
 
 @app.get("/sqladmin", response_class=HTMLResponse)
 def get_sqladmin(request: Request) -> HTMLResponse:

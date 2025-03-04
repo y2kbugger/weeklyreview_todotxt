@@ -12,6 +12,8 @@
 
 <div id="results">
 </div>
+
+
 <pre>
 CREATE TABLE IF NOT EXISTS list (
     uuid UUIDLE PRIMARY KEY,
@@ -25,4 +27,10 @@ CREATE TABLE IF NOT EXISTS list (
     recurring BOOLEAN
     )
 </pre>
+<form>
+<button class='outline secondary' hx-post="/reload" hx-target="#results" >
+Reload ListRegistry from DB
+</button>
+</form>
+
 {% endblock content %}
