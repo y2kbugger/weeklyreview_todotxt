@@ -19,7 +19,8 @@
 
   <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
-  <script src="https://unpkg.com/idiomorph/dist/idiomorph-ext.min.js"></script>
+  <script src="https://unpkg.com/idiomorph@0.6.0/dist/idiomorph-ext.js"></script>
+
   <script src="{{ request.url_for('static', path='/common/_hyperscript.min.js') | githash }}"></script>
   {% block script %}
   {% endblock script %}
