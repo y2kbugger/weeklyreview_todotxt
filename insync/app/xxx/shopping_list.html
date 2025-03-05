@@ -1,0 +1,18 @@
+{% extends "common/layout.html" %}
+{% block style %}
+{% endblock style %}
+
+{% block title %}{{ mylist.name }} - Shopping{% endblock %}
+{% block header %}{{ mylist.name }}{% endblock %}
+{% block subheader %}Shopping{% endblock %}
+
+{% block content %}
+{% for section, items in section_items.items() %}
+<h2>{{ section.title }}</h2>
+<ul>
+  {% for item in items %}
+  <li>{{ item.txt }}</li>
+  {% endfor %}
+</ul>
+{% endfor %}
+{% endblock content %}

@@ -90,4 +90,4 @@ if HOT_RELOAD_ENABLED:
 
 app.mount("/static", lol := StaticFilesWithWhitelist("insync/app/", ['css', 'js', 'svg', 'png', 'ico', 'css.map', 'webmanifest']), name='static')
 
-from . import index, sqladmin, ws, checklist, todotxt, login  # noqa endpoint imports
+from . import index, sqladmin, ws, checklist, todotxt, login, xxx  # noqa endpoint imports
