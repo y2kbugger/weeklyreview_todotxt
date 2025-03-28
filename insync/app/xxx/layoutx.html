@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-US" data-theme="dark">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+
+  <title>{% block title required%}{% endblock %}</title>
+
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ request.url_for('static', path='/common/favicon-16x16.png') | githash }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ request.url_for('static', path='/common/favicon-32x32.png') | githash }}">
+  <link rel="manifest" href="{{ request.url_for('static', path='/common/site.webmanifest') | githash }}" crossorigin="use-credentials">
+
+  <link rel="stylesheet" href="{{ request.url_for('static', path='/common/pico.min.css') | githash }}" />
+  <link rel="stylesheet" href="{{ request.url_for('static', path='/xxx/layoutx.css') | githash }}" />
+
+  {% block style %}
+  {% endblock style %}
+
+  <script src="https://unpkg.com/htmx.org@2.0.4" integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/htmx-ext-ws@2.0.2" integrity="sha384-vuKxTKv5TX/b3lLzDKP2U363sOAoRo5wSvzzc3LJsbaQRSBSS+3rKKHcOx5J8doU" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/idiomorph@0.7.3" integrity="sha384-JcorokHTL/m+D6ZHe2+yFVQopVwZ+91GxAPDyEZ6/A/OEPGEx1+MeNSe2OGvoRS9" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/idiomorph@0.7.3/dist/idiomorph-ext.min.js" integrity="sha384-szktAZju9fwY15dZ6D2FKFN4eZoltuXiHStNDJWK9+FARrxJtquql828JzikODob" crossorigin="anonymous"></script>
+
+  <script src="https://unpkg.com/hyperscript.org@0.9.14" crossorigin="anonymous"></script>
+
+  {% block script %}
+  {% endblock script %}
+
+  {% if hot_reload is defined %}
+  {{ hot_reload.script(url_for('hot-reload')) | safe }}
+  {% endif %}
+</head>
+
+<body class="container" hx-ext="morph"
+  _="
+  on keydown(key)
+
+    if (key == 'Enter')
+      halt the event
+      event.target.blur()
+    else if (key == 'Escape')
+      halt the event
+      set event.target.innerText to event.target.dataset.originaltxt
+      event.target.blur()
+    end
+  ">
+  <header>
+    <div id="toolbar">
+      <hgroup>
+        <h1>{% block header %}{% endblock %}</h1>
+        <p>{% block subheader %}{% endblock %}</p>
+      </hgroup>
+  </header>
+  <main>
+    {% block content required %}
+    {% endblock content %}
+  </main>
+</body>
+
+</html>

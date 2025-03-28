@@ -1,17 +1,27 @@
-{% extends "common/layout.html" %}
+{% extends "layoutx.html" %}
 {% block style %}
+<link rel="stylesheet" href="{{ request.url_for('static', path='xxx/shopping_list.css') | githash }}" />
 {% endblock style %}
 
-{% block title %}{{ mylist.name }} - Shopping{% endblock %}
+{% block title %}{{ mylist.name }} - {{mylist.listtype.codename}} {% endblock %}
 {% block header %}{{ mylist.name }}{% endblock %}
-{% block subheader %}Shopping{% endblock %}
+{% block subheader %}{{mylist.listtype.codename}}{% endblock %}
 
 {% block content %}
 {% for section, items in section_items.items() %}
-<h2>{{ section.title }}</h2>
-<ul>
+<ul class="list">
+  <li class="section-title">{{ section.title }}</li>
   {% for item in items %}
-  <li>{{ item.txt }}</li>
+  {% block listitem scoped %}
+  <li class="list-item"
+    hx-put="{{ request.url_for('update_item', item_id=item.id) }}"
+    hx-trigger="blur"
+    hx-swap="outerHTML"
+    hx-target="this"
+    hx-vals='js:{"txt": event.target.innerText}'
+    contenteditable="true"
+    data-originaltxt="{{ item.txt }}">{{ item.txt }}</li>
+  {% endblock listitem %}
   {% endfor %}
 </ul>
 {% endfor %}

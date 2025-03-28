@@ -747,6 +747,25 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jinja2-fragments"
+version = "1.8.0"
+description = "Render Jinja2 template block as HTML page fragments on Python web frameworks."
+optional = false
+python-versions = "*"
+groups = ["main"]
+files = [
+    {file = "jinja2_fragments-1.8.0-py3-none-any.whl", hash = "sha256:7b8b1439506f1163dba289869b1cedbf0bea3d9c079d27d6a036ccbf1f04fcec"},
+    {file = "jinja2_fragments-1.8.0.tar.gz", hash = "sha256:d1533348f793c8538163162b59531e07076fd389e65374fc3c050cba6a02324b"},
+]
+
+[package.dependencies]
+jinja2 = ">=3.1.0"
+
+[package.extras]
+dev = ["pre-commit"]
+tests = ["fastapi", "flask (>=2.1.0)", "litestar[standard]", "pytest", "pytest_asyncio", "quart (>=0.18.0)", "sanic", "sanic_ext", "sanic_testing", "starlette[full]"]
+
+[[package]]
 name = "jupyter-client"
 version = "8.6.3"
 description = "Jupyter protocol implementation and client libraries"
@@ -2578,4 +2597,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13.0"
-content-hash = "ce4eb3d0c5abc6b0cffba4a60aaddeae0086c55a54082f6f41ac153e26b282ff"
+content-hash = "45b11a6e52cb4a18642d09e29c2337c2d8e6dd9ffd052cf926dab5ca3fba8508"

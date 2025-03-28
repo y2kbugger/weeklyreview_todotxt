@@ -2,23 +2,22 @@ from contextlib import asynccontextmanager
 from logging import getLogger
 
 from fastapi import FastAPI
-from fastapi.templating import Jinja2Templates
-from jinja2 import Environment, PackageLoader, StrictUndefined
 from starlette.middleware import Middleware
 from starlette.middleware.httpsredirect import HTTPSRedirectMiddleware
 
-from insync import DB_STR, HOT_RELOAD_ENABLED, __githash__
+from insync import DB_STR, HOT_RELOAD_ENABLED
 from insync.app.auth_middleware import AuthMiddleware
-from insync.app.jinja_filters import add_jinja_filters_to_env
+from insync.app.jinja_templates import templates_for_package
 from insync.app.staticfilewhitelist import StaticFilesWithWhitelist
 from insync.app.ws_list_updater import WebSocketListUpdater
+from insync.app.xxx import router as xxx_router
 from insync.db import ListDB
 from insync.listregistry import ListRegistry
 
 logger = getLogger(__name__)
 
-
 hot_reload = None
+templates = templates_for_package("insync.app")
 
 
 @asynccontextmanager
@@ -57,12 +56,6 @@ def get_ws_list_updater() -> WebSocketListUpdater:
     return app.state.ws_list_updater
 
 
-loader = PackageLoader("insync.app", "")
-env = Environment(loader=loader, autoescape=False, undefined=StrictUndefined)
-env.globals["githash"] = __githash__
-add_jinja_filters_to_env(env)
-templates = Jinja2Templates(env=env)
-
 middleware = []
 if not HOT_RELOAD_ENABLED:
     middleware.append(Middleware(HTTPSRedirectMiddleware))
@@ -85,9 +78,11 @@ if HOT_RELOAD_ENABLED:
 
     hot_reload = arel.HotReload(paths=[arel.Path("insync")])
     app.add_websocket_route("/hot-reload", route=hot_reload, name="hot-reload")  # type: ignore
-    env.globals["hot_reload"] = hot_reload
+    templates.env.globals["hot_reload"] = hot_reload
 
 
 app.mount("/static", lol := StaticFilesWithWhitelist("insync/app/", ['css', 'js', 'svg', 'png', 'ico', 'css.map', 'webmanifest']), name='static')
+
+app.include_router(xxx_router)
 
 from . import index, sqladmin, ws, checklist, todotxt, login, xxx  # noqa endpoint imports

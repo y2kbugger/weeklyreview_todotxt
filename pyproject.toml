@@ -16,6 +16,7 @@ python-multipart = "^0.0.20"
 uvicorn = {extras = ["standard"], version = "^0.34.0"}
 uvloop = "^0.21.0"
 micro-namedtuple-sqlite-persister = {git = "https://github.com/y2kbugger/tuplesaver.git"}
+jinja2-fragments = "^1.8.0"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
