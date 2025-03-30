@@ -19,15 +19,10 @@
     hx-vals='js:{"txt": event.target.innerText}'
     hx-swap="none"
     contenteditable="true"
+    data-id="{{ item.id }}"
     data-originaltxt="{{ item.txt }}">{{ item.txt }}</li>
   {% endblock listitem %}
   {% endfor %}
-  <li class="list-item new-item"
-    hx-post="{{ request.url_for('create_item_after') }}"
-    hx-trigger="click"
-    hx-swap="beforebegin"
-    hx-target="this"
-    hx-vals='{"after_item_id": {{ items[-1].id }}}'>&nbsp;+</li>
 </ul>
 {% endfor %}
 {% endblock content %}
