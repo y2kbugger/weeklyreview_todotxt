@@ -1,11 +1,14 @@
+@import url('https://fonts.googleapis.com/css2?family=Homemade+Apple&family=Meow+Script&family=Special+Elite&family=Yellowtail&display=swap');
+
+
 ul.list {
   margin: 0;
   padding: 0;
 
   li {
     &.section-title {
-      font-family: 'lucida handwriting', 'cursive';
-      font-size: 1.4em;
+      font-family: "Homemade Apple", cursive;
+      font-size: 1.3em;
       line-height: 1.4em;
       color: rgb(151, 54, 18);
     }
