@@ -6,10 +6,10 @@ from logging import getLogger
 from pathlib import Path
 from typing import Annotated, NamedTuple
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import HTMLResponse
-from micro_namedtuple_sqlite_persister.persister import Engine
-from micro_namedtuple_sqlite_persister.query2 import select
+from micro_namedtuple_sqlite_persister.persister import Engine, IdNoneError
+from micro_namedtuple_sqlite_persister.query import select
 
 from insync.app.jinja_templates import templates_for_package
 
@@ -127,9 +127,6 @@ def xxxlist(request: Request, engine: EngineDepends, list_name: str) -> HTMLResp
     return templates.TemplateResponse(request, f'{mylist.listtype.codename}_list.html', {"mylist": mylist, "section_items": section_items})
 
 
-from fastapi import Form
-
-
 @router.put("/list/item/{item_id}")
 def update_item(request: Request, engine: EngineDepends, item_id: int, txt: Annotated[str, Form()]) -> HTMLResponse:
     item = engine.get(ListItem, item_id)
@@ -140,3 +137,15 @@ def update_item(request: Request, engine: EngineDepends, item_id: int, txt: Anno
     engine.save(item)
 
     return templates.TemplateBlockResponse(request, f'{item.listsection.list.listtype.codename}_list.html', 'listitem', {"item": item})
+
+
+@router.post('/list/item')
+def create_item_after(request: Request, engine: EngineDepends, after_item_id: Annotated[int, Form()]) -> HTMLResponse:
+    try:
+        after_item = engine.get(ListItem, after_item_id)
+    except IdNoneError:
+        return HTMLResponse(status_code=400, content=f"Section with id {after_item_id} invalid")
+
+    item = engine.save(ListItem(None, '', after_item.listsection))
+
+    return templates.TemplateBlockResponse(request, f'{after_item.listsection.list.listtype.codename}_list.html', 'listitem', {"item": item})
