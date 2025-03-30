@@ -152,3 +152,14 @@ def create_item_after(request: Request, engine: EngineDepends, after_item_id: An
     item = engine.save(ListItem(None, '', after_item.listsection))
 
     return templates.TemplateBlockResponse(request, f'{after_item.listsection.list.listtype.codename}_list.html', 'listitem', {"item": item})
+
+
+@router.delete("/list/item/{item_id}")
+def delete_item(request: Request, engine: EngineDepends, item_id: int) -> HTMLResponse:
+    item = engine.get(ListItem, item_id)
+    if item is None:
+        return HTMLResponse(status_code=404, content=f"Item with id {item_id} not found")
+
+    engine.delete(item)
+
+    return HTMLResponse(status_code=200)
