@@ -1,0 +1,6 @@
+- Complete/Uncomplete
+- Order as first class field
+- reorder from js
+- Add/delete/manage sections
+  - can we use use contextmenu?
+- backups
