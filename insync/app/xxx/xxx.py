@@ -80,9 +80,12 @@ def init_db() -> None:
         groceries = engine.save(List(None, "Grocery", shopping))
 
         section_items = {
-            'produce': ['apples', 'bananas', 'oranges'],
+            'produce': ['apples', 'bananas', 'oranges, not the very large ones, but not the small ones either. Also they should be extra sweet, and heavy (and therefore JUICY 💦 yum!)'],
             'dairy': ['milk', 'cheese', 'butter'],
             'meat': ['beef', 'chicken', 'pork'],
+            'seafood': ['fish', 'shrimp', 'crab'],
+            'bakery': ['bread', 'bagels', 'croissants'],
+            'snacks': ['chips', 'cookies', 'candy'],
         }
 
         for section, items in section_items.items():
