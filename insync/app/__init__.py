@@ -16,7 +16,6 @@ from insync.listregistry import ListRegistry
 
 logger = getLogger(__name__)
 
-hot_reload = None
 templates = templates_for_package("insync.app")
 
 
@@ -31,14 +30,14 @@ async def _lifespan(app: FastAPI):
     app.state.ws_list_updater = WebSocketListUpdater(app.state.registry)
 
     if HOT_RELOAD_ENABLED:
-        assert hot_reload is not None
-        await hot_reload.startup()
+        assert app.state.hot_reload is not None
+        await app.state.hot_reload.startup()
 
     yield
 
     if HOT_RELOAD_ENABLED:
-        assert hot_reload is not None
-        await hot_reload.shutdown()
+        assert app.state.hot_reload is not None
+        await app.state.hot_reload.shutdown()
 
     app.state.db.patch(app.state.registry)
     app.state.db.close()
@@ -76,9 +75,8 @@ if HOT_RELOAD_ENABLED:
 
     logger.warning("Arel Hot reload enabled")
 
-    hot_reload = arel.HotReload(paths=[arel.Path("insync")])
-    app.add_websocket_route("/hot-reload", route=hot_reload, name="hot-reload")  # type: ignore
-    templates.env.globals["hot_reload"] = hot_reload
+    app.state.hot_reload = arel.HotReload(paths=[arel.Path("insync")])
+    app.add_websocket_route("/hot-reload", route=app.state.hot_reload, name="hot-reload")  # type: ignore
 
 
 app.mount("/static", lol := StaticFilesWithWhitelist("insync/app/", ['css', 'js', 'svg', 'png', 'ico', 'css.map', 'webmanifest']), name='static')
