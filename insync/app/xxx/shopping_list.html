@@ -17,6 +17,7 @@
     hx-put="{{ request.url_for('update_item', item_id=item.id) }}"
     hx-trigger="input, change, blur"
     hx-vals='js:{"txt": event.target.innerText}'
+    hx-swap="none"
     contenteditable="true"
     data-originaltxt="{{ item.txt }}">{{ item.txt }}</li>
   {% endblock listitem %}
