@@ -75,7 +75,7 @@ def init_db() -> None:
         return
 
     with engine_context() as engine:
-        shopping = ListType(None, "shopping")
+        shopping = engine.save(ListType(None, "shopping"))
         # recursively save
         groceries = engine.save(List(None, "Grocery", shopping))
 
