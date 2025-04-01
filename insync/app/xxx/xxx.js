@@ -9,6 +9,8 @@ function handleKeyDownFromTxt(event) {
     const listItem = event.target.closest('li.list-item');
     const txt = event.target;
 
+    // Auto-resize is now handled by input event instead of keydown
+
     if (event.key === 'Backspace' && txt.value === '') {
         // Don't delete if there's no listitem before current one
         const prevLi = listItem.previousElementSibling;
@@ -56,10 +58,30 @@ function handleKeyDownFromTxt(event) {
     }
 }
 
+/**
+ * Auto-resize textarea to fit content
+ * @param {HTMLTextAreaElement} textarea - The textarea to resize
+ */
+function autoResizeTextarea(textarea) {
+    // Reset height to auto so scrollHeight doesn't include previous manually set height
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
 // Attach event listeners
 document.addEventListener('DOMContentLoaded', function () {
     const main = document.querySelector('main');
     if (main) {
         main.addEventListener('keydown', handleKeyDownFromTxt);
+
+        // Add input event listener for auto-resizing
+        main.addEventListener('input', function (event) {
+            if (event.target.tagName === 'TEXTAREA' && event.target.closest('li.list-item')) {
+                autoResizeTextarea(event.target);
+            }
+        });
+
+        // Initialize height for all existing textareas
+        document.querySelectorAll('li.list-item textarea').forEach(autoResizeTextarea);
     }
 });
