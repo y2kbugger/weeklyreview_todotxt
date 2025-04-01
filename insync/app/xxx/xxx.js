@@ -1,88 +1,65 @@
 /**
- * Handles backspace key events and triggers a delete request via htmx
- * @param {Event} event - The input event
+ * Handles keydown events for list item textareas
+ * @param {Event} event - The keydown event
  */
-function handleKeyDown(event) {
-    if (event.key === 'Backspace') {
-        if (event.target.tagName === 'LI' && event.target.classList.contains('list-item')) {
-            //## Delete list item on Backspace key press ##//
+function handleKeyDownFromTxt(event) {
+    if (event.target.tagName !== 'TEXTAREA') return;
+    if (!event.target.closest('li.list-item')) return;
 
+    const listItem = event.target.closest('li.list-item');
+    const txt = event.target;
 
-            // dont delete if li has text
-            if (event.target.innerText.trim() != '') { return; }
+    if (event.key === 'Backspace' && txt.value === '') {
+        // Don't delete if there's no listitem before current one
+        const prevLi = listItem.previousElementSibling;
+        if (!prevLi || !prevLi.classList.contains('list-item')) return;
 
-            event.preventDefault();
-
-            // dont delete if it is the only li in ul
-            const ul = event.target.closest('ul');
-            const all_list_items = ul.querySelectorAll('li.list-item');
-            if (all_list_items.length <= 1) { return; }
-
-            const itemId = event.target.dataset.id;
-
-            const prevLi = event.target.previousElementSibling;
-            htmx.ajax('DELETE', `/xxx/list/item/${itemId}`, {
-                target: event.target,
-                event: event,
-                swap: 'delete'
-            }).then(() => {
-                // focus previous li.list-item in ul, with cursor at the end
-                if (prevLi && prevLi.classList.contains('list-item')) {
-                    prevLi.focus();
-
-                    // Place cursor at the end of the editable content
-                    const range = document.createRange();
-                    const selection = window.getSelection();
-                    range.selectNodeContents(prevLi);
-                    range.collapse(false); // false means collapse to end
-                    selection.removeAllRanges();
-                    selection.addRange(range);
-                } else {
-                    // focus the ul if there is no previous li
-                    ul.focus();
-                }
-            });
-        }
-    } else if (event.key === 'Enter') {
-        if (event.target.tagName === 'LI' && event.target.classList.contains('list-item')) {
-            //## Create a new list item on Enter key press ##//
-
-            // if shift is pressed, inssert a \n otherwise create a new li
-            if (event.shiftKey) {
-                return;
-            } else {
-                // prevent default enter behavior
-                event.preventDefault();
+        event.preventDefault();
+        htmx.ajax('DELETE', `/xxx/list/item/${listItem.dataset.id}`, {
+            target: listItem,
+            event: event,
+            swap: 'delete'
+        }).then(() => {
+            // Focus previous textarea in li.list-item, with cursor at the end
+            const prevTxt = prevLi.querySelector('textarea');
+            if (prevTxt) {
+                prevTxt.focus();
+                prevTxt.selectionStart = prevTxt.selectionEnd = prevTxt.value.length;
             }
+        });
+        return;
+    }
 
-            // if li is already a blank line, don't create a new one
-            if (event.target.innerText.trim() === '') { return; }
+    // Handle Enter to create new item
+    if (event.key === 'Enter' && !event.shiftKey) {
+        // Prevent default enter behavior
+        event.preventDefault();
 
-
-            // create a new li.list-item after the current one
-            htmx.ajax('POST', `/xxx/list/item`, {
-                source: event.target,
-                event: event,
-                swap: 'afterend',
-                target: event.target,
-                values: {
-                    after_item_id: event.target.dataset.id,
+        htmx.ajax('POST', `/xxx/list/item`, {
+            source: listItem,
+            event: event,
+            swap: 'afterend',
+            target: listItem,
+            values: {
+                after_item_id: listItem.dataset.id,
+            }
+        }).then(() => {
+            const newLi = listItem.nextElementSibling;
+            if (newLi && newLi.classList.contains('list-item')) {
+                // Focus the new textarea
+                const newTextarea = newLi.querySelector('textarea');
+                if (newTextarea) {
+                    newTextarea.focus();
                 }
-            }).then(() => {
-                newLi = event.target.nextElementSibling;
-                if (newLi && newLi.tagName === 'LI' && newLi.classList.contains('list-item')) {
-                    // focus the new li.list-item
-                    newLi.focus();
-                }
-            });
-        }
+            }
+        });
     }
 }
 
-// Attach the handleKeyDown event listener to the main element
+// Attach event listeners
 document.addEventListener('DOMContentLoaded', function () {
     const main = document.querySelector('main');
     if (main) {
-        main.addEventListener('keydown', handleKeyDown);
+        main.addEventListener('keydown', handleKeyDownFromTxt);
     }
 });

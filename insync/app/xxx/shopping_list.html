@@ -2,6 +2,9 @@
 {% block style %}
 <link rel="stylesheet" href="{{ request.url_for('static', path='xxx/shopping_list.css') | githash }}" />
 {% endblock style %}
+{% block script %}
+<script src="{{ request.url_for('static', path='xxx/xxx.js') | githash }}"></script>
+{% endblock script %}
 
 {% block title %}{{ mylist.name }} - {{mylist.listtype.codename}} {% endblock %}
 {% block header %}{{ mylist.name }}{% endblock %}
@@ -13,14 +16,14 @@
   <li class="section-title">{{ section.title }}</li>
   {% for item in items %}
   {% block listitem scoped %}
-  <li class="list-item"
-    hx-put="{{ request.url_for('update_item', item_id=item.id) }}"
-    hx-trigger="input, change, blur"
-    hx-vals='js:{"txt": event.target.innerText}'
-    hx-swap="none"
-    contenteditable="true"
-    data-id="{{ item.id }}"
-    data-originaltxt="{{ item.txt }}">{{ item.txt }}</li>
+  <li class="list-item" data-id="{{ item.id }}">
+    <textarea
+      name="txt"
+      hx-put="{{ request.url_for('update_item', item_id=item.id) }}"
+      hx-trigger="input changed delay:500ms, change"
+      hx-swap="none"
+      rows="1" spellcheck="false">{{ item.txt }}</textarea>
+  </li>
   {% endblock listitem %}
   {% endfor %}
 </ul>
