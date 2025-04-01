@@ -68,8 +68,140 @@ function autoResizeTextarea(textarea) {
     textarea.style.height = textarea.scrollHeight + 'px';
 }
 
+/**
+ * Setup swipe to delete functionality using Hammer.js
+ */
+function setupSwipeToDelete() {
+    document.querySelectorAll('li.list-item').forEach(setupItemSwipe);
+
+    // Setup mutation observer to handle dynamically added items
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.addedNodes) {
+                mutation.addedNodes.forEach(node => {
+                    if (node.nodeType === 1 && node.matches('li.list-item')) {
+                        setupItemSwipe(node);
+                    }
+                });
+            }
+        });
+    });
+
+    observer.observe(document.querySelector('main'), {
+        childList: true,
+        subtree: true
+    });
+}
+
+/**
+ * Setup swipe for a specific list item
+ * @param {HTMLElement} listItem - The list item element
+ */
+function setupItemSwipe(listItem) {
+    const hammer = new Hammer(listItem);
+
+    // Configure horizontal swipe detection
+    hammer.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
+
+    // Define swipe threshold and variables
+    const SWIPE_THRESHOLD = -80; // Left swipe threshold
+    let currentX = 0;
+    let startX = 0;
+    let isDragging = false;
+
+    // Handle pan start
+    hammer.on('panstart', function (e) {
+        isDragging = true;
+        startX = 0;
+        listItem.classList.add('swiping');
+        listItem.style.transition = '';
+    });
+
+    // Handle panning
+    hammer.on('pan', function (e) {
+        if (!isDragging) return;
+
+        currentX = e.deltaX;
+        // Only allow left swipe
+        if (currentX <= 0) {
+            // Add resistance as user swipes further
+            const distance = Math.min(0, currentX);
+            const opacity = 1 - (Math.abs(distance) / 300);
+
+            listItem.style.transform = `translateX(${distance}px)`;
+            listItem.style.opacity = Math.max(0.7, opacity);
+
+            // Show delete indicator when swiping past threshold
+            if (currentX < SWIPE_THRESHOLD) {
+                listItem.classList.add('swipe-delete-ready');
+            } else {
+                listItem.classList.remove('swipe-delete-ready');
+            }
+        }
+    });
+
+    // Handle pan end
+    hammer.on('panend', function (e) {
+        if (!isDragging) return;
+        isDragging = false;
+
+        listItem.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+        if (currentX < SWIPE_THRESHOLD) {
+            // Swiped far enough - complete the delete action
+            listItem.style.transform = 'translateX(-100%)';
+            listItem.style.opacity = '0';
+
+            // Process deletion after animation
+            setTimeout(() => {
+                try {
+                    htmx.ajax('DELETE', `/xxx/list/item/${listItem.dataset.id}`, {
+                        target: listItem,
+                        swap: 'delete'
+                    }).then(() => {
+                        // Focus previous textarea if exists
+                        const prevLi = listItem.previousElementSibling;
+                        if (prevLi && prevLi.classList.contains('list-item')) {
+                            const prevTxt = prevLi.querySelector('textarea');
+                            if (prevTxt) {
+                                prevTxt.focus();
+                                prevTxt.selectionStart = prevTxt.selectionEnd = prevTxt.value.length;
+                            }
+                        }
+                    }).catch(error => {
+                        console.error('Error deleting item:', error);
+                        // Reset if delete fails
+                        listItem.style.transform = 'translateX(0)';
+                        listItem.style.opacity = '1';
+                    });
+                } catch (err) {
+                    console.error('Error processing delete:', err);
+                    // Reset on error
+                    listItem.style.transform = 'translateX(0)';
+                    listItem.style.opacity = '1';
+                }
+            }, 300);
+        } else {
+            // Not swiped far enough - revert
+            listItem.style.transform = 'translateX(0)';
+            listItem.style.opacity = '1';
+        }
+
+        listItem.classList.remove('swiping', 'swipe-delete-ready');
+    });
+}
+
 // Attach event listeners
 document.addEventListener('DOMContentLoaded', function () {
+    // Load Hammer.js dynamically
+    const hammerScript = document.createElement('script');
+    hammerScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js';
+    hammerScript.onload = function () {
+        // Initialize swipe only after Hammer.js is loaded
+        setupSwipeToDelete();
+    };
+    document.head.appendChild(hammerScript);
+
     const main = document.querySelector('main');
     if (main) {
         main.addEventListener('keydown', handleKeyDownFromTxt);
