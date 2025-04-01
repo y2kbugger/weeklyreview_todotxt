@@ -21,7 +21,6 @@
   "python.testing.pytestEnabled": true,
   "python.analysis.diagnosticMode": "workspace",
   "python.analysis.inlayHints.pytestParameters": true,
-  "python.analysis.typeCheckingMode": "standard",
   "html.format.templating": true,
   "html.format.wrapAttributes": "preserve",
   "html.format.preserveNewLines": true,
